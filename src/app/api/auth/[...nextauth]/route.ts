@@ -51,21 +51,9 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as string;
       }
       return session;
-    },
-    async redirect({ url, baseUrl }) {
-      // Always redirect to /joyspanel after successful login
-      if (url.startsWith(baseUrl)) {
-        return '/joyspanel';
-      }
-      return baseUrl;
     }
-  },
-  session: {
-    strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
   }
 };
 
 const handler = NextAuth(authOptions);
-
 export { handler as GET, handler as POST }; 
