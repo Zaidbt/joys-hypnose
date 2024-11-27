@@ -1,46 +1,52 @@
-import { getCollection } from './mongodb';
-import { BlogPost } from '@/types/blog';
+import clientPromise from './mongodb';
+import { BlogPost, CreateBlogPost } from '@/types/blog';
+import { ObjectId } from 'mongodb';
 
-export async function createBlogPost(post: Omit<BlogPost, 'id' | 'publishedAt'>) {
-  const collection = await getCollection('posts');
-  
-  const newPost = {
+export async function createBlogPost(post: CreateBlogPost) {
+  const client = await clientPromise;
+  const collection = client.db('joyshypnose').collection('posts');
+
+  const postToInsert = {
     ...post,
-    publishedAt: new Date().toISOString()
+    featuredImage: post.featuredImage || '',
+    tags: post.tags || [],
+    author: 'Admin',
+    createdAt: new Date(),
+    updatedAt: new Date()
   };
 
-  const result = await collection.insertOne(newPost);
-  
+  const result = await collection.insertOne(postToInsert);
+
   return {
-    id: result.insertedId.toString(),
-    ...newPost
+    ...postToInsert,
+    _id: result.insertedId.toString()
   };
 }
 
-export async function getAllPosts(): Promise<BlogPost[]> {
-  const collection = await getCollection('posts');
-  
+export async function getBlogPosts() {
+  const client = await clientPromise;
+  const collection = client.db('joyshypnose').collection('posts');
+
   const posts = await collection
-    .find({}, { sort: { publishedAt: -1 } })
-    .asArray();
+    .find({ status: 'published' })
+    .sort({ createdAt: -1 })
+    .toArray();
 
   return posts.map(post => ({
     ...post,
-    id: post._id.toString(),
-    _id: undefined
+    _id: post._id.toString()
   }));
 }
 
-export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
-  const collection = await getCollection('posts');
-  
-  const post = await collection.findOne({ slug });
-  
+export async function getBlogPost(id: string) {
+  const client = await clientPromise;
+  const collection = client.db('joyshypnose').collection('posts');
+
+  const post = await collection.findOne({ _id: new ObjectId(id) });
   if (!post) return null;
 
   return {
     ...post,
-    id: post._id.toString(),
-    _id: undefined
+    _id: post._id.toString()
   };
 } 

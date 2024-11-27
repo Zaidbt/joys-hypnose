@@ -1,3 +1,5 @@
+export type BlogStatus = 'draft' | 'published';
+
 export interface BlogPost {
   _id?: string;
   title: string;
@@ -7,6 +9,7 @@ export interface BlogPost {
   tags: string[];
   author?: string;
   readingTime?: number;
+  status: BlogStatus;
   createdAt: Date;
   updatedAt: Date;
 }

@@ -24,6 +24,7 @@ export default function EditPost() {
     content: '',
     tags: [],
     readingTime: 1,
+    status: 'draft',
     createdAt: new Date(),
     updatedAt: new Date()
   });
@@ -92,7 +93,7 @@ export default function EditPost() {
         },
         body: JSON.stringify({
           ...post,
-          readingTime: parseInt(post.readingTime.toString()) || 1
+          readingTime: post.readingTime ? parseInt(post.readingTime.toString()) : 1
         }),
       });
 

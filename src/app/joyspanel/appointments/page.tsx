@@ -71,9 +71,11 @@ export default function AppointmentsPage() {
       if (!response.ok) throw new Error('Failed to fetch appointments');
       
       const data = await response.json();
-      const sortedAppointments = data.sort((a: TimeSlot, b: TimeSlot) => 
-        new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
-      );
+      const sortedAppointments = data.sort((a: TimeSlot, b: TimeSlot) => {
+        const dateA = new Date(`${a.date}T${a.time}`);
+        const dateB = new Date(`${b.date}T${b.time}`);
+        return dateA.getTime() - dateB.getTime();
+      });
       setAppointments(sortedAppointments);
     } catch (error) {
       console.error('Error fetching appointments:', error);
@@ -176,7 +178,7 @@ export default function AppointmentsPage() {
 
   // Group appointments by date
   const appointmentsByDate = appointments.reduce((acc: { [key: string]: TimeSlot[] }, appointment) => {
-    const dateKey = new Date(appointment.startTime).toDateString();
+    const dateKey = new Date(appointment.date).toDateString();
     if (!acc[dateKey]) {
       acc[dateKey] = [];
     }
@@ -266,22 +268,14 @@ export default function AppointmentsPage() {
                       animate={{ opacity: 1 }}
                     >
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
-                        {new Date(appointment.startTime).toLocaleTimeString('fr-FR', {
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                        {' - '}
-                        {new Date(appointment.endTime).toLocaleTimeString('fr-FR', {
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
+                        {appointment.time}
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
-                        {appointment.clientName || '-'}
+                        {appointment.name || '-'}
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[appointment.status]}`}>
-                          {statusLabels[appointment.status]}
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[appointment.status || 'pending']}`}>
+                          {statusLabels[appointment.status || 'pending']}
                         </span>
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">

@@ -1,1 +1,0 @@
-// This file should be deleted as we're now using /api/blog/route.ts

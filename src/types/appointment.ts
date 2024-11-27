@@ -2,14 +2,27 @@ export type AppointmentStatus = 'available' | 'booked' | 'pending' | 'fictitious
 
 export interface TimeSlot {
   _id?: string;
-  startTime: Date;
-  endTime: Date;
-  status: AppointmentStatus;
-  clientName?: string;
-  clientEmail?: string;
-  clientPhone?: string;
+  date: string;
+  time: string;
+  name: string;
+  email: string;
+  phone: string;
   notes?: string;
-  isFictitious: boolean;
+  status?: AppointmentStatus;
+  isFictitious?: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ClientRecord {
+  _id?: string;
+  name: string;
+  email: string;
+  phone: string;
+  visitCount?: number;
+  lastVisit?: Date;
+  notes?: string;
+  status?: AppointmentStatus;
   createdAt: Date;
   updatedAt: Date;
 }

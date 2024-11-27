@@ -1,4 +1,4 @@
-import { BlogPost } from '@/types/blog';
+import { BlogPost, CreateBlogPost, UpdateBlogPost } from '@/types/blog';
 import clientPromise from './mongodb';
 import { ObjectId } from 'mongodb';
 
@@ -13,68 +13,75 @@ export async function getAllPosts() {
 
   return posts.map(post => ({
     ...post,
-    id: post._id.toString(),
-    _id: undefined,
-    coverImage: post.coverImage || '',
+    _id: post._id.toString(),
+    featuredImage: post.featuredImage || '',
     tags: post.tags || [],
     author: post.author || 'Admin',
-    publishedAt: post.publishedAt || new Date().toISOString(),
   }));
 }
 
-export async function getPostBySlug(slug: string) {
+export async function getPostById(id: string) {
   const client = await clientPromise;
   const collection = client.db('joyshypnose').collection('posts');
   
   const post = await collection.findOne({ 
-    slug,
-    status: 'published'
+    _id: new ObjectId(id)
   });
   
   if (!post) return null;
   
   return {
     ...post,
-    id: post._id.toString(),
-    _id: undefined,
-    coverImage: post.coverImage || '',
+    _id: post._id.toString(),
+    featuredImage: post.featuredImage || '',
     tags: post.tags || [],
     author: post.author || 'Admin',
-    publishedAt: post.publishedAt || new Date().toISOString(),
   };
 }
 
-export async function createPost(post: Omit<BlogPost, 'id'>) {
+export async function createPost(post: CreateBlogPost) {
   const client = await clientPromise;
   const collection = client.db('joyshypnose').collection('posts');
   
-  const result = await collection.insertOne({
+  const postToInsert = {
     ...post,
-    publishedAt: new Date().toISOString(),
-    lastModified: new Date().toISOString(),
-    coverImage: post.coverImage || '',
+    featuredImage: post.featuredImage || '',
     tags: post.tags || [],
-    author: post.author || 'Admin',
-  });
+    author: 'Admin',
+    createdAt: new Date(),
+    updatedAt: new Date()
+  };
+
+  const result = await collection.insertOne(postToInsert);
   
   return {
-    ...post,
-    id: result.insertedId.toString()
+    ...postToInsert,
+    _id: result.insertedId.toString()
   };
 }
 
-export async function updatePost(id: string, post: Partial<BlogPost>) {
+export async function updatePost(id: string, post: UpdateBlogPost) {
   const client = await clientPromise;
   const collection = client.db('joyshypnose').collection('posts');
   
-  await collection.updateOne(
+  const result = await collection.findOneAndUpdate(
     { _id: new ObjectId(id) },
-    { $set: post }
+    { 
+      $set: {
+        ...post,
+        updatedAt: new Date()
+      }
+    },
+    { returnDocument: 'after' }
   );
+
+  if (!result) {
+    throw new Error('Post not found');
+  }
   
   return {
-    ...post,
-    id
+    ...result,
+    _id: result._id.toString()
   };
 }
 
@@ -82,7 +89,11 @@ export async function deletePost(id: string) {
   const client = await clientPromise;
   const collection = client.db('joyshypnose').collection('posts');
   
-  await collection.deleteOne({ _id: new ObjectId(id) });
+  const result = await collection.deleteOne({ _id: new ObjectId(id) });
   
-  return { id };
+  if (result.deletedCount === 0) {
+    throw new Error('Post not found');
+  }
+  
+  return { _id: id };
 } 

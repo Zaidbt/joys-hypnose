@@ -26,22 +26,38 @@ export default function CreatePost() {
   const router = useRouter();
   const [formData, setFormData] = useState<CreateBlogPost>({
     title: '',
-    slug: '',
     content: '',
     excerpt: '',
-    author: '',
     tags: [],
-    status: 'draft',
-    coverImage: ''
+    featuredImage: '',
+    readingTime: 1,
+    status: 'draft'
   });
   const [tagInput, setTagInput] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleImageSelect = async (file: File) => {
-    // Here you would typically upload the image to your storage service
-    // and get back a URL. For now, we'll use a placeholder
-    const imageUrl = URL.createObjectURL(file);
-    setFormData(prev => ({ ...prev, coverImage: imageUrl }));
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to upload image');
+      }
+
+      const data = await response.json();
+      setFormData(prev => ({
+        ...prev,
+        featuredImage: data.url
+      }));
+    } catch (error) {
+      console.error('Error uploading image:', error);
+    }
   };
 
   const handleAddTag = (e: React.KeyboardEvent) => {
@@ -100,8 +116,8 @@ export default function CreatePost() {
             <h2 className="text-lg font-semibold mb-4">Cover Image</h2>
             <ImageUpload
               onImageSelect={handleImageSelect}
-              currentImage={formData.coverImage}
-              onImageRemove={() => setFormData(prev => ({ ...prev, coverImage: '' }))}
+              currentImage={formData.featuredImage}
+              onImageRemove={() => setFormData(prev => ({ ...prev, featuredImage: '' }))}
             />
           </div>
 
@@ -123,20 +139,15 @@ export default function CreatePost() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Slug
+                  Excerpt
                 </label>
-                <div className="mt-1 flex rounded-md shadow-sm">
-                  <span className="inline-flex items-center rounded-l-md border border-r-0 border-gray-300 px-3 text-gray-500 sm:text-sm">
-                    /blog/
-                  </span>
-                  <input
-                    type="text"
-                    value={formData.slug}
-                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                    className="block w-full min-w-0 flex-1 rounded-none rounded-r-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-                    required
-                  />
-                </div>
+                <textarea
+                  value={formData.excerpt}
+                  onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
+                  rows={3}
+                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                  required
+                />
               </div>
 
               <div>
@@ -151,19 +162,6 @@ export default function CreatePost() {
                     className="h-64 mb-12"
                   />
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Excerpt
-                </label>
-                <textarea
-                  value={formData.excerpt}
-                  onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                  rows={3}
-                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                  required
-                />
               </div>
 
               <div>
@@ -210,6 +208,17 @@ export default function CreatePost() {
                   <option value="draft">Draft</option>
                   <option value="published">Published</option>
                 </select>
+              </div>
+
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Featured Image
+                </label>
+                <ImageUpload
+                  onImageSelect={handleImageSelect}
+                  currentImage={formData.featuredImage}
+                  onImageRemove={() => setFormData(prev => ({ ...prev, featuredImage: '' }))}
+                />
               </div>
             </div>
           </div>

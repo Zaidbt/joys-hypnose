@@ -61,42 +61,34 @@ export default function ContactPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedDate || !selectedTime) {
-      setError('Veuillez sélectionner une date et un horaire');
-      return;
-    }
-    
     setIsLoading(true);
     setError('');
-    setSuccess(false);
 
     try {
       const appointmentDate = new Date(selectedDate);
-      const [hours, minutes] = selectedTime.split(':').map(Number);
-      appointmentDate.setHours(hours, minutes, 0, 0);
-
-      const endDate = new Date(appointmentDate);
-      endDate.setMinutes(endDate.getMinutes() + (settings?.slotDuration || 60));
-
-      const appointmentData = {
-        startTime: appointmentDate,
-        endTime: endDate,
-        clientName: name,
-        clientEmail: email,
-        clientPhone: phone,
-        notes: message,
-        status: 'pending'
-      };
+      appointmentDate.setHours(parseInt(selectedTime.split(':')[0]), parseInt(selectedTime.split(':')[1]));
 
       const response = await fetch('/api/appointments', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(appointmentData),
+        body: JSON.stringify({
+          date: selectedDate,
+          time: selectedTime,
+          name,
+          email,
+          phone,
+          notes: message,
+          status: 'pending'
+        }),
       });
 
-      if (!response.ok) throw new Error('Failed to book appointment');
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to book appointment');
+      }
 
       setSuccess(true);
       // Reset form
@@ -106,8 +98,8 @@ export default function ContactPage() {
       setEmail('');
       setPhone('');
       setMessage('');
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Failed to book appointment');
+    } catch (error: any) {
+      setError(error.message);
     } finally {
       setIsLoading(false);
     }

@@ -43,13 +43,11 @@ export default function ClientsPage() {
 
   const filteredClients = clients.filter(client => {
     const matchesSearch = 
-      client.clientName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.clientEmail?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.clientPhone?.includes(searchTerm);
+      client.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      client.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      client.phone?.includes(searchTerm);
     
-    const matchesStatus = filterStatus === 'all' || client.status === filterStatus;
-    
-    return matchesSearch && matchesStatus;
+    return matchesSearch;
   });
 
   if (isLoading) {
@@ -113,7 +111,7 @@ export default function ClientsPage() {
                       </div>
                     </div>
                     <div>
-                      <h3 className="text-lg font-medium text-gray-900">{client.clientName}</h3>
+                      <h3 className="text-lg font-medium text-gray-900">{client.name}</h3>
                       <p className="text-sm text-gray-500">
                         {client.visitCount || 1} visite{(client.visitCount || 1) > 1 ? 's' : ''}
                       </p>
@@ -128,18 +126,23 @@ export default function ClientsPage() {
                   </span>
                 </div>
 
+                <div className="mt-2">
+                  <p className="text-sm text-gray-500">
+                    <a href={`mailto:${client.email}`} className="hover:underline">
+                      {client.email}
+                    </a>
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    <a href={`tel:${client.phone}`} className="hover:underline">
+                      {client.phone}
+                    </a>
+                  </p>
+                </div>
+
                 <div className="mt-4 space-y-2">
                   <div className="flex items-center text-sm text-gray-600">
-                    <EnvelopeIcon className="h-5 w-5 mr-2 text-gray-400" />
-                    {client.clientEmail}
-                  </div>
-                  <div className="flex items-center text-sm text-gray-600">
-                    <PhoneIcon className="h-5 w-5 mr-2 text-gray-400" />
-                    {client.clientPhone}
-                  </div>
-                  <div className="flex items-center text-sm text-gray-600">
                     <CalendarIcon className="h-5 w-5 mr-2 text-gray-400" />
-                    {new Date(client.startTime).toLocaleDateString('fr-FR', {
+                    {new Date(client.date).toLocaleDateString('fr-FR', {
                       year: 'numeric',
                       month: 'long',
                       day: 'numeric'
@@ -147,10 +150,7 @@ export default function ClientsPage() {
                   </div>
                   <div className="flex items-center text-sm text-gray-600">
                     <ClockIcon className="h-5 w-5 mr-2 text-gray-400" />
-                    {new Date(client.startTime).toLocaleTimeString('fr-FR', {
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
+                    {client.time}
                   </div>
                 </div>
 

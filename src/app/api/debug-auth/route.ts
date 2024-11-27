@@ -14,7 +14,10 @@ export async function GET() {
         nextAuthUrl: process.env.NEXTAUTH_URL,
       }
     });
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to get session', details: error.message }, { status: 500 });
+  } catch (error: any) {
+    return NextResponse.json({ 
+      error: 'Failed to get session', 
+      details: error?.message || 'Unknown error' 
+    }, { status: 500 });
   }
 } 

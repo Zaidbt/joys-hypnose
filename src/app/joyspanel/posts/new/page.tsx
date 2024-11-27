@@ -31,6 +31,7 @@ export default function NewPost() {
     content: '',
     tags: [],
     readingTime: 1,
+    status: 'draft'
   });
   const [currentTag, setCurrentTag] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -90,7 +91,7 @@ export default function NewPost() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...post,
-          readingTime: parseInt(post.readingTime.toString()) || 1,
+          readingTime: post.readingTime ? parseInt(post.readingTime.toString()) : 1,
           status
         }),
       });

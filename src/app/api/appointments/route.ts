@@ -1,17 +1,18 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '../auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import clientPromise from '@/lib/mongodb';
-import type { TimeSlot, AppointmentSettings } from '@/types/appointment';
+import { ObjectId } from 'mongodb';
+import type { TimeSlot } from '@/types/appointment';
 
 // Cache for appointments
 let slotsCache: any = null;
 let lastFetchTime = 0;
 const CACHE_DURATION = 60000; // 1 minute cache
 
-async function getAppointments(startDate: Date, endDate: Date, forceRefresh = false) {
+async function getAppointments(startDate: string, endDate: string, forceRefresh = false) {
   const now = Date.now();
-  const cacheKey = `${startDate.toISOString()}-${endDate.toISOString()}`;
+  const cacheKey = `${startDate}-${endDate}`;
   
   if (!forceRefresh && slotsCache?.[cacheKey] && (now - lastFetchTime) < CACHE_DURATION) {
     return slotsCache[cacheKey];
@@ -23,12 +24,12 @@ async function getAppointments(startDate: Date, endDate: Date, forceRefresh = fa
 
   const slots = await appointmentsCollection
     .find({
-      startTime: { 
+      date: { 
         $gte: startDate,
         $lte: endDate
       }
     })
-    .sort({ startTime: 1 })
+    .sort({ date: 1, time: 1 })
     .toArray();
 
   if (!slotsCache) slotsCache = {};
@@ -44,8 +45,8 @@ async function getAppointments(startDate: Date, endDate: Date, forceRefresh = fa
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const startDate = new Date(searchParams.get('start') || new Date());
-    const endDate = new Date(searchParams.get('end') || new Date());
+    const startDate = searchParams.get('start') || new Date().toISOString().split('T')[0];
+    const endDate = searchParams.get('end') || startDate;
     
     const client = await clientPromise;
     const db = client.db('joyshypnose');
@@ -53,12 +54,12 @@ export async function GET(request: Request) {
 
     const appointments = await appointmentsCollection
       .find({
-        startTime: {
+        date: {
           $gte: startDate,
           $lte: endDate
         }
       })
-      .sort({ startTime: 1 })
+      .sort({ date: 1, time: 1 })
       .toArray();
 
     return new NextResponse(JSON.stringify(appointments.map(apt => ({
@@ -84,51 +85,47 @@ export async function POST(request: Request) {
   const client = await clientPromise;
   try {
     const session = await getServerSession(authOptions);
-    const body = await request.json();
-    const isAdmin = !!session;
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-    // Validate the request
-    if (!body.startTime || !body.endTime) {
+    const body = await request.json();
+    const { date, time, name, email, phone, notes, status = 'pending', isFictitious = false } = body;
+
+    if (!date || !time || !name || !email || !phone) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       );
     }
 
-    // If not admin, additional validation for client bookings
-    if (!isAdmin) {
-      if (!body.clientName || !body.clientEmail) {
-        return NextResponse.json(
-          { error: 'Client information required' },
-          { status: 400 }
-        );
-      }
-    }
-
     const db = client.db('joyshypnose');
     const appointmentsCollection = db.collection('appointments');
 
-    // Check for existing appointments in the time slot
+    // Check if slot is available
     const existingAppointment = await appointmentsCollection.findOne({
-      startTime: new Date(body.startTime),
-      status: { $in: ['booked', 'pending'] }
+      date,
+      time,
     });
 
     if (existingAppointment) {
       return NextResponse.json(
-        { error: 'Time slot already booked' },
-        { status: 409 }
+        { error: 'This time slot is already booked' },
+        { status: 400 }
       );
     }
 
-    const appointment: TimeSlot = {
-      ...body,
-      startTime: new Date(body.startTime),
-      endTime: new Date(body.endTime),
-      status: isAdmin ? (body.status || 'available') : 'pending',
-      isFictitious: isAdmin ? (body.isFictitious || false) : false,
+    const appointment: TimeSlot & { _id?: ObjectId } = {
+      date,
+      time,
+      name,
+      email,
+      phone,
+      notes,
+      status,
+      isFictitious,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
     const result = await appointmentsCollection.insertOne(appointment);
