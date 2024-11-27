@@ -4,6 +4,10 @@ import { authOptions } from '@/lib/auth';
 import clientPromise from '@/lib/mongodb';
 import type { ClientRecord } from '@/types/appointment';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+
 export async function GET() {
   const client = await clientPromise;
   try {

@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -43,7 +47,7 @@ export async function GET(request: Request) {
           $lte: endDate
         },
         status: { 
-          $in: ['booked', 'pending', 'fictitious'] // Include fictitious appointments
+          $in: ['booked', 'pending', 'fictitious']
         }
       })
       .toArray();
@@ -61,7 +65,7 @@ export async function GET(request: Request) {
       const slotDate = new Date(date);
       slotDate.setHours(currentHour, currentMinute, 0, 0);
 
-      // Check if slot is booked or fictitious
+      // Check if slot is booked
       const bookedSlot = bookedSlots.find(booking => {
         const bookingTime = new Date(booking.startTime);
         return bookingTime.getTime() === slotDate.getTime();
@@ -70,7 +74,7 @@ export async function GET(request: Request) {
       slots.push({
         time: timeString,
         status: bookedSlot ? bookedSlot.status : 'available',
-        available: !bookedSlot // Slot is available only if there's no booking of any kind
+        available: !bookedSlot
       });
 
       currentMinute += settings.slotDuration;
