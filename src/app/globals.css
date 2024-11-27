@@ -1,0 +1,175 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #000000;
+}
+
+html,
+body {
+  color: var(--foreground);
+  background: var(--background);
+  min-height: 100vh;
+  width: 100%;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.prose-editor {
+  @apply relative mb-12;
+}
+
+.prose-editor .ql-container {
+  @apply min-h-[200px] rounded-b-lg border border-gray-300;
+  font-family: inherit;
+  background-color: white;
+}
+
+.prose-editor .ql-toolbar {
+  @apply rounded-t-lg border border-gray-300 bg-gray-50;
+  border-bottom: none !important;
+}
+
+.prose-editor .ql-editor {
+  min-height: 400px !important;
+  @apply text-base leading-relaxed p-4;
+  background-color: white;
+}
+
+.prose-editor .ql-editor p {
+  @apply mb-4;
+}
+
+.prose-editor .ql-editor {
+  cursor: text !important;
+  pointer-events: auto !important;
+}
+
+.prose-editor {
+  z-index: 1;
+}
+
+.prose-editor .ql-toolbar {
+  z-index: 2;
+}
+
+.prose-editor .ql-container {
+  z-index: 1;
+}
+
+.blog-content {
+  @apply prose prose-lg max-w-none;
+}
+
+.blog-content h1,
+.blog-content h2,
+.blog-content h3 {
+  @apply text-gray-900 font-bold;
+}
+
+.blog-content h1 {
+  @apply text-3xl mt-8 mb-4;
+}
+
+.blog-content h2 {
+  @apply text-2xl mt-6 mb-3;
+}
+
+.blog-content h3 {
+  @apply text-xl mt-4 mb-2;
+}
+
+.blog-content p {
+  @apply text-gray-700 mb-4 leading-relaxed;
+}
+
+.blog-content ul,
+.blog-content ol {
+  @apply my-4 pl-6;
+}
+
+.blog-content li {
+  @apply mb-2;
+}
+
+.blog-content a {
+  @apply text-primary-600 hover:text-primary-700 underline;
+}
+
+.blog-content blockquote {
+  @apply border-l-4 border-primary-200 pl-4 italic my-4;
+}
+
+.prose-editor .ql-container {
+  font-family: inherit;
+}
+
+.prose-editor .ql-editor {
+  padding: 1.5rem;
+}
+
+.prose-editor .ql-editor h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.prose-editor .ql-editor h2 {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 0.875rem;
+}
+
+.prose-editor .ql-editor h3 {
+  font-size: 1.75rem;
+  font-weight: bold;
+  margin-bottom: 0.75rem;
+}
+
+.prose-editor .ql-editor blockquote {
+  border-left: 4px solid #e2e8f0;
+  padding-left: 1rem;
+  margin: 1.5rem 0;
+  font-style: italic;
+  color: #4a5568;
+}
+
+.prose-editor .ql-editor img {
+  max-width: 100%;
+  height: auto;
+  margin: 1rem 0;
+}
+
+.prose-editor .ql-editor pre {
+  background-color: #f7fafc;
+  padding: 1rem;
+  border-radius: 0.375rem;
+  margin: 1rem 0;
+}
+
+.prose-editor .ql-editor a {
+  color: #6366f1;
+  text-decoration: underline;
+}
+
+.prose-editor .ql-formats {
+  margin-right: 1rem !important;
+}
+
+.prose-editor .ql-toolbar button {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.prose-editor .ql-picker {
+  height: 28px;
+} 
