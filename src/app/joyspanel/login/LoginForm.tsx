@@ -19,23 +19,29 @@ export default function LoginForm() {
     const password = formData.get('password') as string;
 
     try {
+      console.log('Attempting login...');
       const result = await signIn('credentials', {
         email,
         password,
         redirect: false,
       });
 
+      console.log('Login result:', result);
+
       if (result?.error) {
-        setError('Invalid credentials');
+        setError(result.error);
         setIsLoading(false);
         return;
       }
 
       if (result?.ok) {
+        console.log('Login successful, redirecting...');
         router.push('/joyspanel');
+        router.refresh();
       }
     } catch (error) {
-      setError('An error occurred during login');
+      console.error('Login error:', error);
+      setError('An error occurred during login. Please try again.');
       setIsLoading(false);
     }
   };

@@ -1,5 +1,6 @@
 import type { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from 'bcryptjs';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -17,11 +18,15 @@ export const authOptions: NextAuthOptions = {
 
           // Check email
           if (credentials.email !== process.env.ADMIN_EMAIL) {
+            console.log('Invalid email');
             throw new Error('Invalid credentials');
           }
 
-          // Use direct comparison with new password
-          const isValidPassword = credentials.password === 'Joys@@2024';
+          // Compare password with hashed password from env
+          const isValidPassword = await bcrypt.compare(
+            credentials.password,
+            process.env.ADMIN_PASSWORD || ''
+          );
 
           if (isValidPassword) {
             return {
@@ -31,8 +36,10 @@ export const authOptions: NextAuthOptions = {
             };
           }
 
+          console.log('Invalid password');
           throw new Error('Invalid credentials');
         } catch (error) {
+          console.error('Auth error:', error);
           throw new Error('Invalid credentials');
         }
       }
