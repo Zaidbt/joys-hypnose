@@ -4,25 +4,29 @@ import { ObjectId } from 'mongodb';
 
 export async function getAllPosts() {
   const client = await clientPromise;
-  const collection = client.db('joyshypnose').collection('posts');
+  const collection = client.db('joyshypnose').collection('blog_posts');
   
   const posts = await collection
-    .find({ status: 'published' })
-    .sort({ publishedAt: -1 })
+    .find({})
+    .sort({ createdAt: -1 })
     .toArray();
 
   return posts.map(post => ({
     ...post,
     _id: post._id.toString(),
-    featuredImage: post.featuredImage || '',
+    createdAt: post.createdAt || post.publishedAt || new Date(),
+    updatedAt: post.updatedAt || post.lastModified || post.publishedAt || new Date(),
+    content: post.content || post.body || '',
+    featuredImage: post.featuredImage || post.coverImage || '',
+    excerpt: post.excerpt || '',
     tags: post.tags || [],
-    author: post.author || 'Admin',
+    author: post.author || 'Admin'
   }));
 }
 
 export async function getPostById(id: string) {
   const client = await clientPromise;
-  const collection = client.db('joyshypnose').collection('posts');
+  const collection = client.db('joyshypnose').collection('blog_posts');
   
   const post = await collection.findOne({ 
     _id: new ObjectId(id)
@@ -41,7 +45,7 @@ export async function getPostById(id: string) {
 
 export async function createPost(post: CreateBlogPost) {
   const client = await clientPromise;
-  const collection = client.db('joyshypnose').collection('posts');
+  const collection = client.db('joyshypnose').collection('blog_posts');
   
   const postToInsert = {
     ...post,
@@ -62,7 +66,7 @@ export async function createPost(post: CreateBlogPost) {
 
 export async function updatePost(id: string, post: UpdateBlogPost) {
   const client = await clientPromise;
-  const collection = client.db('joyshypnose').collection('posts');
+  const collection = client.db('joyshypnose').collection('blog_posts');
   
   const result = await collection.findOneAndUpdate(
     { _id: new ObjectId(id) },
@@ -87,7 +91,7 @@ export async function updatePost(id: string, post: UpdateBlogPost) {
 
 export async function deletePost(id: string) {
   const client = await clientPromise;
-  const collection = client.db('joyshypnose').collection('posts');
+  const collection = client.db('joyshypnose').collection('blog_posts');
   
   const result = await collection.deleteOne({ _id: new ObjectId(id) });
   

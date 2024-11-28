@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import clientPromise from '@/lib/mongodb';
+import { getAllPosts, createPost } from '@/lib/blog-service';
 import type { BlogPost } from '@/types/blog';
 
 // Cache for blog posts
@@ -12,37 +12,27 @@ const CACHE_DURATION = 60000; // 1 minute cache
 async function getPosts(forceRefresh = false) {
   const now = Date.now();
   if (!forceRefresh && postsCache && (now - lastFetchTime) < CACHE_DURATION) {
+    console.log('Returning cached posts:', postsCache);
     return postsCache;
   }
 
-  const client = await clientPromise;
-  const db = client.db('joyshypnose');
-  const blogCollection = db.collection('blog_posts');
+  try {
+    console.log('Fetching posts from MongoDB...');
+    const posts = await getAllPosts();
+    console.log('Raw posts from MongoDB:', posts);
+    console.log('Number of posts found:', posts.length);
 
-  const posts = await blogCollection
-    .find({})
-    .sort({ createdAt: -1 })
-    .project({
-      title: 1,
-      excerpt: 1,
-      featuredImage: 1,
-      tags: 1,
-      createdAt: 1,
-      author: 1
-    })
-    .toArray();
+    postsCache = posts;
+    lastFetchTime = now;
 
-  postsCache = posts.map(post => ({
-    ...post,
-    _id: post._id.toString()
-  }));
-  lastFetchTime = now;
-
-  return postsCache;
+    return postsCache;
+  } catch (error) {
+    console.error('Error in getPosts:', error);
+    throw error;
+  }
 }
 
 export async function POST(request: Request) {
-  const client = await clientPromise;
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
@@ -59,32 +49,21 @@ export async function POST(request: Request) {
       );
     }
 
-    const db = client.db('joyshypnose');
-    const blogCollection = db.collection('blog_posts');
-
-    const newPost = {
+    const newPost = await createPost({
       title,
       excerpt,
       content,
       featuredImage,
       readingTime: body.readingTime || 1,
       tags: tags || [],
-      author: session.user.email,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    const result = await blogCollection.insertOne(newPost);
+    });
     
     // Invalidate cache after new post
     postsCache = null;
 
     return NextResponse.json({
       success: true,
-      data: {
-        _id: result.insertedId.toString(),
-        ...newPost
-      }
+      data: newPost
     }, { status: 201 });
 
   } catch (error) {
@@ -103,9 +82,11 @@ export async function GET(request: Request) {
     
     const posts = await getPosts(forceRefresh);
     
-    return new NextResponse(JSON.stringify(posts), {
+    return NextResponse.json({
+      success: true,
+      data: posts
+    }, {
       headers: {
-        'Content-Type': 'application/json',
         'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300'
       }
     });
