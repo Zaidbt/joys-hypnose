@@ -2,16 +2,25 @@
 const nextConfig = {
   output: 'standalone',
   images: {
+    domains: ['localhost', 'joyshypnose-therapies.com', 'www.joyshypnose-therapies.com'],
     remotePatterns: [
       {
         protocol: 'http',
         hostname: 'localhost',
       },
       {
-        protocol: 'http',
-        hostname: 'srv654164.hstgr.cloud',
+        protocol: 'https',
+        hostname: 'joyshypnose-therapies.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.joyshypnose-therapies.com',
       },
     ],
+    unoptimized: true,
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    formats: ['image/webp'],
   },
   async headers() {
     return [
