@@ -12,14 +12,18 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         try {
           if (!credentials?.email || !credentials?.password) {
-            return null;
+            throw new Error('Missing credentials');
           }
 
-          // Simple direct comparison for testing
-          if (
-            credentials.email === process.env.ADMIN_EMAIL &&
-            credentials.password === 'admin123'
-          ) {
+          // Check email
+          if (credentials.email !== process.env.ADMIN_EMAIL) {
+            throw new Error('Invalid credentials');
+          }
+
+          // Use direct comparison with new password
+          const isValidPassword = credentials.password === 'Joys@@2024';
+
+          if (isValidPassword) {
             return {
               id: "1",
               email: process.env.ADMIN_EMAIL,
@@ -27,16 +31,20 @@ export const authOptions: NextAuthOptions = {
             };
           }
 
-          return null;
+          throw new Error('Invalid credentials');
         } catch (error) {
-          console.error('Auth error:', error);
-          return null;
+          throw new Error('Invalid credentials');
         }
       }
     })
   ],
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
   pages: {
     signIn: '/joyspanel/login',
+    error: '/joyspanel/login', // Redirect to login page on error
   },
   callbacks: {
     async jwt({ token, user }) {
@@ -51,5 +59,6 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     }
-  }
+  },
+  secret: process.env.NEXTAUTH_SECRET
 }; 

@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState } from 'react';
 import { signIn } from 'next-auth/react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
-function LoginFormContent() {
+export default function LoginForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -23,19 +22,20 @@ function LoginFormContent() {
       const result = await signIn('credentials', {
         email,
         password,
-        redirect: false
+        redirect: false,
       });
 
       if (result?.error) {
         setError('Invalid credentials');
+        setIsLoading(false);
         return;
       }
 
-      router.push('/joyspanel');
-      router.refresh();
+      if (result?.ok) {
+        router.push('/joyspanel');
+      }
     } catch (error) {
       setError('An error occurred during login');
-    } finally {
       setIsLoading(false);
     }
   };
@@ -47,6 +47,9 @@ function LoginFormContent() {
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Sign in to your account
           </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Use your admin credentials to access the panel
+          </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
@@ -94,7 +97,7 @@ function LoginFormContent() {
             <button
               type="submit"
               disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50"
             >
               {isLoading ? 'Signing in...' : 'Sign in'}
             </button>
@@ -102,13 +105,5 @@ function LoginFormContent() {
         </form>
       </div>
     </div>
-  );
-}
-
-export default function LoginForm() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <LoginFormContent />
-    </Suspense>
   );
 } 

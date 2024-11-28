@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/ && NODE_ENV=production node .next/standalone/server.js",
     "lint": "next lint"
   },
   "dependencies": {
