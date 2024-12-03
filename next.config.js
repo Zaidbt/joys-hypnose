@@ -39,7 +39,15 @@ const nextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            value: 'no-cache, no-store, must-revalidate',
+          },
+          {
+            key: 'Pragma',
+            value: 'no-cache',
+          },
+          {
+            key: 'Expires',
+            value: '0',
           },
           {
             key: 'Access-Control-Allow-Origin',
@@ -52,6 +60,22 @@ const nextConfig = {
         ],
       },
     ];
+  },
+  webpack: (config, { isServer }) => {
+    config.module.rules.push({
+      test: /\.(png|jpe?g|gif|webp)$/i,
+      use: [
+        {
+          loader: 'file-loader',
+          options: {
+            publicPath: '/_next/static/images',
+            outputPath: 'static/images',
+          },
+        },
+      ],
+    });
+
+    return config;
   },
 }
 

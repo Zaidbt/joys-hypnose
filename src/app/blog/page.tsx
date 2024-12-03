@@ -16,8 +16,10 @@ export default function BlogPage() {
 
   const fetchPosts = useCallback(async (forceRefresh = false) => {
     try {
-      const response = await fetch(`/api/blog${forceRefresh ? '?refresh=true' : ''}`, {
-        next: { revalidate: 60 }
+      const timestamp = new Date().getTime();
+      const response = await fetch(`/api/blog?t=${timestamp}${forceRefresh ? '&refresh=true' : ''}`, {
+        cache: 'no-store',
+        next: { revalidate: 0 }
       });
       
       if (!response.ok) throw new Error('Failed to fetch posts');
@@ -76,11 +78,12 @@ export default function BlogPage() {
                   {post.featuredImage && (
                     <div className="relative h-56 w-full overflow-hidden">
                       <Image
-                        src={post.featuredImage}
+                        src={`${post.featuredImage}?t=${new Date().getTime()}`}
                         alt={post.title}
                         fill
                         className="object-cover transform group-hover:scale-105 transition-transform duration-300"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        priority={index < 6}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                     </div>
