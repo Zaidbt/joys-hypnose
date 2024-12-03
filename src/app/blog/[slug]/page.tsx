@@ -17,7 +17,7 @@ export default function BlogPostPage() {
   useEffect(() => {
     async function fetchPost() {
       try {
-        const response = await fetch(`/api/blog/post/${params.id}`, {
+        const response = await fetch(`/api/blog/post/${params.slug}`, {
           cache: 'no-store'
         });
         if (!response.ok) throw new Error('Failed to fetch post');
@@ -31,10 +31,10 @@ export default function BlogPostPage() {
       }
     }
 
-    if (params.id) {
+    if (params.slug) {
       fetchPost();
     }
-  }, [params.id]);
+  }, [params.slug]);
 
   if (isLoading) {
     return <div className="flex justify-center items-center min-h-screen">
