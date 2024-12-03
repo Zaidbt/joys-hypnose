@@ -42,9 +42,10 @@ export async function POST(request: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Create unique filename
+    // Create unique filename with sanitized original name
     const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
-    const filename = `${uniqueSuffix}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '')}`;
+    const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '').replace(/\s+/g, '-');
+    const filename = `${uniqueSuffix}-${sanitizedName}`;
 
     // Ensure upload directory exists
     try {
@@ -67,8 +68,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Return the absolute URL for the uploaded file
-    const fileUrl = `${uploadConfig.baseUrl}/uploads/${filename}`;
+    // Return the relative URL
+    const fileUrl = uploadConfig.getImageUrl(filename);
     console.log('File uploaded successfully:', fileUrl);
     
     return NextResponse.json({ 
