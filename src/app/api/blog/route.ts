@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '../auth/[...nextauth]/route';
+import { authOptions } from '@/app/utils/authOptions';
 import clientPromise from '@/lib/mongodb';
 import type { BlogPost } from '@/types/blog';
 
@@ -72,6 +72,7 @@ export async function POST(request: Request) {
       author: session.user.email,
       createdAt: new Date(),
       updatedAt: new Date(),
+      slug: body.slug
     };
 
     const result = await blogCollection.insertOne(newPost);
@@ -82,8 +83,8 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       data: {
-        _id: result.insertedId.toString(),
-        ...newPost
+        ...newPost,
+        _id: result.insertedId.toString()
       }
     }, { status: 201 });
 

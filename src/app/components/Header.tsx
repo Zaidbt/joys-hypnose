@@ -1,8 +1,5 @@
 'use client';
 
-import React from 'react';
-
-
 import { useState } from 'react';
 import Link from 'next/link';
 import { Dialog } from '@headlessui/react';
@@ -25,7 +22,7 @@ export default function Header() {
         <div className="flex h-16 items-center justify-between">
           <div className="flex lg:flex-1">
             <Link href="/" className="-m-1.5 p-1.5">
-              <span className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-secondary-500 bg-clip-text text-transparent">
+              <span className="text-2xl font-bold logo-text">
                 Joys Hypnose
               </span>
             </Link>
@@ -33,9 +30,8 @@ export default function Header() {
           <div className="flex lg:hidden">
             <button
               type="button"
-              className="inline-flex items-center justify-center rounded-md p-2.5 text-primary-600"
+              className="inline-flex items-center justify-center rounded-md p-2.5 text-black"
               onClick={() => setMobileMenuOpen(true)}
-              aria-label="Open main menu"
             >
               <span className="sr-only">Open main menu</span>
               <Bars3Icon className="h-6 w-6" aria-hidden="true" />
@@ -46,7 +42,7 @@ export default function Header() {
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-sm font-semibold leading-6 text-gray-900 hover:text-primary-600 transition-colors duration-300"
+                className="text-sm font-semibold leading-6 text-black hover:text-rose-500 transition-colors duration-300 nav-link"
               >
                 {item.name}
               </Link>
@@ -56,17 +52,18 @@ export default function Header() {
       </nav>
 
       <Dialog as="div" className="lg:hidden" open={mobileMenuOpen} onClose={setMobileMenuOpen}>
-        <div className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm" />
+        <div className="fixed inset-0 z-50" />
         <Dialog.Panel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm">
           <div className="flex items-center justify-between">
             <Link href="/" className="-m-1.5 p-1.5">
-              <span className="text-2xl font-bold text-primary-600">New Therapie</span>
+              <span className="text-2xl font-bold logo-text">
+                Joys Hypnose
+              </span>
             </Link>
             <button
               type="button"
-              className="rounded-md p-2.5 text-gray-700 hover:text-primary-600"
+              className="rounded-md p-2.5 text-black"
               onClick={() => setMobileMenuOpen(false)}
-              aria-label="Close menu"
             >
               <span className="sr-only">Close menu</span>
               <XMarkIcon className="h-6 w-6" aria-hidden="true" />
@@ -79,7 +76,7 @@ export default function Header() {
                   <Link
                     key={item.name}
                     href={item.href}
-                    className="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-primary-50 hover:text-primary-600"
+                    className="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-black hover:bg-rose-50 hover:text-rose-500 nav-link"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {item.name}

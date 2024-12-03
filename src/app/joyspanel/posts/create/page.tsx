@@ -29,10 +29,9 @@ export default function CreatePost() {
     slug: '',
     content: '',
     excerpt: '',
-    author: '',
     tags: [],
-    status: 'draft',
-    coverImage: ''
+    readingTime: 1,
+    featuredImage: ''
   });
   const [tagInput, setTagInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -41,7 +40,7 @@ export default function CreatePost() {
     // Here you would typically upload the image to your storage service
     // and get back a URL. For now, we'll use a placeholder
     const imageUrl = URL.createObjectURL(file);
-    setFormData(prev => ({ ...prev, coverImage: imageUrl }));
+    setFormData(prev => ({ ...prev, featuredImage: imageUrl }));
   };
 
   const handleAddTag = (e: React.KeyboardEvent) => {
@@ -100,8 +99,8 @@ export default function CreatePost() {
             <h2 className="text-lg font-semibold mb-4">Cover Image</h2>
             <ImageUpload
               onImageSelect={handleImageSelect}
-              currentImage={formData.coverImage}
-              onImageRemove={() => setFormData(prev => ({ ...prev, coverImage: '' }))}
+              currentImage={formData.featuredImage}
+              onImageRemove={() => setFormData(prev => ({ ...prev, featuredImage: '' }))}
             />
           </div>
 
@@ -200,16 +199,15 @@ export default function CreatePost() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Status
+                  Reading Time
                 </label>
-                <select
-                  value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value as 'draft' | 'published' })}
+                <input
+                  type="number"
+                  value={formData.readingTime}
+                  onChange={(e) => setFormData({ ...formData, readingTime: parseInt(e.target.value) || 1 })}
+                  min="1"
                   className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                >
-                  <option value="draft">Draft</option>
-                  <option value="published">Published</option>
-                </select>
+                />
               </div>
             </div>
           </div>

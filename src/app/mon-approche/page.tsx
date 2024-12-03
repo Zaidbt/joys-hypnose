@@ -26,7 +26,7 @@ export default function MonApproche() {
   return (
     <main className="flex min-h-screen flex-col pt-16">
       {/* Comment se déroulent les séances Section */}
-      <section className="py-24 bg-gradient-to-b from-primary-50/30 to-white">
+      <section className="py-24 bg-[#fff5f5]">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -34,7 +34,7 @@ export default function MonApproche() {
             transition={{ duration: 0.8 }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            <h2 className="text-3xl font-bold tracking-tight text-rose-500 sm:text-4xl">
               Comment se déroulent les séances
             </h2>
           </motion.div>
@@ -49,12 +49,11 @@ export default function MonApproche() {
                 viewport={{ once: true }}
                 className="relative group"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-primary-50 to-secondary-50 rounded-2xl transform group-hover:scale-[1.02] transition-transform duration-300 -z-10" />
-                <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-sm ring-1 ring-gray-200/50 hover:shadow-lg transition-all duration-300 h-full">
-                  <h3 className="text-xl font-semibold mb-4 bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+                <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 border border-rose-100/20 h-full">
+                  <h3 className="text-xl font-semibold mb-4 text-rose-500">
                     {session.title}
                   </h3>
-                  <p className="text-gray-600 leading-relaxed">
+                  <p className="text-black leading-relaxed">
                     {session.content}
                   </p>
                 </div>
@@ -65,7 +64,7 @@ export default function MonApproche() {
       </section>
 
       {/* Notre Histoire Section */}
-      <section className="relative py-24 bg-gradient-to-b from-white to-primary-50/30">
+      <section className="relative py-24 bg-white">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             {/* Title Column */}
@@ -75,7 +74,7 @@ export default function MonApproche() {
               transition={{ duration: 0.8 }}
               className="lg:col-span-3"
             >
-              <h1 className="text-4xl font-bold italic text-primary-600">
+              <h1 className="text-4xl font-bold text-rose-500">
                 Notre histoire
               </h1>
             </motion.div>
@@ -87,19 +86,121 @@ export default function MonApproche() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="lg:col-span-9"
             >
-              <div className="prose prose-lg max-w-none space-y-6 text-gray-600">
-                <p>
-                  Choisir de devenir hypnothérapeute n'est pas simplement une profession pour moi, mais plutôt une mission de vie profondément enracinée dans ma propre expérience et ma conviction profonde. Depuis toujours, j'ai été naturellement attirée par l'écoute des autres et la recherche de solutions pour les aider à surmonter les défis de la vie. Ayant moi-même traversé des périodes tumultueuses et étant dotée d'une sensibilité aiguë, d'une empathie profonde, et d'une âme ancienne, j'ai trouvé dans le voyage intérieur une boussole pour ma propre transformation.
+              <div className="prose prose-lg max-w-none space-y-8 text-black">
+                <p className="max-w-[65ch]">
+                  Choisir de devenir hypnothérapeute n'est pas simplement une profession pour moi, mais plutôt une mission de vie profondément enracinée dans ma propre expérience et ma conviction profonde.
                 </p>
 
-                <p>
-                  Ce parcours personnel, parsemé d'expériences qui ont forgé ma compréhension des profondeurs de l'âme humaine, m'a conduit à comprendre que le véritable alignement et l'harmonie ne peuvent être atteints qu'en travaillant sur tous les niveaux de notre être. Pour moi, l'esprit, l'âme et le corps sont intrinsèquement liés, et la clé de l'harmonie intérieure réside dans l'équilibre holistique de ces aspects. Ainsi, ma pratique d'hypnothérapeute repose sur la conviction que l'exploration de l'inconscient, la transformation des schémas de pensée, et l'intégration de plusieurs synergies contribuent tous à créer un chemin vers l'alignement complet.
+                <p className="max-w-[65ch]">
+                  Depuis toujours, j'ai été naturellement attirée par l'écoute des autres et la recherche de solutions pour les aider à surmonter les défis de la vie.
                 </p>
 
-                <p>
-                  En embrassant ma propre hypersensibilité et en apprenant à canaliser cette énergie unique, j'ai découvert que ma mission est d'aider les autres à faire de même. Mon objectif est d'offrir un espace bienveillant où les individus peuvent explorer leurs propres profondeurs, libérer leurs blessures émotionnelles, et trouver un équilibre durable. En tant que maître praticienne, je m'engage à accompagner mes clients dans leur voyage vers l'harmonie, tout en partageant la conviction profonde que la transformation personnelle n'est pas seulement possible, mais aussi essentielle pour atteindre une vie pleine de sens et de bien-être.
+                <p className="max-w-[65ch]">
+                  Ayant moi-même traversé des périodes tumultueuses et étant dotée d'une sensibilité aiguë, d'une empathie profonde, et d'une âme ancienne, j'ai trouvé dans le voyage intérieur une boussole pour ma propre transformation.
+                </p>
+
+                <p className="max-w-[65ch]">
+                  Ce parcours personnel, parsemé d'expériences qui ont forgé ma compréhension des profondeurs de l'âme humaine, m'a conduit à comprendre que le véritable alignement et l'harmonie ne peuvent être atteints qu'en travaillant sur tous les niveaux de notre être.
+                </p>
+
+                <p className="max-w-[65ch]">
+                  Pour moi, l'esprit, l'âme et le corps sont intrinsèquement liés, et la clé de l'harmonie intérieure réside dans l'équilibre holistique de ces aspects.
+                </p>
+
+                <p className="max-w-[65ch]">
+                  En embrassant ma propre hypersensibilité et en apprenant à canaliser cette énergie unique, j'ai découvert que ma mission est d'aider les autres à faire de même.
+                </p>
+
+                <p className="max-w-[65ch]">
+                  Mon objectif est d'offrir un espace bienveillant où les individus peuvent explorer leurs propres profondeurs, libérer leurs blessures émotionnelles, et trouver un équilibre durable.
+                </p>
+
+                <p className="max-w-[65ch]">
+                  En tant que maître praticienne, je m'engage à accompagner mes clients dans leur voyage vers l'harmonie, tout en partageant la conviction profonde que la transformation personnelle n'est pas seulement possible, mais aussi essentielle pour atteindre une vie pleine de sens et de bien-être.
                 </p>
               </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Diplômes & Formation Section */}
+      <section className="relative py-24 bg-[#fff5f5]">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="max-w-3xl mx-auto text-center mb-16"
+          >
+            <h2 className="text-3xl font-bold text-rose-500 mb-6">
+              Diplômes & Formation
+            </h2>
+            <p className="text-lg text-black max-w-2xl mx-auto">
+              Mes formations spécialisées, constamment enrichies pour rester à la pointe de mon domaine, attestent de mon engagement continu envers le perfectionnement professionnel et la fourniture de services de qualité supérieure.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            {/* Hypnose Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              viewport={{ once: true }}
+              className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300"
+            >
+              <h3 className="text-2xl font-semibold text-rose-500 mb-6">Hypnose</h3>
+              <ul className="space-y-3 text-black">
+                <li>Praticien en Hypnose transformatrice</li>
+                <li>Maitre praticien en hypnose Transformatrice</li>
+                <li>BQH beyond Quantum healing Hypnosis</li>
+                <li>Hypnose accompagnement dans le Deuil</li>
+                <li>Hypnose Chamanisme</li>
+                <li>Hypnose transgénérationnel</li>
+                <li>Hypnose Spirituelle</li>
+                <li>Hypnose Toc/ Anxiété</li>
+                <li>Hypnose Addiction</li>
+                <li>Hypnose soutien dans le cancer</li>
+                <li>Hypnose régressive Quantique</li>
+              </ul>
+            </motion.div>
+
+            {/* Énergie Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300"
+            >
+              <h3 className="text-2xl font-semibold text-rose-500 mb-6">Énergie</h3>
+              <ul className="space-y-3 text-black">
+                <li>Lahochi</li>
+                <li>Les 14 Rayons des êtres Intergalaciques</li>
+                <li>Les Rois mages</li>
+                <li>Cérémonie Cacao</li>
+                <li>Initiation à la thérapie chamanique</li>
+              </ul>
+            </motion.div>
+
+            {/* Autres Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              viewport={{ once: true }}
+              className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300"
+            >
+              <h3 className="text-2xl font-semibold text-rose-500 mb-6">Autres</h3>
+              <ul className="space-y-3 text-black">
+                <li>Neuroprogrammation Quantique</li>
+                <li>Thérapie sonore</li>
+                <li>EFT/TPT Maitre Praticien</li>
+                <li>Facilitatrice de Constellation Familiale systémique et organisationnelle (fin Nov 2024)</li>
+                <li>The Lost Remedies praticienne (en cours)</li>
+                <li>Herboristerie (en cours)</li>
+              </ul>
             </motion.div>
           </div>
         </div>

@@ -1,8 +1,6 @@
 'use client';
 
 import React from 'react';
-
-
 import { motion } from 'framer-motion';
 import {
   Sparkle,
@@ -56,10 +54,10 @@ export default function ServicesGrid() {
           transition={{ duration: 0.8 }}
           className="mx-auto max-w-2xl text-center"
         >
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl mb-4">
+          <h2 className="text-3xl font-bold tracking-tight text-black sm:text-4xl mb-4">
             Nos Services Thérapeutiques
           </h2>
-          <p className="mt-6 text-lg leading-8 text-gray-600">
+          <p className="mt-6 text-lg leading-8 text-black">
             Une approche holistique pour votre bien-être et votre développement personnel.
           </p>
         </motion.div>
@@ -74,20 +72,19 @@ export default function ServicesGrid() {
               viewport={{ once: true }}
               className="relative group"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-primary-50 to-secondary-50 rounded-2xl transform group-hover:scale-[1.02] transition-transform duration-300 -z-10" />
-              <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-sm ring-1 ring-gray-200/50 hover:shadow-lg transition-all duration-300 h-full">
+              <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 border border-rose-100">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="p-2 rounded-xl bg-gradient-to-r from-primary-100 to-secondary-100">
+                  <div className="p-2 rounded-xl bg-rose-50">
                     <service.Icon 
-                      className="w-8 h-8 text-primary-600" 
+                      className="w-8 h-8 text-rose-500" 
                       weight="duotone"
                     />
                   </div>
-                  <h3 className="text-xl font-semibold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+                  <h3 className="text-xl font-semibold text-black">
                     {service.title}
                   </h3>
                 </div>
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-black leading-relaxed">
                   {service.description}
                 </p>
               </div>

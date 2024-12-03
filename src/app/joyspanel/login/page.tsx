@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { signIn, useSession } from 'next-auth/react';
+import { useState } from 'react';
+import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 
@@ -11,15 +11,8 @@ export default function Login() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { data: session, status } = useSession();
   const searchParams = useSearchParams();
-  const from = searchParams.get('from') || '/joyspanel';
-
-  useEffect(() => {
-    if (status === 'authenticated') {
-      router.push(from);
-    }
-  }, [status, router, from]);
+  const callbackUrl = searchParams.get('callbackUrl') || '/joyspanel';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,29 +21,25 @@ export default function Login() {
       setError('');
       
       const result = await signIn('credentials', {
-        redirect: false,
         email,
         password,
+        redirect: false,
+        callbackUrl,
       });
 
       if (result?.error) {
-        setError('Invalid credentials');
+        setError(result.error);
       } else {
-        router.push(from);
+        router.push(callbackUrl);
         router.refresh();
       }
     } catch (error) {
-      setError('An error occurred');
+      setError('An error occurred during login');
+      console.error('Login error:', error);
     } finally {
       setIsLoading(false);
     }
   };
-
-  if (status === 'loading') {
-    return <div className="flex items-center justify-center min-h-screen">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
-    </div>;
-  }
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -113,9 +102,10 @@ export default function Login() {
             <div>
               <button
                 type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                disabled={isLoading}
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50"
               >
-                Se connecter
+                {isLoading ? 'Connexion...' : 'Se connecter'}
               </button>
             </div>
           </form>

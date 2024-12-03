@@ -23,12 +23,11 @@ export default function Hero() {
       {/* Background Image */}
       <div className="absolute inset-0 -z-10">
         <Image
-          src="/images/hero/hero.webp"
-          alt="Background"
+          src="/images/hero-image.jpg"
+          alt="Séance d'hypnothérapie"
           fill
-          priority
-          quality={100}
           className="object-cover"
+          priority
         />
         <div className="absolute inset-0 bg-gradient-to-b from-primary-50/80 via-white/50 to-white/80 backdrop-blur-[2px]" />
       </div>

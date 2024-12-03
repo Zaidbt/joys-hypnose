@@ -20,6 +20,7 @@ export default function EditPost() {
   const params = useParams();
   const [post, setPost] = useState<BlogPost>({
     title: '',
+    slug: '',
     excerpt: '',
     content: '',
     tags: [],
@@ -92,7 +93,7 @@ export default function EditPost() {
         },
         body: JSON.stringify({
           ...post,
-          readingTime: parseInt(post.readingTime.toString()) || 1
+          readingTime: typeof post.readingTime === 'number' ? post.readingTime : 1
         }),
       });
 

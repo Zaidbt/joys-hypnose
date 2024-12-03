@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '../auth/[...nextauth]/route';
+import { authOptions } from '@/app/utils/authOptions';
 import clientPromise from '@/lib/mongodb';
 import type { TimeSlot, AppointmentSettings } from '@/types/appointment';
 
@@ -121,12 +121,15 @@ export async function POST(request: Request) {
       );
     }
 
-    const appointment: TimeSlot = {
-      ...body,
+    const appointment = {
       startTime: new Date(body.startTime),
       endTime: new Date(body.endTime),
       status: isAdmin ? (body.status || 'available') : 'pending',
-      isFictitious: isAdmin ? (body.isFictitious || false) : false,
+      clientName: body.clientName,
+      clientEmail: body.clientEmail,
+      clientPhone: body.clientPhone,
+      notes: body.notes,
+      isFictitious: false,
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -139,8 +142,8 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       data: {
-        _id: result.insertedId.toString(),
-        ...appointment
+        ...appointment,
+        _id: result.insertedId.toString()
       }
     }, { status: 201 });
 

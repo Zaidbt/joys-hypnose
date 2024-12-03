@@ -3,16 +3,37 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #000000;
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 255, 255, 255;
+  --background-end-rgb: 255, 255, 255;
 }
 
-html,
 body {
-  color: var(--foreground);
-  background: var(--background);
-  min-height: 100vh;
-  width: 100%;
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-start-rgb));
+}
+
+/* Make sure text is fully opaque */
+h1, h2, h3, h4, h5, h6, p, span, a {
+  opacity: 1 !important;
+}
+
+/* Ensure logo text is fully visible */
+.logo-text {
+  opacity: 1 !important;
+  color: #000000 !important;
+}
+
+/* Ensure menu text is fully visible */
+.nav-link {
+  opacity: 1 !important;
+  color: #000000 !important;
+}
+
+/* Make sure service titles and section headings are fully visible */
+.section-title, .service-title {
+  opacity: 1 !important;
+  color: #000000 !important;
 }
 
 * {
@@ -21,89 +42,77 @@ body {
   padding: 0;
 }
 
-.prose-editor {
-  @apply relative mb-12;
-}
+@layer components {
+  .prose-editor {
+    @apply relative mb-12;
+  }
 
-.prose-editor .ql-container {
-  @apply min-h-[200px] rounded-b-lg border border-gray-300;
-  font-family: inherit;
-  background-color: white;
-}
+  .prose-editor .ql-container {
+    @apply min-h-[200px] rounded-b-lg border border-gray-300;
+    font-family: inherit;
+    background-color: white;
+  }
 
-.prose-editor .ql-toolbar {
-  @apply rounded-t-lg border border-gray-300 bg-gray-50;
-  border-bottom: none !important;
-}
+  .prose-editor .ql-toolbar {
+    @apply rounded-t-lg border border-gray-300 bg-gray-50;
+    border-bottom: none !important;
+  }
 
-.prose-editor .ql-editor {
-  min-height: 400px !important;
-  @apply text-base leading-relaxed p-4;
-  background-color: white;
-}
+  .prose-editor .ql-editor {
+    min-height: 400px !important;
+    @apply text-base leading-relaxed p-4;
+    background-color: white;
+  }
 
-.prose-editor .ql-editor p {
-  @apply mb-4;
-}
+  .prose-editor .ql-editor p {
+    @apply mb-4;
+  }
 
-.prose-editor .ql-editor {
-  cursor: text !important;
-  pointer-events: auto !important;
-}
+  .prose-editor .ql-editor {
+    cursor: text !important;
+    pointer-events: auto !important;
+  }
 
-.prose-editor {
-  z-index: 1;
-}
+  .prose-editor {
+    z-index: 1;
+  }
 
-.prose-editor .ql-toolbar {
-  z-index: 2;
-}
+  .prose-editor .ql-toolbar {
+    z-index: 2;
+  }
 
-.prose-editor .ql-container {
-  z-index: 1;
-}
+  .prose-editor .ql-container {
+    z-index: 1;
+  }
 
-.blog-content {
-  @apply prose prose-lg max-w-none;
-}
+  .blog-content {
+    @apply prose prose-lg max-w-none prose-headings:text-gray-900 prose-headings:font-bold prose-p:text-gray-700 prose-p:leading-relaxed prose-a:text-primary-600 prose-a:hover:text-primary-700 prose-blockquote:border-primary-200;
+  }
 
-.blog-content h1,
-.blog-content h2,
-.blog-content h3 {
-  @apply text-gray-900 font-bold;
-}
+  .blog-content h1 {
+    @apply text-3xl mt-8 mb-4;
+  }
 
-.blog-content h1 {
-  @apply text-3xl mt-8 mb-4;
-}
+  .blog-content h2 {
+    @apply text-2xl mt-6 mb-3;
+  }
 
-.blog-content h2 {
-  @apply text-2xl mt-6 mb-3;
-}
+  .blog-content h3 {
+    @apply text-xl mt-4 mb-2;
+  }
 
-.blog-content h3 {
-  @apply text-xl mt-4 mb-2;
-}
+  .blog-content ul,
+  .blog-content ol {
+    @apply my-4 pl-6;
+  }
 
-.blog-content p {
-  @apply text-gray-700 mb-4 leading-relaxed;
-}
+  .blog-content li {
+    @apply mb-2;
+  }
 
-.blog-content ul,
-.blog-content ol {
-  @apply my-4 pl-6;
-}
-
-.blog-content li {
-  @apply mb-2;
-}
-
-.blog-content a {
-  @apply text-primary-600 hover:text-primary-700 underline;
-}
-
-.blog-content blockquote {
-  @apply border-l-4 border-primary-200 pl-4 italic my-4;
+  .blog-content blockquote {
+    @apply border-l-4 pl-4 italic my-4;
+  }
 }
 
 .prose-editor .ql-container {

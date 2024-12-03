@@ -48,11 +48,13 @@ export async function createPost(post: Omit<BlogPost, 'id'>) {
   const client = await clientPromise;
   const collection = client.db('joyshypnose').collection('posts');
   
+  const { _id, ...postWithoutId } = post;
+  
   const result = await collection.insertOne({
-    ...post,
+    ...postWithoutId,
     publishedAt: new Date().toISOString(),
     lastModified: new Date().toISOString(),
-    coverImage: post.coverImage || '',
+    coverImage: post.featuredImage || '',
     tags: post.tags || [],
     author: post.author || 'Admin',
   });

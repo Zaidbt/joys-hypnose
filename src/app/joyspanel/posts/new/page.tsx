@@ -27,10 +27,12 @@ export default function NewPost() {
   const router = useRouter();
   const [post, setPost] = useState<CreateBlogPost>({
     title: '',
+    slug: '',
     excerpt: '',
     content: '',
     tags: [],
     readingTime: 1,
+    featuredImage: ''
   });
   const [currentTag, setCurrentTag] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -38,8 +40,22 @@ export default function NewPost() {
   const [previewMode, setPreviewMode] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
 
+  const generateSlug = (title: string) => {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  };
+
   const handleChange = (field: keyof CreateBlogPost, value: any) => {
-    setPost(prev => ({ ...prev, [field]: value }));
+    setPost(prev => {
+      const updates = { [field]: value };
+      // If title is being updated, also update the slug
+      if (field === 'title') {
+        updates.slug = generateSlug(value);
+      }
+      return { ...prev, ...updates };
+    });
     setIsDirty(true);
   };
 
@@ -90,7 +106,7 @@ export default function NewPost() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...post,
-          readingTime: parseInt(post.readingTime.toString()) || 1,
+          readingTime: post.readingTime ?? 1,
           status
         }),
       });

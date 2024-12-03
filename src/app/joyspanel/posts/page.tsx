@@ -125,7 +125,7 @@ export default function PostsPage() {
                             <span className="sr-only">Edit</span>
                           </button>
                           <button
-                            onClick={() => handleDelete(post._id!)}
+                            onClick={() => post._id && handleDelete(post._id)}
                             className="text-red-600 hover:text-red-900"
                           >
                             <TrashIcon className="h-5 w-5" />

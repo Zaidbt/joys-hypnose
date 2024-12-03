@@ -1,8 +1,6 @@
 'use client';
 
 import React from 'react';
-
-
 import { motion } from 'framer-motion';
 
 const sessions = [
@@ -26,7 +24,7 @@ const sessions = [
 
 export default function SessionSteps() {
   return (
-    <section className="py-24 sm:py-32 bg-gradient-to-b from-white via-primary-50/20 to-white">
+    <section className="py-24 sm:py-32 bg-[#fff5f5]">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -34,10 +32,10 @@ export default function SessionSteps() {
           transition={{ duration: 0.8 }}
           className="mx-auto max-w-2xl text-center mb-16"
         >
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl mb-4">
+          <h2 className="text-3xl font-bold tracking-tight text-black sm:text-4xl mb-4">
             Comment les séances se déroulent?
           </h2>
-          <p className="text-lg leading-8 text-gray-600">
+          <p className="text-lg leading-8 text-black">
             Découvrez notre approche thérapeutique personnalisée
           </p>
         </motion.div>
@@ -52,12 +50,11 @@ export default function SessionSteps() {
               viewport={{ once: true }}
               className="relative group"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-primary-50 to-secondary-50 rounded-2xl transform group-hover:scale-[1.02] transition-transform duration-300 -z-10" />
-              <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-sm ring-1 ring-gray-200/50 hover:shadow-lg transition-all duration-300">
-                <h3 className="text-xl font-semibold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent mb-4">
+              <div className="bg-white/80 p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 border border-rose-100/20">
+                <h3 className="text-xl font-semibold text-black mb-4">
                   {session.title}
                 </h3>
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-black leading-relaxed">
                   {session.content}
                 </p>
               </div>
