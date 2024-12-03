@@ -1,14 +1,18 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/utils/authOptions';
-import { writeFile, mkdir, access, stat } from 'fs/promises';
+import { writeFile, mkdir, stat } from 'fs/promises';
 import path from 'path';
 import { uploadConfig } from '@/lib/upload-config';
+
+function getFileExtension(filename: string): string {
+  const ext = path.extname(filename).toLowerCase();
+  return ext;
+}
 
 export async function POST(request: Request) {
   console.log('Starting file upload process...');
   try {
-    // Check authentication
     const session = await getServerSession(authOptions);
     if (!session) {
       console.log('Authentication failed');
@@ -26,15 +30,18 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+
+    const fileExt = getFileExtension(file.name);
     console.log('File received:', {
       name: file.name,
       type: file.type,
-      size: file.size
+      size: file.size,
+      extension: fileExt
     });
 
-    // Validate file type
-    if (!uploadConfig.allowedTypes.includes(file.type)) {
-      console.log('Invalid file type:', file.type);
+    // Validate file type and extension
+    if (!uploadConfig.allowedTypes.includes(file.type) || !uploadConfig.allowedExtensions.includes(fileExt)) {
+      console.log('Invalid file type or extension:', { type: file.type, extension: fileExt });
       return NextResponse.json(
         { error: 'Invalid file type. Only JPEG, PNG and WebP are allowed.' },
         { status: 400 }
@@ -54,27 +61,18 @@ export async function POST(request: Request) {
     const buffer = Buffer.from(bytes);
     console.log('File buffer created, size:', buffer.length);
 
-    // Create unique filename with sanitized original name
+    // Create unique filename with sanitized original name and preserved extension
     const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
-    const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '').replace(/\s+/g, '-');
-    const filename = `${uniqueSuffix}-${sanitizedName}`;
+    const sanitizedName = path.parse(file.name).name.replace(/[^a-zA-Z0-9]/g, '-');
+    const filename = `${uniqueSuffix}-${sanitizedName}${fileExt}`;
     console.log('Generated filename:', filename);
 
-    // Log upload directory information
-    console.log('Upload directory:', uploadConfig.uploadDir);
+    // Ensure upload directory exists
     try {
-      const uploadDirStats = await stat(uploadConfig.uploadDir);
-      console.log('Upload directory stats:', {
-        exists: true,
-        isDirectory: uploadDirStats.isDirectory(),
-        permissions: uploadDirStats.mode,
-        owner: uploadDirStats.uid,
-        group: uploadDirStats.gid
-      });
+      await stat(uploadConfig.uploadDir);
     } catch (error) {
-      console.log('Upload directory does not exist, creating it...');
+      console.log('Creating upload directory...');
       await mkdir(uploadConfig.uploadDir, { recursive: true });
-      console.log('Created uploads directory');
     }
 
     const filepath = path.join(uploadConfig.uploadDir, filename);
@@ -88,9 +86,7 @@ export async function POST(request: Request) {
       const fileStats = await stat(filepath);
       console.log('Written file stats:', {
         size: fileStats.size,
-        permissions: fileStats.mode,
-        owner: fileStats.uid,
-        group: fileStats.gid
+        permissions: fileStats.mode
       });
     } catch (error) {
       console.error('Error writing file:', error);
@@ -100,7 +96,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Return the relative URL
+    // Return the full URL for production
     const fileUrl = uploadConfig.getImageUrl(filename);
     console.log('Generated file URL:', fileUrl);
     

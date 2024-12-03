@@ -38,8 +38,8 @@ export default function BlogPage() {
     fetchPosts();
   }, [fetchPosts]);
 
-  const handlePostClick = useCallback((postId: string) => {
-    router.push(`/blog/${postId}`);
+  const handlePostClick = useCallback((slug: string) => {
+    router.push(`/blog/${slug}`);
   }, [router]);
 
   return (
@@ -71,7 +71,7 @@ export default function BlogPage() {
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   className="group bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer"
-                  onClick={() => post._id && handlePostClick(post._id)}
+                  onClick={() => post.slug && handlePostClick(post.slug)}
                 >
                   {post.featuredImage && (
                     <div className="relative h-56 w-full overflow-hidden">

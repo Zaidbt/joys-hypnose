@@ -50,17 +50,26 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { title, excerpt, content, tags, featuredImage } = body as BlogPost;
+    const { title, excerpt, content, tags, featuredImage, slug } = body as BlogPost;
 
-    if (!title || !excerpt || !content) {
+    if (!title || !excerpt || !content || !slug) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Missing required fields (title, excerpt, content, or slug)' },
         { status: 400 }
       );
     }
 
     const db = client.db('joyshypnose');
     const blogCollection = db.collection('blog_posts');
+
+    // Check if slug already exists
+    const existingPost = await blogCollection.findOne({ slug });
+    if (existingPost) {
+      return NextResponse.json(
+        { error: 'A post with this slug already exists' },
+        { status: 400 }
+      );
+    }
 
     const newPost = {
       title,
@@ -72,7 +81,7 @@ export async function POST(request: Request) {
       author: session.user.email,
       createdAt: new Date(),
       updatedAt: new Date(),
-      slug: body.slug
+      slug
     };
 
     const result = await blogCollection.insertOne(newPost);

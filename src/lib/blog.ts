@@ -6,6 +6,12 @@ export async function createBlogPost(post: Omit<BlogPost, '_id'>) {
   const client = await clientPromise;
   const collection = client.db('joyshypnose').collection('blog_posts');
   
+  // Check if slug already exists
+  const existingPost = await collection.findOne({ slug: post.slug });
+  if (existingPost) {
+    throw new Error('A post with this slug already exists');
+  }
+
   const newPost = {
     ...post,
     createdAt: new Date(),
@@ -26,7 +32,7 @@ export async function getAllPosts(): Promise<BlogPost[]> {
   
   const posts = await collection
     .find({})
-    .sort({ publishedAt: -1 })
+    .sort({ createdAt: -1 })
     .toArray();
 
   return posts.map(post => ({
@@ -67,4 +73,50 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
     createdAt: post.createdAt || new Date(),
     updatedAt: post.updatedAt || new Date()
   };
+}
+
+export async function updatePost(slug: string, updates: Partial<BlogPost>) {
+  const client = await clientPromise;
+  const collection = client.db('joyshypnose').collection('blog_posts');
+  
+  // If trying to update slug, check if new slug already exists
+  if (updates.slug && updates.slug !== slug) {
+    const existingPost = await collection.findOne({ slug: updates.slug });
+    if (existingPost) {
+      throw new Error('A post with this slug already exists');
+    }
+  }
+
+  const result = await collection.findOneAndUpdate(
+    { slug },
+    { 
+      $set: {
+        ...updates,
+        updatedAt: new Date()
+      }
+    },
+    { returnDocument: 'after' }
+  );
+
+  if (!result) {
+    throw new Error('Post not found');
+  }
+
+  return {
+    ...result,
+    _id: result._id.toString()
+  };
+}
+
+export async function deletePost(slug: string) {
+  const client = await clientPromise;
+  const collection = client.db('joyshypnose').collection('blog_posts');
+  
+  const result = await collection.deleteOne({ slug });
+  
+  if (result.deletedCount === 0) {
+    throw new Error('Post not found');
+  }
+  
+  return { slug };
 } 

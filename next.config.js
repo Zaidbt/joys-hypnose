@@ -2,6 +2,7 @@
 const nextConfig = {
   images: {
     unoptimized: true,
+    domains: ['77.37.122.81'],
     remotePatterns: [
       {
         protocol: 'http',
@@ -14,11 +15,25 @@ const nextConfig = {
   output: 'standalone',
   outputFileTracing: true,
   distDir: '.next',
-  async rewrites() {
+  experimental: {
+    outputFileTracingExcludes: {
+      '*': [
+        'node_modules/@swc/core-linux-x64-gnu',
+        'node_modules/@swc/core-linux-x64-musl',
+        'node_modules/@esbuild/linux-x64',
+      ],
+    },
+  },
+  async headers() {
     return [
       {
         source: '/uploads/:path*',
-        destination: '/public/uploads/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
       },
     ];
   },
