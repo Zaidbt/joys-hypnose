@@ -2,12 +2,29 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/utils/authOptions';
 import { writeFile, mkdir, stat } from 'fs/promises';
+import { createWriteStream } from 'fs';
 import path from 'path';
 import { uploadConfig } from '@/lib/upload-config';
+import { Readable } from 'stream';
 
 function getFileExtension(filename: string): string {
   const ext = path.extname(filename).toLowerCase();
   return ext;
+}
+
+async function streamToFile(stream: Readable, filepath: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const writeStream = createWriteStream(filepath);
+    stream.pipe(writeStream);
+    
+    writeStream.on('finish', () => {
+      resolve();
+    });
+    
+    writeStream.on('error', (error) => {
+      reject(error);
+    });
+  });
 }
 
 export async function POST(request: Request) {
@@ -57,16 +74,6 @@ export async function POST(request: Request) {
       );
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    console.log('File buffer created, size:', buffer.length);
-
-    // Create unique filename with sanitized original name and preserved extension
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
-    const sanitizedName = path.parse(file.name).name.replace(/[^a-zA-Z0-9]/g, '-');
-    const filename = `${uniqueSuffix}-${sanitizedName}${fileExt}`;
-    console.log('Generated filename:', filename);
-
     // Ensure upload directory exists
     try {
       await stat(uploadConfig.uploadDir);
@@ -75,11 +82,19 @@ export async function POST(request: Request) {
       await mkdir(uploadConfig.uploadDir, { recursive: true });
     }
 
+    // Create unique filename with sanitized original name and preserved extension
+    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
+    const sanitizedName = path.parse(file.name).name.replace(/[^a-zA-Z0-9]/g, '-');
+    const filename = `${uniqueSuffix}-${sanitizedName}${fileExt}`;
+    console.log('Generated filename:', filename);
+
     const filepath = path.join(uploadConfig.uploadDir, filename);
     console.log('Full file path:', filepath);
 
     try {
-      await writeFile(filepath, buffer);
+      // Convert File to stream and write to disk
+      const fileStream = Readable.from(Buffer.from(await file.arrayBuffer()));
+      await streamToFile(fileStream, filepath);
       console.log('Successfully wrote file');
       
       // Verify file was written
