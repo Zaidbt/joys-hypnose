@@ -57,6 +57,10 @@ const nextConfig = {
             key: 'Access-Control-Allow-Methods',
             value: 'GET',
           },
+          {
+            key: 'Content-Type',
+            value: 'image/jpeg',
+          },
         ],
       },
     ];

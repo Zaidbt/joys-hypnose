@@ -16,8 +16,15 @@ module.exports = {
     ignore_watch: [
       'node_modules',
       '.next',
-      '.git'
+      '.git',
+      'node_modules/**',
+      '**/*.log'
     ],
+    watch_options: {
+      followSymlinks: false,
+      usePolling: true,
+      interval: 1000
+    },
     max_memory_restart: '1G'
   }]
 }; 
