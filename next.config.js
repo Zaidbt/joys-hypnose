@@ -3,27 +3,15 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: '**',
-      },
-      {
         protocol: 'http',
-        hostname: '**',
+        hostname: '77.37.122.81',
+        port: '3000',
+        pathname: '/uploads/**',
       },
     ],
+    unoptimized: true,
   },
-  webpack: (config) => {
-    config.resolve.alias.canvas = false;
-    
-    // Add this to ensure proper module resolution
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      fs: false,
-      path: false,
-    };
-    
-    return config;
-  },
+  output: 'standalone',
 }
 
 module.exports = nextConfig 
