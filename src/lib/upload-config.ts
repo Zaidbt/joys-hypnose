@@ -1,8 +1,5 @@
 import path from 'path';
 
-const isProd = process.env.NODE_ENV === 'production';
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-
 // MIME type mapping
 const mimeTypes = {
   '.jpg': 'image/jpeg',
@@ -18,6 +15,6 @@ export const uploadConfig = {
   allowedExtensions: Object.keys(mimeTypes),
   mimeTypes,
   getImageUrl: (filename: string) => {
-    return `${baseUrl}/uploads/${filename}`;
+    return `/uploads/${filename}`;
   }
 }; 
