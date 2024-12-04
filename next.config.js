@@ -2,7 +2,11 @@
 const nextConfig = {
   images: {
     unoptimized: true,
-    domains: ['77.37.122.81'],
+    domains: [
+      '77.37.122.81', 
+      'joyshypnose-therapies.com',
+      'www.joyshypnose-therapies.com'
+    ],
     remotePatterns: [
       {
         protocol: 'http',
@@ -10,6 +14,16 @@ const nextConfig = {
         port: '3000',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'joyshypnose-therapies.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.joyshypnose-therapies.com',
+        pathname: '/**',
+      }
     ],
   },
   output: 'standalone',
@@ -64,22 +78,6 @@ const nextConfig = {
         ],
       },
     ];
-  },
-  webpack: (config, { isServer }) => {
-    config.module.rules.push({
-      test: /\.(png|jpe?g|gif|webp)$/i,
-      use: [
-        {
-          loader: 'file-loader',
-          options: {
-            publicPath: '/_next/static/images',
-            outputPath: 'static/images',
-          },
-        },
-      ],
-    });
-
-    return config;
   },
 }
 

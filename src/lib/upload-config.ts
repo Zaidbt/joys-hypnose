@@ -1,6 +1,7 @@
 import path from 'path';
 
 const isProd = process.env.NODE_ENV === 'production';
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
 // MIME type mapping
 const mimeTypes = {
@@ -17,7 +18,6 @@ export const uploadConfig = {
   allowedExtensions: Object.keys(mimeTypes),
   mimeTypes,
   getImageUrl: (filename: string) => {
-    const baseUrl = isProd ? 'http://77.37.122.81:3000' : '';
     return `${baseUrl}/uploads/${filename}`;
   }
 }; 
