@@ -136,43 +136,20 @@ export async function POST(request: Request) {
       );
     }
 
-    // For first-time clients, validate that both hours are available
-    if (body.isFirstTime) {
-      const firstHourStart = new Date(startTime);
-      const secondHourStart = new Date(startTime);
-      secondHourStart.setTime(secondHourStart.getTime() + 60 * 60 * 1000); // Add 1 hour
-      const slotEnd = new Date(startTime);
-      slotEnd.setTime(slotEnd.getTime() + 120 * 60 * 1000); // Add 2 hours
+    // Check for existing appointments that overlap with the requested time slot
+    const existingAppointments = await appointmentsCollection.find({
+      startTime: { $lt: endTime },
+      endTime: { $gt: startTime },
+      status: { $in: ['booked', 'pending'] }
+    }).toArray();
 
-      const existingAppointments = await appointmentsCollection.find({
-        startTime: {
-          $lt: slotEnd
-        },
-        endTime: {
-          $gt: firstHourStart
-        },
-        status: { $in: ['booked', 'pending'] }
-      }).toArray();
-
-      if (existingAppointments.length > 0) {
-        return NextResponse.json(
-          { error: 'One or both hours are not available for a 2-hour appointment' },
-          { status: 409 }
-        );
-      }
-    } else {
-      // Check for existing appointments in the time slot
-      const existingAppointment = await appointmentsCollection.findOne({
-        startTime: new Date(body.startTime),
-        status: { $in: ['booked', 'pending'] }
-      });
-
-      if (existingAppointment) {
-        return NextResponse.json(
-          { error: 'Time slot already booked' },
-          { status: 409 }
-        );
-      }
+    if (existingAppointments.length > 0) {
+      return NextResponse.json(
+        { error: body.isFirstTime ? 
+          'One or both hours are not available for a 2-hour appointment' : 
+          'Time slot already booked' },
+        { status: 409 }
+      );
     }
 
     const appointment = {

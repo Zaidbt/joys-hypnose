@@ -45,7 +45,7 @@ export async function GET(request: Request) {
       );
     }
 
-    // Only get active appointments (not cancelled ones)
+    // Get all appointments for the day
     const bookedSlots = await appointmentsCollection
       .find({
         startTime: {
@@ -70,42 +70,28 @@ export async function GET(request: Request) {
     let currentMinute = startMinute;
 
     while (currentHour < endHour || (currentHour === endHour && currentMinute < endMinute)) {
-      // Calculate if this slot would end after working hours
       const currentTimeInMinutes = currentHour * 60 + currentMinute;
       const slotEndTimeInMinutes = currentTimeInMinutes + (isFirstTime ? 120 : settings.slotDuration);
       
       // Only create slot if it ends within working hours
       if (slotEndTimeInMinutes <= endTimeInMinutes) {
         const timeString = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
-        const slotDate = new Date(date);
-        slotDate.setHours(currentHour, currentMinute, 0, 0);
+        const slotStart = new Date(date);
+        slotStart.setHours(currentHour, currentMinute, 0, 0);
+        const slotEnd = new Date(slotStart);
+        slotEnd.setMinutes(slotEnd.getMinutes() + (isFirstTime ? 120 : settings.slotDuration));
 
-        // For first-time clients, check if both hours are available
+        // Check if slot is available
         let isSlotAvailable = true;
-        if (isFirstTime) {
-          // Check both hours in the 2-hour slot
-          const firstHourStart = new Date(slotDate);
-          const secondHourStart = new Date(slotDate);
-          secondHourStart.setTime(secondHourStart.getTime() + 60 * 60 * 1000); // Add 1 hour in milliseconds
-          const slotEnd = new Date(slotDate);
-          slotEnd.setTime(slotEnd.getTime() + 120 * 60 * 1000); // Add 2 hours in milliseconds
-
-          const conflictingBooking = bookedSlots.find(booking => {
-            const bookingStart = new Date(booking.startTime);
-            const bookingEnd = new Date(booking.endTime);
-            // Check if any part of the 2-hour slot overlaps with an existing booking
-            return (firstHourStart < bookingEnd && slotEnd > bookingStart);
-          });
+        for (const booking of bookedSlots) {
+          const bookingStart = new Date(booking.startTime);
+          const bookingEnd = new Date(booking.endTime);
           
-          isSlotAvailable = !conflictingBooking;
-        } else {
-          // Regular 1-hour booking check
-          const conflictingBooking = bookedSlots.find(booking => {
-            const bookingStart = new Date(booking.startTime);
-            const bookingEnd = new Date(booking.endTime);
-            return slotDate >= bookingStart && slotDate < bookingEnd;
-          });
-          isSlotAvailable = !conflictingBooking;
+          // Check if there's any overlap between the slot and the booking
+          if (!(slotEnd <= bookingStart || slotStart >= bookingEnd)) {
+            isSlotAvailable = false;
+            break;
+          }
         }
 
         slots.push({
@@ -115,6 +101,7 @@ export async function GET(request: Request) {
         });
       }
 
+      // Increment by slot duration
       currentMinute += settings.slotDuration;
       if (currentMinute >= 60) {
         currentHour += Math.floor(currentMinute / 60);
