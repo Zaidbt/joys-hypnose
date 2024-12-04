@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import 'react-quill/dist/quill.snow.css';
 import type ReactQuill from 'react-quill';
@@ -77,6 +77,20 @@ const fonts = [
 
 export default function RichTextEditor({ value, onChange, placeholder }: RichTextEditorProps) {
   const quillRef = useRef<ReactQuill>(null);
+
+  useEffect(() => {
+    // Load Google Fonts dynamically
+    const link = document.createElement('link');
+    link.href = 'https://fonts.googleapis.com/css2?family=' + fonts.map(font => 
+      font.replace(/\s+/g, '+')
+    ).join('&family=') + '&display=swap';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+
+    return () => {
+      document.head.removeChild(link);
+    };
+  }, []);
 
   const modules = {
     toolbar: {
