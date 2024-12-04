@@ -5,12 +5,16 @@ import dynamic from 'next/dynamic';
 import 'react-quill/dist/quill.snow.css';
 import type ReactQuill from 'react-quill';
 
+// Import Quill for type and static methods
+import Quill from 'react-quill';
+const QuillJS = typeof window === 'undefined' ? null : Quill.Quill;
+
 const QuillWrapper = dynamic(
   async () => {
     const { default: RQ } = await import('react-quill');
     // Register fonts with Quill
     if (typeof window !== 'undefined') {
-      const Quill = (await import('react-quill')).default.Quill;
+      const Quill = RQ.Quill;
       const Font = Quill.import('formats/font');
       
       // Import and register the image resize module
@@ -109,7 +113,7 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
       ]
     },
     imageResize: {
-      parchment: Quill?.import('parchment'),
+      parchment: QuillJS?.import('parchment'),
       modules: ['Resize', 'DisplaySize', 'Toolbar'],
       displayStyles: {
         backgroundColor: 'black',
