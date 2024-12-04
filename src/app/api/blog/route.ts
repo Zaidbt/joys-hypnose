@@ -19,11 +19,14 @@ async function getPosts(forceRefresh = false) {
   const db = client.db('joyshypnose');
   const blogCollection = db.collection('blog_posts');
 
+  console.log('Fetching posts from database...');
+
   const posts = await blogCollection
     .find({})
     .sort({ createdAt: -1 })
     .project({
       title: 1,
+      slug: 1,
       excerpt: 1,
       featuredImage: 1,
       tags: 1,
@@ -32,9 +35,12 @@ async function getPosts(forceRefresh = false) {
     })
     .toArray();
 
+  console.log('Found posts:', posts.length);
+
   postsCache = posts.map(post => ({
     ...post,
-    _id: post._id.toString()
+    _id: post._id.toString(),
+    slug: post.slug || `post-${post._id.toString()}` // Fallback slug if none exists
   }));
   lastFetchTime = now;
 
@@ -111,12 +117,14 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const forceRefresh = searchParams.get('refresh') === 'true';
     
+    console.log('GET /api/blog - Fetching posts...');
     const posts = await getPosts(forceRefresh);
+    console.log('Returning posts:', posts.length);
     
     return new NextResponse(JSON.stringify(posts), {
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300'
+        'Cache-Control': 'no-cache, no-store, must-revalidate'
       }
     });
   } catch (error) {
