@@ -140,23 +140,17 @@ export async function POST(request: Request) {
     if (body.isFirstTime) {
       const firstHourStart = new Date(startTime);
       const secondHourStart = new Date(startTime);
-      secondHourStart.setHours(secondHourStart.getHours() + 1);
+      secondHourStart.setTime(secondHourStart.getTime() + 60 * 60 * 1000); // Add 1 hour
+      const slotEnd = new Date(startTime);
+      slotEnd.setTime(slotEnd.getTime() + 120 * 60 * 1000); // Add 2 hours
 
       const existingAppointments = await appointmentsCollection.find({
-        $or: [
-          {
-            startTime: {
-              $gte: firstHourStart,
-              $lt: secondHourStart
-            }
-          },
-          {
-            startTime: {
-              $gte: secondHourStart,
-              $lt: endTime
-            }
-          }
-        ],
+        startTime: {
+          $lt: slotEnd
+        },
+        endTime: {
+          $gt: firstHourStart
+        },
         status: { $in: ['booked', 'pending'] }
       }).toArray();
 

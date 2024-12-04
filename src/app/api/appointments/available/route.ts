@@ -83,22 +83,21 @@ export async function GET(request: Request) {
         // For first-time clients, check if both hours are available
         let isSlotAvailable = true;
         if (isFirstTime) {
-          // Check current hour and next hour
-          for (let i = 0; i < 2; i++) {
-            const checkTime = new Date(slotDate);
-            checkTime.setHours(currentHour, currentMinute + (i * 60), 0, 0);
-            
-            const conflictingBooking = bookedSlots.find(booking => {
-              const bookingStart = new Date(booking.startTime);
-              const bookingEnd = new Date(booking.endTime);
-              return checkTime >= bookingStart && checkTime < bookingEnd;
-            });
-            
-            if (conflictingBooking) {
-              isSlotAvailable = false;
-              break;
-            }
-          }
+          // Check both hours in the 2-hour slot
+          const firstHourStart = new Date(slotDate);
+          const secondHourStart = new Date(slotDate);
+          secondHourStart.setTime(secondHourStart.getTime() + 60 * 60 * 1000); // Add 1 hour in milliseconds
+          const slotEnd = new Date(slotDate);
+          slotEnd.setTime(slotEnd.getTime() + 120 * 60 * 1000); // Add 2 hours in milliseconds
+
+          const conflictingBooking = bookedSlots.find(booking => {
+            const bookingStart = new Date(booking.startTime);
+            const bookingEnd = new Date(booking.endTime);
+            // Check if any part of the 2-hour slot overlaps with an existing booking
+            return (firstHourStart < bookingEnd && slotEnd > bookingStart);
+          });
+          
+          isSlotAvailable = !conflictingBooking;
         } else {
           // Regular 1-hour booking check
           const conflictingBooking = bookedSlots.find(booking => {
