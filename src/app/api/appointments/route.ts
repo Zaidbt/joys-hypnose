@@ -118,20 +118,26 @@ export async function POST(request: Request) {
       );
     }
 
+    // Parse the start time and create end time
     const startTime = new Date(body.startTime);
-    const endTime = new Date(startTime); // Create endTime based on startTime
-    endTime.setMinutes(startTime.getMinutes() + (body.isFirstTime ? 120 : settings.slotDuration));
+    const endTime = new Date(startTime);
+    if (body.isFirstTime) {
+      endTime.setHours(startTime.getHours() + 2); // Add 2 hours for first-time clients
+    } else {
+      endTime.setHours(startTime.getHours() + 1); // Add 1 hour for regular clients
+    }
 
     // Validate if the appointment is within working hours
-    const [startHour, startMinute] = settings.workingHours.start.split(':').map(Number);
-    const [endHour, endMinute] = settings.workingHours.end.split(':').map(Number);
+    const [startWorkHour, startWorkMinute] = settings.workingHours.start.split(':').map(Number);
+    const [endWorkHour, endWorkMinute] = settings.workingHours.end.split(':').map(Number);
     
     const workStart = new Date(startTime);
-    workStart.setHours(startHour, startMinute, 0, 0);
+    workStart.setHours(startWorkHour, startWorkMinute, 0, 0);
     
     const workEnd = new Date(startTime);
-    workEnd.setHours(endHour, endMinute, 0, 0);
+    workEnd.setHours(endWorkHour, endWorkMinute, 0, 0);
 
+    // Check if both start and end times are within working hours
     if (startTime < workStart || endTime > workEnd) {
       return NextResponse.json(
         { error: 'Appointment must be within working hours' },

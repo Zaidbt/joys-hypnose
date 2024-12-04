@@ -62,27 +62,31 @@ export async function GET(request: Request) {
     const [startHour, startMinute] = settings.workingHours.start.split(':').map(Number);
     const [endHour, endMinute] = settings.workingHours.end.split(':').map(Number);
     
-    // Convert times to minutes for easier comparison
-    const startTimeInMinutes = startHour * 60 + startMinute;
-    const endTimeInMinutes = endHour * 60 + endMinute;
-    
     const slots = [];
-    let currentTimeInMinutes = startTimeInMinutes;
+    let currentHour = startHour;
+    let currentMinute = startMinute;
 
-    while (currentTimeInMinutes < endTimeInMinutes) {
-      const currentHour = Math.floor(currentTimeInMinutes / 60);
-      const currentMinute = currentTimeInMinutes % 60;
-      
+    // Calculate end time in hours for comparison
+    const endTimeInHours = endHour + (endMinute / 60);
+
+    while (currentHour < endHour || (currentHour === endHour && currentMinute < endMinute)) {
       const timeString = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
       
+      // Calculate current time in hours for comparison
+      const currentTimeInHours = currentHour + (currentMinute / 60);
+      
       // For first-time clients, check if there's enough time for a 2-hour slot
-      const slotDurationMinutes = isFirstTime ? 120 : settings.slotDuration;
-      if (currentTimeInMinutes + slotDurationMinutes <= endTimeInMinutes) {
+      const slotDurationHours = isFirstTime ? 2 : 1;
+      if (currentTimeInHours + slotDurationHours <= endTimeInHours) {
         const slotStart = new Date(date);
         slotStart.setHours(currentHour, currentMinute, 0, 0);
         
         const slotEnd = new Date(slotStart);
-        slotEnd.setMinutes(slotStart.getMinutes() + slotDurationMinutes);
+        if (isFirstTime) {
+          slotEnd.setHours(slotStart.getHours() + 2); // Add 2 hours for first-time clients
+        } else {
+          slotEnd.setHours(slotStart.getHours() + 1); // Add 1 hour for regular clients
+        }
 
         // Check if slot is available
         let isSlotAvailable = true;
@@ -104,8 +108,12 @@ export async function GET(request: Request) {
         });
       }
 
-      // Increment by slot duration (always use standard slot duration for increment)
-      currentTimeInMinutes += settings.slotDuration;
+      // Increment by standard slot duration (1 hour)
+      currentMinute += settings.slotDuration;
+      if (currentMinute >= 60) {
+        currentHour += Math.floor(currentMinute / 60);
+        currentMinute = currentMinute % 60;
+      }
     }
 
     return NextResponse.json(slots);
