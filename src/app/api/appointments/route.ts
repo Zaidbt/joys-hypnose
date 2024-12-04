@@ -118,55 +118,78 @@ export async function POST(request: Request) {
       );
     }
 
-    // Parse the selected time
-    const selectedTime = new Date(body.startTime);
-    const selectedHour = selectedTime.getHours();
-    const selectedMinutes = selectedTime.getMinutes();
+    // Create immutable date objects for all our calculations
+    const originalSelectedTime = new Date(body.startTime);
+    console.log('Original selected time:', originalSelectedTime);
 
-    // Create the next hour time
-    const nextHourTime = new Date(body.startTime);
-    nextHourTime.setHours(selectedHour + 1, selectedMinutes);
+    // Extract hours and minutes once
+    const selectedHour = originalSelectedTime.getHours();
+    const selectedMinutes = originalSelectedTime.getMinutes();
+    console.log('Selected hour:', selectedHour, 'Selected minutes:', selectedMinutes);
+
+    // Calculate appointment start and end times
+    const appointmentStart = new Date(originalSelectedTime);
+    const appointmentEnd = new Date(originalSelectedTime);
+    appointmentEnd.setHours(selectedHour + (body.isFirstTime ? 2 : 1), selectedMinutes);
+    
+    console.log('Appointment start:', appointmentStart);
+    console.log('Appointment end:', appointmentEnd);
 
     // Validate if the appointment is within working hours
     const [startWorkHour, startWorkMinute] = settings.workingHours.start.split(':').map(Number);
     const [endWorkHour, endWorkMinute] = settings.workingHours.end.split(':').map(Number);
     
-    const workStart = new Date(selectedTime);
+    const workStart = new Date(originalSelectedTime);
     workStart.setHours(startWorkHour, startWorkMinute, 0, 0);
     
-    const workEnd = new Date(selectedTime);
+    const workEnd = new Date(originalSelectedTime);
     workEnd.setHours(endWorkHour, endWorkMinute, 0, 0);
 
-    // For first-time clients, we need to ensure both hours are within working hours
-    if (body.isFirstTime) {
-      const secondHourEnd = new Date(nextHourTime);
-      secondHourEnd.setHours(selectedHour + 2, selectedMinutes);
-      
-      if (selectedTime < workStart || secondHourEnd > workEnd) {
-        return NextResponse.json(
-          { error: 'Two-hour appointment must be within working hours' },
-          { status: 400 }
-        );
-      }
-    } else {
-      if (selectedTime < workStart || nextHourTime > workEnd) {
-        return NextResponse.json(
-          { error: 'Appointment must be within working hours' },
-          { status: 400 }
-        );
-      }
+    console.log('Work start:', workStart);
+    console.log('Work end:', workEnd);
+
+    // Validate working hours
+    if (appointmentStart < workStart || appointmentEnd > workEnd) {
+      return NextResponse.json(
+        { error: body.isFirstTime ? 
+          'Two-hour appointment must be within working hours' : 
+          'Appointment must be within working hours' },
+        { status: 400 }
+      );
     }
 
-    // Check for existing appointments in the selected hour
+    // Create fresh date objects for the query
+    const queryStart = new Date(originalSelectedTime);
+    queryStart.setHours(selectedHour, 0, 0, 0);
+    
+    const queryEnd = new Date(originalSelectedTime);
+    queryEnd.setHours(selectedHour + (body.isFirstTime ? 2 : 1), 0, 0, 0);
+
+    console.log('Checking for existing appointments between:', queryStart, 'and', queryEnd);
+
+    // Check for existing appointments
     const existingAppointments = await appointmentsCollection.find({
-      startTime: {
-        $gte: new Date(selectedTime.setHours(selectedHour, 0, 0, 0)),
-        $lt: new Date(selectedTime.setHours(selectedHour + (body.isFirstTime ? 2 : 1), 0, 0, 0))
-      },
+      $or: [
+        // Check if any appointment starts during our slot
+        {
+          startTime: {
+            $gte: queryStart,
+            $lt: queryEnd
+          }
+        },
+        // Check if any appointment ends during our slot
+        {
+          endTime: {
+            $gt: queryStart,
+            $lte: queryEnd
+          }
+        }
+      ],
       status: { $in: ['booked', 'pending'] }
     }).toArray();
 
     if (existingAppointments.length > 0) {
+      console.log('Found conflicting appointments:', existingAppointments);
       return NextResponse.json(
         { error: body.isFirstTime ? 
           'One or both hours are not available for a 2-hour appointment' : 
@@ -175,14 +198,9 @@ export async function POST(request: Request) {
       );
     }
 
-    // Create the appointment with explicit start and end times
-    const startTime = new Date(body.startTime);
-    const endTime = new Date(body.startTime);
-    endTime.setHours(startTime.getHours() + (body.isFirstTime ? 2 : 1));
-
     const appointment = {
-      startTime: startTime,
-      endTime: endTime,
+      startTime: appointmentStart,
+      endTime: appointmentEnd,
       status: isAdmin ? (body.status || 'available') : 'pending',
       clientName: body.clientName,
       clientEmail: body.clientEmail,
@@ -193,6 +211,8 @@ export async function POST(request: Request) {
       createdAt: new Date(),
       updatedAt: new Date()
     };
+
+    console.log('Creating appointment:', appointment);
 
     const result = await appointmentsCollection.insertOne(appointment);
     

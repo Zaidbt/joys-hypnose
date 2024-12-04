@@ -58,6 +58,8 @@ export async function GET(request: Request) {
       })
       .toArray();
 
+    console.log('Found booked slots:', bookedSlots);
+
     // Generate all possible slots
     const [startHour, startMinute] = settings.workingHours.start.split(':').map(Number);
     const [endHour, endMinute] = settings.workingHours.end.split(':').map(Number);
@@ -65,35 +67,43 @@ export async function GET(request: Request) {
     const slots = [];
     let currentHour = startHour;
 
-    // Helper function to check if a specific hour is booked
-    const isHourBooked = (hour: number) => {
-      const hourStart = new Date(date);
-      hourStart.setHours(hour, 0, 0, 0);
-      const hourEnd = new Date(date);
-      hourEnd.setHours(hour + 1, 0, 0, 0);
+    // Helper function to check if a time slot is booked
+    const isTimeSlotBooked = (hour: number, duration: number) => {
+      // Create fresh date objects for each check
+      const slotStart = new Date(date);
+      slotStart.setHours(hour, 0, 0, 0);
+      
+      const slotEnd = new Date(date);
+      slotEnd.setHours(hour + duration, 0, 0, 0);
 
       return bookedSlots.some(booking => {
         const bookingStart = new Date(booking.startTime);
         const bookingEnd = new Date(booking.endTime);
-        return bookingStart < hourEnd && bookingEnd > hourStart;
+        
+        // Check if there's any overlap
+        return (bookingStart < slotEnd && bookingEnd > slotStart);
       });
     };
 
+    // Generate slots
     while (currentHour < endHour) {
       const timeString = `${currentHour.toString().padStart(2, '0')}:00`;
       
-      let isSlotAvailable = !isHourBooked(currentHour);
+      // For first-time clients, check if both hours are available
+      const duration = isFirstTime ? 2 : 1;
+      
+      // Only show slot if we have enough hours left in the day
+      const hasEnoughTime = currentHour + duration <= endHour;
+      
+      // Check availability
+      const isSlotAvailable = hasEnoughTime && !isTimeSlotBooked(currentHour, duration);
 
-      // For first-time clients, also check the next hour
-      if (isFirstTime && isSlotAvailable) {
-        // Only check next hour if we're not at the last hour
-        if (currentHour + 1 < endHour) {
-          isSlotAvailable = !isHourBooked(currentHour + 1);
-        } else {
-          // If we can't fit a 2-hour slot, mark as unavailable
-          isSlotAvailable = false;
-        }
-      }
+      console.log(`Checking slot ${timeString}:`, {
+        isFirstTime,
+        duration,
+        hasEnoughTime,
+        isAvailable: isSlotAvailable
+      });
 
       slots.push({
         time: timeString,
