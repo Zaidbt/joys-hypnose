@@ -2,63 +2,55 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: 'Dream Avenue';
-  src: url('/fonts/DreamAvenue.woff2') format('woff2'),
-       url('/fonts/DreamAvenue.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
 }
 
-/* Global heading styles */
+/* Global font styles */
+body {
+  font-family: var(--font-quicksand);
+}
+
+/* Headings */
 h1, h2, h3, h4, h5, h6,
 .section-title, 
 .service-title,
 .logo-text {
-  font-family: 'Dream Avenue', cursive;
+  font-family: var(--font-quicksand);
+  font-weight: 500;
 }
 
-/* Blog content headings */
+/* Blog content */
 .blog-content h1,
 .blog-content h2,
 .blog-content h3,
 .blog-content h4,
 .blog-content h5,
 .blog-content h6 {
-  font-family: 'Dream Avenue', cursive;
+  font-family: var(--font-quicksand);
+  font-weight: 500;
 }
 
 /* Editor headings */
 .prose-editor .ql-editor h1,
 .prose-editor .ql-editor h2,
 .prose-editor .ql-editor h3 {
-  font-family: 'Dream Avenue', cursive;
+  font-family: var(--font-quicksand);
+  font-weight: 500;
 }
 
 /* Specific components */
 .hero-title,
 .page-title,
 .section-heading {
-  font-family: 'Dream Avenue', cursive;
-}
-
-/* Keep body text in regular font */
-body, p, span, div {
   font-family: var(--font-quicksand);
+  font-weight: 500;
 }
 
 /* Existing styles */
 .prose-editor .ql-picker {
   height: 28px;
 }
-
-.font-dream-avenue {
-  font-family: 'Dream Avenue', cursive;
-} 
+ 

@@ -8,7 +8,6 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        'dream-avenue': ['Dream Avenue', 'cursive'],
         'quicksand': ['var(--font-quicksand)', 'sans-serif'],
       },
       backgroundImage: {
@@ -34,17 +33,22 @@ module.exports = {
       typography: {
         DEFAULT: {
           css: {
+            fontFamily: 'var(--font-quicksand)',
             h1: {
-              fontFamily: 'Dream Avenue, cursive',
+              fontFamily: 'var(--font-quicksand)',
+              fontWeight: '500',
             },
             h2: {
-              fontFamily: 'Dream Avenue, cursive',
+              fontFamily: 'var(--font-quicksand)',
+              fontWeight: '500',
             },
             h3: {
-              fontFamily: 'Dream Avenue, cursive',
+              fontFamily: 'var(--font-quicksand)',
+              fontWeight: '500',
             },
             h4: {
-              fontFamily: 'Dream Avenue, cursive',
+              fontFamily: 'var(--font-quicksand)',
+              fontWeight: '500',
             },
           },
         },
