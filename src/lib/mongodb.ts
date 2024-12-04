@@ -4,7 +4,10 @@ if (!process.env.MONGODB_URI) {
   throw new Error('Please add your Mongo URI to .env.local');
 }
 
-let client: MongoClient;
+const uri = process.env.MONGODB_URI;
+const options = {};
+
+let client;
 let clientPromise: Promise<MongoClient>;
 
 if (process.env.NODE_ENV === 'development') {
@@ -15,14 +18,18 @@ if (process.env.NODE_ENV === 'development') {
   };
 
   if (!globalWithMongo._mongoClientPromise) {
-    client = new MongoClient(process.env.MONGODB_URI);
+    client = new MongoClient(uri, options);
     globalWithMongo._mongoClientPromise = client.connect();
   }
   clientPromise = globalWithMongo._mongoClientPromise;
 } else {
   // In production mode, it's best to not use a global variable.
-  client = new MongoClient(process.env.MONGODB_URI);
+  client = new MongoClient(uri, options);
   clientPromise = client.connect();
 }
 
-export default clientPromise; 
+export async function connectToDatabase() {
+  const client = await clientPromise;
+  const db = client.db();
+  return { db, client };
+} 
