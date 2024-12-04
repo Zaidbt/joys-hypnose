@@ -10,6 +10,7 @@ export interface TimeSlot {
   clientPhone?: string;
   notes?: string;
   isFictitious: boolean;
+  isFirstTime?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

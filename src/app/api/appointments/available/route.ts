@@ -5,6 +5,7 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const date = searchParams.get('date');
+    const isFirstTime = searchParams.get('isFirstTime') === 'true';
     
     if (!date) {
       return NextResponse.json(
@@ -52,7 +53,7 @@ export async function GET(request: Request) {
           $lte: endDate
         },
         status: { 
-          $in: ['booked', 'pending', 'fictitious'] // Include fictitious appointments
+          $in: ['booked', 'pending', 'fictitious']
         }
       })
       .toArray();
@@ -71,7 +72,7 @@ export async function GET(request: Request) {
     while (currentHour < endHour || (currentHour === endHour && currentMinute < endMinute)) {
       // Calculate if this slot would end after working hours
       const currentTimeInMinutes = currentHour * 60 + currentMinute;
-      const slotEndTimeInMinutes = currentTimeInMinutes + settings.slotDuration;
+      const slotEndTimeInMinutes = currentTimeInMinutes + (isFirstTime ? 120 : settings.slotDuration);
       
       // Only create slot if it ends within working hours
       if (slotEndTimeInMinutes <= endTimeInMinutes) {
@@ -79,16 +80,39 @@ export async function GET(request: Request) {
         const slotDate = new Date(date);
         slotDate.setHours(currentHour, currentMinute, 0, 0);
 
-        // Check if slot is booked or fictitious
-        const bookedSlot = bookedSlots.find(booking => {
-          const bookingTime = new Date(booking.startTime);
-          return bookingTime.getTime() === slotDate.getTime();
-        });
+        // For first-time clients, check if both hours are available
+        let isSlotAvailable = true;
+        if (isFirstTime) {
+          // Check current hour and next hour
+          for (let i = 0; i < 2; i++) {
+            const checkTime = new Date(slotDate);
+            checkTime.setHours(currentHour, currentMinute + (i * 60), 0, 0);
+            
+            const conflictingBooking = bookedSlots.find(booking => {
+              const bookingStart = new Date(booking.startTime);
+              const bookingEnd = new Date(booking.endTime);
+              return checkTime >= bookingStart && checkTime < bookingEnd;
+            });
+            
+            if (conflictingBooking) {
+              isSlotAvailable = false;
+              break;
+            }
+          }
+        } else {
+          // Regular 1-hour booking check
+          const conflictingBooking = bookedSlots.find(booking => {
+            const bookingStart = new Date(booking.startTime);
+            const bookingEnd = new Date(booking.endTime);
+            return slotDate >= bookingStart && slotDate < bookingEnd;
+          });
+          isSlotAvailable = !conflictingBooking;
+        }
 
         slots.push({
           time: timeString,
-          status: bookedSlot ? bookedSlot.status : 'available',
-          available: !bookedSlot // Slot is available only if there's no booking of any kind
+          status: isSlotAvailable ? 'available' : 'booked',
+          available: isSlotAvailable
         });
       }
 

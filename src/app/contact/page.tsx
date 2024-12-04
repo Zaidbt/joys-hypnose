@@ -22,6 +22,7 @@ export default function ContactPage() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [message, setMessage] = useState('');
+  const [isFirstTime, setIsFirstTime] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -47,7 +48,7 @@ export default function ContactPage() {
       if (!selectedDate) return;
 
       try {
-        const response = await fetch(`/api/appointments/available?date=${selectedDate}`);
+        const response = await fetch(`/api/appointments/available?date=${selectedDate}&isFirstTime=${isFirstTime}`);
         if (!response.ok) throw new Error('Failed to fetch available slots');
         const data = await response.json();
         setAvailableSlots(data);
@@ -57,18 +58,12 @@ export default function ContactPage() {
     }
 
     fetchAvailableSlots();
-  }, [selectedDate]);
+  }, [selectedDate, isFirstTime]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedDate || !selectedTime) {
-      setError('Veuillez sélectionner une date et un horaire');
-      return;
-    }
-    
     setIsLoading(true);
     setError('');
-    setSuccess(false);
 
     try {
       const appointmentDate = new Date(selectedDate);
@@ -76,7 +71,7 @@ export default function ContactPage() {
       appointmentDate.setHours(hours, minutes, 0, 0);
 
       const endDate = new Date(appointmentDate);
-      endDate.setMinutes(endDate.getMinutes() + (settings?.slotDuration || 60));
+      endDate.setMinutes(endDate.getMinutes() + (isFirstTime ? 120 : 60));
 
       const appointmentData = {
         startTime: appointmentDate,
@@ -85,6 +80,7 @@ export default function ContactPage() {
         clientEmail: email,
         clientPhone: phone,
         notes: message,
+        isFirstTime,
         status: 'pending'
       };
 
@@ -96,18 +92,21 @@ export default function ContactPage() {
         body: JSON.stringify(appointmentData),
       });
 
-      if (!response.ok) throw new Error('Failed to book appointment');
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to create appointment');
+      }
 
       setSuccess(true);
-      // Reset form
-      setSelectedDate('');
-      setSelectedTime('');
       setName('');
       setEmail('');
       setPhone('');
       setMessage('');
+      setSelectedDate('');
+      setSelectedTime('');
+      setIsFirstTime(false);
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Failed to book appointment');
+      setError(error instanceof Error ? error.message : 'Failed to create appointment');
     } finally {
       setIsLoading(false);
     }
@@ -182,90 +181,107 @@ export default function ContactPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              {error && (
-                <div className="p-4 bg-red-50 border border-red-200 text-red-600 rounded-md">
-                  {error}
-                </div>
-              )}
+              <div className="space-y-6 bg-white p-6 rounded-lg shadow-sm">
+                <h2 className="text-2xl font-semibold text-gray-900 mb-6">Prendre rendez-vous</h2>
 
-              {success && (
-                <div className="p-4 bg-green-50 border border-green-200 text-green-600 rounded-md">
-                  Votre demande de rendez-vous a été envoyée avec succès. Nous vous contacterons rapidement pour confirmer.
-                </div>
-              )}
-
-              <AppointmentCalendar onSelectSlot={handleSlotSelect} />
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Nom complet
-                </label>
-                <div className="mt-1 relative">
+                <div className="flex items-center space-x-2 mb-4">
                   <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                    type="checkbox"
+                    id="isFirstTime"
+                    checked={isFirstTime}
+                    onChange={(e) => setIsFirstTime(e.target.checked)}
+                    className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                   />
-                  <UserIcon className="absolute right-3 top-2 h-5 w-5 text-gray-400" />
+                  <label htmlFor="isFirstTime" className="text-sm text-gray-700">
+                    C'est ma première séance (durée 2 heures)
+                  </label>
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Email
-                </label>
-                <div className="mt-1 relative">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                  />
-                  <EnvelopeIcon className="absolute right-3 top-2 h-5 w-5 text-gray-400" />
+                {error && (
+                  <div className="p-4 bg-red-50 border border-red-200 text-red-600 rounded-md">
+                    {error}
+                  </div>
+                )}
+
+                {success && (
+                  <div className="p-4 bg-green-50 border border-green-200 text-green-600 rounded-md">
+                    Votre demande de rendez-vous a été envoyée avec succès. Nous vous contacterons rapidement pour confirmer.
+                  </div>
+                )}
+
+                <AppointmentCalendar onSelectSlot={handleSlotSelect} />
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Nom complet
+                  </label>
+                  <div className="mt-1 relative">
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                    />
+                    <UserIcon className="absolute right-3 top-2 h-5 w-5 text-gray-400" />
+                  </div>
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Téléphone
-                </label>
-                <div className="mt-1 relative">
-                  <input
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    required
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                  />
-                  <PhoneIcon className="absolute right-3 top-2 h-5 w-5 text-gray-400" />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Email
+                  </label>
+                  <div className="mt-1 relative">
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                    />
+                    <EnvelopeIcon className="absolute right-3 top-2 h-5 w-5 text-gray-400" />
+                  </div>
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Message (optionnel)
-                </label>
-                <div className="mt-1">
-                  <textarea
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    rows={4}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                    placeholder="Décrivez brièvement la raison de votre consultation..."
-                  />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Téléphone
+                  </label>
+                  <div className="mt-1 relative">
+                    <input
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      required
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                    />
+                    <PhoneIcon className="absolute right-3 top-2 h-5 w-5 text-gray-400" />
+                  </div>
                 </div>
-              </div>
 
-              <button
-                type="submit"
-                disabled={isLoading || !selectedDate || !selectedTime}
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50"
-              >
-                {isLoading ? 'Envoi en cours...' : 'Demander un rendez-vous'}
-              </button>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Message (optionnel)
+                  </label>
+                  <div className="mt-1">
+                    <textarea
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      rows={4}
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                      placeholder="Décrivez brièvement la raison de votre consultation..."
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoading || !selectedDate || !selectedTime}
+                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50"
+                >
+                  {isLoading ? 'Envoi en cours...' : 'Demander un rendez-vous'}
+                </button>
+              </div>
             </motion.form>
           </div>
         </div>

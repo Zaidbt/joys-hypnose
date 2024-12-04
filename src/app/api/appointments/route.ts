@@ -107,18 +107,78 @@ export async function POST(request: Request) {
 
     const db = client.db('joyshypnose');
     const appointmentsCollection = db.collection('appointments');
+    const settingsCollection = db.collection('appointment_settings');
 
-    // Check for existing appointments in the time slot
-    const existingAppointment = await appointmentsCollection.findOne({
-      startTime: new Date(body.startTime),
-      status: { $in: ['booked', 'pending'] }
-    });
-
-    if (existingAppointment) {
+    // Get settings to validate working hours
+    const settings = await settingsCollection.findOne({});
+    if (!settings) {
       return NextResponse.json(
-        { error: 'Time slot already booked' },
-        { status: 409 }
+        { error: 'Settings not found' },
+        { status: 404 }
       );
+    }
+
+    const startTime = new Date(body.startTime);
+    const endTime = new Date(body.endTime);
+
+    // Validate if the appointment is within working hours
+    const [startHour, startMinute] = settings.workingHours.start.split(':').map(Number);
+    const [endHour, endMinute] = settings.workingHours.end.split(':').map(Number);
+    const workStart = new Date(startTime);
+    workStart.setHours(startHour, startMinute, 0, 0);
+    const workEnd = new Date(startTime);
+    workEnd.setHours(endHour, endMinute, 0, 0);
+
+    if (startTime < workStart || endTime > workEnd) {
+      return NextResponse.json(
+        { error: 'Appointment must be within working hours' },
+        { status: 400 }
+      );
+    }
+
+    // For first-time clients, validate that both hours are available
+    if (body.isFirstTime) {
+      const firstHourStart = new Date(startTime);
+      const secondHourStart = new Date(startTime);
+      secondHourStart.setHours(secondHourStart.getHours() + 1);
+
+      const existingAppointments = await appointmentsCollection.find({
+        $or: [
+          {
+            startTime: {
+              $gte: firstHourStart,
+              $lt: secondHourStart
+            }
+          },
+          {
+            startTime: {
+              $gte: secondHourStart,
+              $lt: endTime
+            }
+          }
+        ],
+        status: { $in: ['booked', 'pending'] }
+      }).toArray();
+
+      if (existingAppointments.length > 0) {
+        return NextResponse.json(
+          { error: 'One or both hours are not available for a 2-hour appointment' },
+          { status: 409 }
+        );
+      }
+    } else {
+      // Check for existing appointments in the time slot
+      const existingAppointment = await appointmentsCollection.findOne({
+        startTime: new Date(body.startTime),
+        status: { $in: ['booked', 'pending'] }
+      });
+
+      if (existingAppointment) {
+        return NextResponse.json(
+          { error: 'Time slot already booked' },
+          { status: 409 }
+        );
+      }
     }
 
     const appointment = {
@@ -129,6 +189,7 @@ export async function POST(request: Request) {
       clientEmail: body.clientEmail,
       clientPhone: body.clientPhone,
       notes: body.notes,
+      isFirstTime: body.isFirstTime || false,
       isFictitious: false,
       createdAt: new Date(),
       updatedAt: new Date()
