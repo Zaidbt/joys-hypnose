@@ -119,13 +119,16 @@ export async function POST(request: Request) {
     }
 
     const startTime = new Date(body.startTime);
-    const endTime = new Date(body.endTime);
+    const endTime = new Date(startTime); // Create endTime based on startTime
+    endTime.setMinutes(startTime.getMinutes() + (body.isFirstTime ? 120 : settings.slotDuration));
 
     // Validate if the appointment is within working hours
     const [startHour, startMinute] = settings.workingHours.start.split(':').map(Number);
     const [endHour, endMinute] = settings.workingHours.end.split(':').map(Number);
+    
     const workStart = new Date(startTime);
     workStart.setHours(startHour, startMinute, 0, 0);
+    
     const workEnd = new Date(startTime);
     workEnd.setHours(endHour, endMinute, 0, 0);
 
@@ -138,9 +141,11 @@ export async function POST(request: Request) {
 
     // Check for existing appointments that overlap with the requested time slot
     const existingAppointments = await appointmentsCollection.find({
-      startTime: { $lt: endTime },
-      endTime: { $gt: startTime },
-      status: { $in: ['booked', 'pending'] }
+      $and: [
+        { startTime: { $lt: endTime } },
+        { endTime: { $gt: startTime } },
+        { status: { $in: ['booked', 'pending'] } }
+      ]
     }).toArray();
 
     if (existingAppointments.length > 0) {
@@ -153,8 +158,8 @@ export async function POST(request: Request) {
     }
 
     const appointment = {
-      startTime: new Date(body.startTime),
-      endTime: new Date(body.endTime),
+      startTime: startTime,
+      endTime: endTime,
       status: isAdmin ? (body.status || 'available') : 'pending',
       clientName: body.clientName,
       clientEmail: body.clientEmail,

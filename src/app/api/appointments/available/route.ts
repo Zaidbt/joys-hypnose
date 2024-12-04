@@ -62,24 +62,27 @@ export async function GET(request: Request) {
     const [startHour, startMinute] = settings.workingHours.start.split(':').map(Number);
     const [endHour, endMinute] = settings.workingHours.end.split(':').map(Number);
     
-    // Convert end time to minutes for easier comparison
+    // Convert times to minutes for easier comparison
+    const startTimeInMinutes = startHour * 60 + startMinute;
     const endTimeInMinutes = endHour * 60 + endMinute;
     
     const slots = [];
-    let currentHour = startHour;
-    let currentMinute = startMinute;
+    let currentTimeInMinutes = startTimeInMinutes;
 
-    while (currentHour < endHour || (currentHour === endHour && currentMinute < endMinute)) {
-      const currentTimeInMinutes = currentHour * 60 + currentMinute;
-      const slotEndTimeInMinutes = currentTimeInMinutes + (isFirstTime ? 120 : settings.slotDuration);
+    while (currentTimeInMinutes < endTimeInMinutes) {
+      const currentHour = Math.floor(currentTimeInMinutes / 60);
+      const currentMinute = currentTimeInMinutes % 60;
       
-      // Only create slot if it ends within working hours
-      if (slotEndTimeInMinutes <= endTimeInMinutes) {
-        const timeString = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
+      const timeString = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
+      
+      // For first-time clients, check if there's enough time for a 2-hour slot
+      const slotDurationMinutes = isFirstTime ? 120 : settings.slotDuration;
+      if (currentTimeInMinutes + slotDurationMinutes <= endTimeInMinutes) {
         const slotStart = new Date(date);
         slotStart.setHours(currentHour, currentMinute, 0, 0);
+        
         const slotEnd = new Date(slotStart);
-        slotEnd.setMinutes(slotEnd.getMinutes() + (isFirstTime ? 120 : settings.slotDuration));
+        slotEnd.setMinutes(slotStart.getMinutes() + slotDurationMinutes);
 
         // Check if slot is available
         let isSlotAvailable = true;
@@ -101,12 +104,8 @@ export async function GET(request: Request) {
         });
       }
 
-      // Increment by slot duration
-      currentMinute += settings.slotDuration;
-      if (currentMinute >= 60) {
-        currentHour += Math.floor(currentMinute / 60);
-        currentMinute = currentMinute % 60;
-      }
+      // Increment by slot duration (always use standard slot duration for increment)
+      currentTimeInMinutes += settings.slotDuration;
     }
 
     return NextResponse.json(slots);
