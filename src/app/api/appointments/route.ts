@@ -88,7 +88,7 @@ export async function POST(request: Request) {
     const isAdmin = !!session;
 
     // Validate the request
-    if (!body.startTime || !body.endTime) {
+    if (!body.startTime) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -120,12 +120,14 @@ export async function POST(request: Request) {
 
     // Parse the start time and create end time
     const startTime = new Date(body.startTime);
-    const endTime = new Date(startTime);
-    if (body.isFirstTime) {
-      endTime.setHours(startTime.getHours() + 2); // Add 2 hours for first-time clients
-    } else {
-      endTime.setHours(startTime.getHours() + 1); // Add 1 hour for regular clients
-    }
+    const endTime = new Date(body.startTime); // Create new date from start time
+    
+    // Keep the original hours and minutes
+    const originalHours = startTime.getHours();
+    const originalMinutes = startTime.getMinutes();
+    
+    // Set end time by adding hours to the original time
+    endTime.setHours(originalHours + (body.isFirstTime ? 2 : 1), originalMinutes);
 
     // Validate if the appointment is within working hours
     const [startWorkHour, startWorkMinute] = settings.workingHours.start.split(':').map(Number);

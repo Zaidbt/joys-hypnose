@@ -81,12 +81,8 @@ export async function GET(request: Request) {
         const slotStart = new Date(date);
         slotStart.setHours(currentHour, currentMinute, 0, 0);
         
-        const slotEnd = new Date(slotStart);
-        if (isFirstTime) {
-          slotEnd.setHours(slotStart.getHours() + 2); // Add 2 hours for first-time clients
-        } else {
-          slotEnd.setHours(slotStart.getHours() + 1); // Add 1 hour for regular clients
-        }
+        const slotEnd = new Date(date);
+        slotEnd.setHours(currentHour + slotDurationHours, currentMinute, 0, 0);
 
         // Check if slot is available
         let isSlotAvailable = true;
