@@ -4,7 +4,7 @@ import { ObjectId } from 'mongodb';
 
 export async function getAllPosts() {
   const client = await clientPromise;
-  const collection = client.db('joyshypnose').collection('posts');
+  const collection = client.db('joyshypnose').collection('blog_posts');
   
   const posts = await collection
     .find({ status: 'published' })
@@ -24,7 +24,7 @@ export async function getAllPosts() {
 
 export async function getPostBySlug(slug: string) {
   const client = await clientPromise;
-  const collection = client.db('joyshypnose').collection('posts');
+  const collection = client.db('joyshypnose').collection('blog_posts');
   
   const post = await collection.findOne({ 
     slug,
@@ -46,7 +46,7 @@ export async function getPostBySlug(slug: string) {
 
 export async function createPost(post: Omit<BlogPost, 'id'>) {
   const client = await clientPromise;
-  const collection = client.db('joyshypnose').collection('posts');
+  const collection = client.db('joyshypnose').collection('blog_posts');
   
   const { _id, ...postWithoutId } = post;
   
@@ -67,7 +67,7 @@ export async function createPost(post: Omit<BlogPost, 'id'>) {
 
 export async function updatePost(id: string, post: Partial<BlogPost>) {
   const client = await clientPromise;
-  const collection = client.db('joyshypnose').collection('posts');
+  const collection = client.db('joyshypnose').collection('blog_posts');
   
   await collection.updateOne(
     { _id: new ObjectId(id) },
@@ -82,7 +82,7 @@ export async function updatePost(id: string, post: Partial<BlogPost>) {
 
 export async function deletePost(id: string) {
   const client = await clientPromise;
-  const collection = client.db('joyshypnose').collection('posts');
+  const collection = client.db('joyshypnose').collection('blog_posts');
   
   await collection.deleteOne({ _id: new ObjectId(id) });
   
