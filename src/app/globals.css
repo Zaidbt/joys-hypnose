@@ -2,209 +2,63 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Dream Avenue';
+  src: url('/fonts/DreamAvenue.woff2') format('woff2'),
+       url('/fonts/DreamAvenue.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 255, 255, 255;
+  --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
 }
 
-/* Typography styles */
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-playfair);
-  font-weight: 600;
-  line-height: 1.2;
-  opacity: 1 !important;
-}
-
-body {
-  color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-start-rgb));
-  font-family: var(--font-quicksand);
-  line-height: 1.6;
-}
-
-/* Make sure text is fully opaque */
-p, span, a {
-  opacity: 1 !important;
-}
-
-/* Ensure logo text is fully visible */
+/* Global heading styles */
+h1, h2, h3, h4, h5, h6,
+.section-title, 
+.service-title,
 .logo-text {
-  opacity: 1 !important;
-  color: #000000 !important;
-  font-family: var(--font-playfair);
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-family: 'Dream Avenue', cursive;
 }
 
-/* Ensure menu text is fully visible */
-.nav-link {
-  opacity: 1 !important;
-  color: #000000 !important;
-  font-family: var(--font-quicksand);
-  font-weight: 500;
+/* Blog content headings */
+.blog-content h1,
+.blog-content h2,
+.blog-content h3,
+.blog-content h4,
+.blog-content h5,
+.blog-content h6 {
+  font-family: 'Dream Avenue', cursive;
 }
 
-/* Make sure service titles and section headings are fully visible */
-.section-title, .service-title {
-  opacity: 1 !important;
-  color: #000000 !important;
-  font-family: var(--font-playfair);
-  font-weight: 600;
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-@layer components {
-  .prose-editor {
-    @apply relative mb-12;
-  }
-
-  .prose-editor .ql-container {
-    @apply min-h-[200px] rounded-b-lg border border-gray-300;
-    font-family: var(--font-quicksand);
-    background-color: white;
-  }
-
-  .prose-editor .ql-toolbar {
-    @apply rounded-t-lg border border-gray-300 bg-gray-50;
-    border-bottom: none !important;
-  }
-
-  .prose-editor .ql-editor {
-    min-height: 400px !important;
-    @apply text-base leading-relaxed p-4;
-    background-color: white;
-    font-family: var(--font-quicksand);
-  }
-
-  .prose-editor .ql-editor p {
-    @apply mb-4;
-  }
-
-  .prose-editor .ql-editor {
-    cursor: text !important;
-    pointer-events: auto !important;
-  }
-
-  .prose-editor {
-    z-index: 1;
-  }
-
-  .prose-editor .ql-toolbar {
-    z-index: 2;
-  }
-
-  .prose-editor .ql-container {
-    z-index: 1;
-  }
-
-  .blog-content {
-    @apply prose prose-lg max-w-none prose-headings:text-gray-900 prose-headings:font-bold prose-p:text-gray-700 prose-p:leading-relaxed prose-a:text-primary-600 prose-a:hover:text-primary-700 prose-blockquote:border-primary-200;
-  }
-
-  .blog-content h1 {
-    @apply text-3xl mt-8 mb-4 font-playfair;
-  }
-
-  .blog-content h2 {
-    @apply text-2xl mt-6 mb-3 font-playfair;
-  }
-
-  .blog-content h3 {
-    @apply text-xl mt-4 mb-2 font-playfair;
-  }
-
-  .blog-content p {
-    @apply font-quicksand;
-  }
-
-  .blog-content ul,
-  .blog-content ol {
-    @apply my-4 pl-6 font-quicksand;
-  }
-
-  .blog-content li {
-    @apply mb-2;
-  }
-
-  .blog-content blockquote {
-    @apply border-l-4 pl-4 italic my-4 font-playfair;
-  }
-}
-
-.prose-editor .ql-container {
-  font-family: var(--font-quicksand);
-}
-
-.prose-editor .ql-editor {
-  padding: 1.5rem;
-}
-
-.prose-editor .ql-editor h1 {
-  font-size: 2.5rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
-  font-family: var(--font-playfair);
-}
-
-.prose-editor .ql-editor h2 {
-  font-size: 2rem;
-  font-weight: bold;
-  margin-bottom: 0.875rem;
-  font-family: var(--font-playfair);
-}
-
+/* Editor headings */
+.prose-editor .ql-editor h1,
+.prose-editor .ql-editor h2,
 .prose-editor .ql-editor h3 {
-  font-size: 1.75rem;
-  font-weight: bold;
-  margin-bottom: 0.75rem;
-  font-family: var(--font-playfair);
+  font-family: 'Dream Avenue', cursive;
 }
 
-.prose-editor .ql-editor blockquote {
-  border-left: 4px solid #e2e8f0;
-  padding-left: 1rem;
-  margin: 1.5rem 0;
-  font-style: italic;
-  color: #4a5568;
-  font-family: var(--font-playfair);
+/* Specific components */
+.hero-title,
+.page-title,
+.section-heading {
+  font-family: 'Dream Avenue', cursive;
 }
 
-.prose-editor .ql-editor img {
-  max-width: 100%;
-  height: auto;
-  margin: 1rem 0;
+/* Keep body text in regular font */
+body, p, span, div {
+  font-family: var(--font-quicksand);
 }
 
-.prose-editor .ql-editor pre {
-  background-color: #f7fafc;
-  padding: 1rem;
-  border-radius: 0.375rem;
-  margin: 1rem 0;
-}
-
-.prose-editor .ql-editor a {
-  color: #6366f1;
-  text-decoration: underline;
-}
-
-.prose-editor .ql-formats {
-  margin-right: 1rem !important;
-}
-
-.prose-editor .ql-toolbar button {
-  width: 28px;
-  height: 28px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
+/* Existing styles */
 .prose-editor .ql-picker {
   height: 28px;
+}
+
+.font-dream-avenue {
+  font-family: 'Dream Avenue', cursive;
 } 
