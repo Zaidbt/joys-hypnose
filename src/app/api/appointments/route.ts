@@ -118,42 +118,52 @@ export async function POST(request: Request) {
       );
     }
 
-    // Parse the start time and create end time
-    const startTime = new Date(body.startTime);
-    const endTime = new Date(body.startTime); // Create new date from start time
-    
-    // Keep the original hours and minutes
-    const originalHours = startTime.getHours();
-    const originalMinutes = startTime.getMinutes();
-    
-    // Set end time by adding hours to the original time
-    endTime.setHours(originalHours + (body.isFirstTime ? 2 : 1), originalMinutes);
+    // Parse the selected time
+    const selectedTime = new Date(body.startTime);
+    const selectedHour = selectedTime.getHours();
+    const selectedMinutes = selectedTime.getMinutes();
+
+    // Create the next hour time
+    const nextHourTime = new Date(body.startTime);
+    nextHourTime.setHours(selectedHour + 1, selectedMinutes);
 
     // Validate if the appointment is within working hours
     const [startWorkHour, startWorkMinute] = settings.workingHours.start.split(':').map(Number);
     const [endWorkHour, endWorkMinute] = settings.workingHours.end.split(':').map(Number);
     
-    const workStart = new Date(startTime);
+    const workStart = new Date(selectedTime);
     workStart.setHours(startWorkHour, startWorkMinute, 0, 0);
     
-    const workEnd = new Date(startTime);
+    const workEnd = new Date(selectedTime);
     workEnd.setHours(endWorkHour, endWorkMinute, 0, 0);
 
-    // Check if both start and end times are within working hours
-    if (startTime < workStart || endTime > workEnd) {
-      return NextResponse.json(
-        { error: 'Appointment must be within working hours' },
-        { status: 400 }
-      );
+    // For first-time clients, we need to ensure both hours are within working hours
+    if (body.isFirstTime) {
+      const secondHourEnd = new Date(nextHourTime);
+      secondHourEnd.setHours(selectedHour + 2, selectedMinutes);
+      
+      if (selectedTime < workStart || secondHourEnd > workEnd) {
+        return NextResponse.json(
+          { error: 'Two-hour appointment must be within working hours' },
+          { status: 400 }
+        );
+      }
+    } else {
+      if (selectedTime < workStart || nextHourTime > workEnd) {
+        return NextResponse.json(
+          { error: 'Appointment must be within working hours' },
+          { status: 400 }
+        );
+      }
     }
 
-    // Check for existing appointments that overlap with the requested time slot
+    // Check for existing appointments in the selected hour
     const existingAppointments = await appointmentsCollection.find({
-      $and: [
-        { startTime: { $lt: endTime } },
-        { endTime: { $gt: startTime } },
-        { status: { $in: ['booked', 'pending'] } }
-      ]
+      startTime: {
+        $gte: new Date(selectedTime.setHours(selectedHour, 0, 0, 0)),
+        $lt: new Date(selectedTime.setHours(selectedHour + (body.isFirstTime ? 2 : 1), 0, 0, 0))
+      },
+      status: { $in: ['booked', 'pending'] }
     }).toArray();
 
     if (existingAppointments.length > 0) {
@@ -164,6 +174,11 @@ export async function POST(request: Request) {
         { status: 409 }
       );
     }
+
+    // Create the appointment with explicit start and end times
+    const startTime = new Date(body.startTime);
+    const endTime = new Date(body.startTime);
+    endTime.setHours(startTime.getHours() + (body.isFirstTime ? 2 : 1));
 
     const appointment = {
       startTime: startTime,
