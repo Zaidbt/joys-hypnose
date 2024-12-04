@@ -8,13 +8,23 @@
   --background-end-rgb: 255, 255, 255;
 }
 
+/* Typography styles */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-playfair);
+  font-weight: 600;
+  line-height: 1.2;
+  opacity: 1 !important;
+}
+
 body {
   color: rgb(var(--foreground-rgb));
   background: rgb(var(--background-start-rgb));
+  font-family: var(--font-quicksand);
+  line-height: 1.6;
 }
 
 /* Make sure text is fully opaque */
-h1, h2, h3, h4, h5, h6, p, span, a {
+p, span, a {
   opacity: 1 !important;
 }
 
@@ -22,18 +32,25 @@ h1, h2, h3, h4, h5, h6, p, span, a {
 .logo-text {
   opacity: 1 !important;
   color: #000000 !important;
+  font-family: var(--font-playfair);
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 /* Ensure menu text is fully visible */
 .nav-link {
   opacity: 1 !important;
   color: #000000 !important;
+  font-family: var(--font-quicksand);
+  font-weight: 500;
 }
 
 /* Make sure service titles and section headings are fully visible */
 .section-title, .service-title {
   opacity: 1 !important;
   color: #000000 !important;
+  font-family: var(--font-playfair);
+  font-weight: 600;
 }
 
 * {
@@ -49,7 +66,7 @@ h1, h2, h3, h4, h5, h6, p, span, a {
 
   .prose-editor .ql-container {
     @apply min-h-[200px] rounded-b-lg border border-gray-300;
-    font-family: inherit;
+    font-family: var(--font-quicksand);
     background-color: white;
   }
 
@@ -62,6 +79,7 @@ h1, h2, h3, h4, h5, h6, p, span, a {
     min-height: 400px !important;
     @apply text-base leading-relaxed p-4;
     background-color: white;
+    font-family: var(--font-quicksand);
   }
 
   .prose-editor .ql-editor p {
@@ -90,20 +108,24 @@ h1, h2, h3, h4, h5, h6, p, span, a {
   }
 
   .blog-content h1 {
-    @apply text-3xl mt-8 mb-4;
+    @apply text-3xl mt-8 mb-4 font-playfair;
   }
 
   .blog-content h2 {
-    @apply text-2xl mt-6 mb-3;
+    @apply text-2xl mt-6 mb-3 font-playfair;
   }
 
   .blog-content h3 {
-    @apply text-xl mt-4 mb-2;
+    @apply text-xl mt-4 mb-2 font-playfair;
+  }
+
+  .blog-content p {
+    @apply font-quicksand;
   }
 
   .blog-content ul,
   .blog-content ol {
-    @apply my-4 pl-6;
+    @apply my-4 pl-6 font-quicksand;
   }
 
   .blog-content li {
@@ -111,12 +133,12 @@ h1, h2, h3, h4, h5, h6, p, span, a {
   }
 
   .blog-content blockquote {
-    @apply border-l-4 pl-4 italic my-4;
+    @apply border-l-4 pl-4 italic my-4 font-playfair;
   }
 }
 
 .prose-editor .ql-container {
-  font-family: inherit;
+  font-family: var(--font-quicksand);
 }
 
 .prose-editor .ql-editor {
@@ -127,18 +149,21 @@ h1, h2, h3, h4, h5, h6, p, span, a {
   font-size: 2.5rem;
   font-weight: bold;
   margin-bottom: 1rem;
+  font-family: var(--font-playfair);
 }
 
 .prose-editor .ql-editor h2 {
   font-size: 2rem;
   font-weight: bold;
   margin-bottom: 0.875rem;
+  font-family: var(--font-playfair);
 }
 
 .prose-editor .ql-editor h3 {
   font-size: 1.75rem;
   font-weight: bold;
   margin-bottom: 0.75rem;
+  font-family: var(--font-playfair);
 }
 
 .prose-editor .ql-editor blockquote {
@@ -147,6 +172,7 @@ h1, h2, h3, h4, h5, h6, p, span, a {
   margin: 1.5rem 0;
   font-style: italic;
   color: #4a5568;
+  font-family: var(--font-playfair);
 }
 
 .prose-editor .ql-editor img {

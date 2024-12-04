@@ -7,6 +7,10 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        playfair: ['var(--font-playfair)'],
+        quicksand: ['var(--font-quicksand)'],
+      },
       colors: {
         primary: {
           50: '#fdf2f8',
@@ -49,26 +53,33 @@ module.exports = {
         DEFAULT: {
           css: {
             color: '#334155',
+            fontFamily: 'var(--font-quicksand)',
+            h1: {
+              color: '#1e293b',
+              fontFamily: 'var(--font-playfair)',
+            },
+            h2: {
+              color: '#1e293b',
+              fontFamily: 'var(--font-playfair)',
+            },
+            h3: {
+              color: '#1e293b',
+              fontFamily: 'var(--font-playfair)',
+            },
+            h4: {
+              color: '#1e293b',
+              fontFamily: 'var(--font-playfair)',
+            },
             a: {
               color: '#ec4899',
               '&:hover': {
                 color: '#db2777',
               },
             },
-            h1: {
-              color: '#1e293b',
-            },
-            h2: {
-              color: '#1e293b',
-            },
-            h3: {
-              color: '#1e293b',
-            },
-            h4: {
-              color: '#1e293b',
-            },
             blockquote: {
               borderLeftColor: '#ec4899',
+              fontFamily: 'var(--font-playfair)',
+              fontStyle: 'italic',
             },
           },
         },
