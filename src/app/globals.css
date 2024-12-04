@@ -13,6 +13,87 @@ body {
   font-family: var(--font-quicksand);
 }
 
+/* Rich text editor font variables */
+.ql-font-quicksand {
+  font-family: var(--font-quicksand) !important;
+}
+
+.ql-font-playfair-display {
+  font-family: var(--font-playfair) !important;
+}
+
+.ql-font-roboto {
+  font-family: var(--font-roboto) !important;
+}
+
+.ql-font-lora {
+  font-family: var(--font-lora) !important;
+}
+
+.ql-font-montserrat {
+  font-family: var(--font-montserrat) !important;
+}
+
+.ql-font-open-sans {
+  font-family: var(--font-open-sans) !important;
+}
+
+.ql-font-raleway {
+  font-family: var(--font-raleway) !important;
+}
+
+.ql-font-merriweather {
+  font-family: var(--font-merriweather) !important;
+}
+
+.ql-font-poppins {
+  font-family: var(--font-poppins) !important;
+}
+
+.ql-font-nunito {
+  font-family: var(--font-nunito) !important;
+}
+
+.ql-font-source-sans-pro {
+  font-family: var(--font-source-sans-pro) !important;
+}
+
+.ql-font-pt-serif {
+  font-family: var(--font-pt-serif) !important;
+}
+
+.ql-font-dancing-script {
+  font-family: var(--font-dancing-script) !important;
+}
+
+.ql-font-oswald {
+  font-family: var(--font-oswald) !important;
+}
+
+.ql-font-ubuntu {
+  font-family: var(--font-ubuntu) !important;
+}
+
+.ql-font-rubik {
+  font-family: var(--font-rubik) !important;
+}
+
+.ql-font-mulish {
+  font-family: var(--font-mulish) !important;
+}
+
+.ql-font-crimson-text {
+  font-family: var(--font-crimson-text) !important;
+}
+
+.ql-font-work-sans {
+  font-family: var(--font-work-sans) !important;
+}
+
+.ql-font-inter {
+  font-family: var(--font-inter) !important;
+}
+
 /* Headings */
 h1, h2, h3, h4, h5, h6,
 .section-title, 

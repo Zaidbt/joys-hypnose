@@ -12,17 +12,32 @@ const QuillWrapper = dynamic(
     if (typeof window !== 'undefined') {
       const Quill = (await import('react-quill')).default.Quill;
       const Font = Quill.import('formats/font');
+      
+      // Import and register the image resize module
+      const ImageResize = await import('quill-image-resize-module-react');
+      Quill.register('modules/imageResize', ImageResize.default);
+      
       Font.whitelist = [
-        'arial',
-        'times-new-roman',
-        'helvetica',
-        'courier-new',
-        'georgia',
-        'trebuchet-ms',
-        'verdana',
-        'roboto',
+        'quicksand',
         'playfair-display',
-        'montserrat'
+        'roboto',
+        'lora',
+        'montserrat',
+        'open-sans',
+        'raleway',
+        'merriweather',
+        'poppins',
+        'nunito',
+        'source-sans-pro',
+        'pt-serif',
+        'dancing-script',
+        'oswald',
+        'ubuntu',
+        'rubik',
+        'mulish',
+        'crimson-text',
+        'work-sans',
+        'inter'
       ];
       Quill.register(Font, true);
     }
@@ -38,16 +53,26 @@ interface RichTextEditorProps {
 }
 
 const fonts = [
-  'Arial',
-  'Times New Roman',
-  'Helvetica',
-  'Courier New',
-  'Georgia',
-  'Trebuchet MS',
-  'Verdana',
-  'Roboto',
+  'Quicksand',
   'Playfair Display',
-  'Montserrat'
+  'Roboto',
+  'Lora',
+  'Montserrat',
+  'Open Sans',
+  'Raleway',
+  'Merriweather',
+  'Poppins',
+  'Nunito',
+  'Source Sans Pro',
+  'PT Serif',
+  'Dancing Script',
+  'Oswald',
+  'Ubuntu',
+  'Rubik',
+  'Mulish',
+  'Crimson Text',
+  'Work Sans',
+  'Inter'
 ];
 
 export default function RichTextEditor({ value, onChange, placeholder }: RichTextEditorProps) {
@@ -68,6 +93,25 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
         ['link', 'image'],
         ['clean']
       ]
+    },
+    imageResize: {
+      parchment: Quill?.import('parchment'),
+      modules: ['Resize', 'DisplaySize', 'Toolbar'],
+      displayStyles: {
+        backgroundColor: 'black',
+        border: 'none',
+        color: 'white'
+      },
+      toolbarStyles: {
+        backgroundColor: 'black',
+        border: 'none',
+        color: 'white'
+      },
+      handleStyles: {
+        backgroundColor: 'black',
+        border: 'none',
+        color: 'white'
+      }
     }
   };
 
@@ -130,7 +174,7 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
 
         /* Font picker styles */
         .ql-snow .ql-picker.ql-font {
-          width: 150px !important;
+          width: 200px !important;
         }
 
         .ql-snow .ql-picker.ql-font .ql-picker-label,
@@ -139,7 +183,7 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
         }
 
         .ql-snow .ql-picker.ql-font .ql-picker-options {
-          min-width: 150px !important;
+          min-width: 200px !important;
           max-height: 300px;
           overflow-y: auto;
           padding: 5px 0;
@@ -184,6 +228,23 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
           border-color: #e2e8f0;
           border-bottom-left-radius: 0.5rem;
           border-bottom-right-radius: 0.5rem;
+        }
+
+        /* Image resize module styles */
+        .ql-editor img {
+          max-width: 100%;
+          height: auto;
+        }
+
+        .ql-editor .image-resizer {
+          border: 1px dashed #6366f1;
+        }
+
+        .ql-editor .image-resizer .resize-handle {
+          background-color: #6366f1;
+          border: none;
+          width: 8px;
+          height: 8px;
         }
       `}</style>
     </div>
