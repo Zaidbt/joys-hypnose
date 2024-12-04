@@ -9,6 +9,13 @@ let postsCache: any = null;
 let lastFetchTime = 0;
 const CACHE_DURATION = 60000; // 1 minute cache
 
+function generateSlug(title: string, id: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '') + '-' + id.substring(0, 6);
+}
+
 async function getPosts(forceRefresh = false) {
   const now = Date.now();
   if (!forceRefresh && postsCache && (now - lastFetchTime) < CACHE_DURATION) {
@@ -31,17 +38,21 @@ async function getPosts(forceRefresh = false) {
       featuredImage: 1,
       tags: 1,
       createdAt: 1,
-      author: 1
+      author: 1,
+      content: 1
     })
     .toArray();
 
   console.log('Found posts:', posts.length);
 
-  postsCache = posts.map(post => ({
-    ...post,
-    _id: post._id.toString(),
-    slug: post.slug || `post-${post._id.toString()}` // Fallback slug if none exists
-  }));
+  postsCache = posts.map(post => {
+    const postId = post._id.toString();
+    return {
+      ...post,
+      _id: postId,
+      slug: post.slug || generateSlug(post.title, postId)
+    };
+  });
   lastFetchTime = now;
 
   return postsCache;
@@ -56,17 +67,21 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { title, excerpt, content, tags, featuredImage, slug } = body as BlogPost;
+    const { title, excerpt, content, tags, featuredImage } = body as BlogPost;
 
-    if (!title || !excerpt || !content || !slug) {
+    if (!title || !excerpt || !content) {
       return NextResponse.json(
-        { error: 'Missing required fields (title, excerpt, content, or slug)' },
+        { error: 'Missing required fields (title, excerpt, content)' },
         { status: 400 }
       );
     }
 
     const db = client.db('joyshypnose');
     const blogCollection = db.collection('blog_posts');
+
+    // Generate slug from title
+    const tempId = new Date().getTime().toString();
+    const slug = generateSlug(title, tempId);
 
     // Check if slug already exists
     const existingPost = await blogCollection.findOne({ slug });

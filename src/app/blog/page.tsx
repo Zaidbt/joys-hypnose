@@ -60,13 +60,11 @@ export default function BlogPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {posts.map((post, index) => {
                 // Ensure post has a slug
-                if (!post.slug) {
-                  console.warn('Post missing slug:', post);
-                  return null;
-                }
-
+                const postSlug = post.slug || `post-${post._id}`;
+                console.log('Post slug:', postSlug);
+                
                 return (
-                  <Link href={`/blog/${post.slug}`} key={post._id}>
+                  <Link href={`/blog/${postSlug}`} key={post._id}>
                     <motion.article
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
