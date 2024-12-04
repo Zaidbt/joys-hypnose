@@ -35,6 +35,15 @@ export async function GET(request: Request) {
     const endDate = new Date(date);
     endDate.setHours(23, 59, 59, 999);
 
+    // Check if the requested date is a working day
+    const requestedDay = startDate.getDay();
+    if (!settings.workingDays.includes(requestedDay)) {
+      return NextResponse.json(
+        { error: 'The requested date is not a working day' },
+        { status: 400 }
+      );
+    }
+
     // Only get active appointments (not cancelled ones)
     const bookedSlots = await appointmentsCollection
       .find({
@@ -52,26 +61,36 @@ export async function GET(request: Request) {
     const [startHour, startMinute] = settings.workingHours.start.split(':').map(Number);
     const [endHour, endMinute] = settings.workingHours.end.split(':').map(Number);
     
+    // Convert end time to minutes for easier comparison
+    const endTimeInMinutes = endHour * 60 + endMinute;
+    
     const slots = [];
     let currentHour = startHour;
     let currentMinute = startMinute;
 
     while (currentHour < endHour || (currentHour === endHour && currentMinute < endMinute)) {
-      const timeString = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
-      const slotDate = new Date(date);
-      slotDate.setHours(currentHour, currentMinute, 0, 0);
+      // Calculate if this slot would end after working hours
+      const currentTimeInMinutes = currentHour * 60 + currentMinute;
+      const slotEndTimeInMinutes = currentTimeInMinutes + settings.slotDuration;
+      
+      // Only create slot if it ends within working hours
+      if (slotEndTimeInMinutes <= endTimeInMinutes) {
+        const timeString = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
+        const slotDate = new Date(date);
+        slotDate.setHours(currentHour, currentMinute, 0, 0);
 
-      // Check if slot is booked or fictitious
-      const bookedSlot = bookedSlots.find(booking => {
-        const bookingTime = new Date(booking.startTime);
-        return bookingTime.getTime() === slotDate.getTime();
-      });
+        // Check if slot is booked or fictitious
+        const bookedSlot = bookedSlots.find(booking => {
+          const bookingTime = new Date(booking.startTime);
+          return bookingTime.getTime() === slotDate.getTime();
+        });
 
-      slots.push({
-        time: timeString,
-        status: bookedSlot ? bookedSlot.status : 'available',
-        available: !bookedSlot // Slot is available only if there's no booking of any kind
-      });
+        slots.push({
+          time: timeString,
+          status: bookedSlot ? bookedSlot.status : 'available',
+          available: !bookedSlot // Slot is available only if there's no booking of any kind
+        });
+      }
 
       currentMinute += settings.slotDuration;
       if (currentMinute >= 60) {

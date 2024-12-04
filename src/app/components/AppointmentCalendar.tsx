@@ -31,6 +31,23 @@ const slotLabels = {
   fictitious: 'À confirmer'
 };
 
+const daysOfWeek = [
+  'Dimanche',
+  'Lundi',
+  'Mardi',
+  'Mercredi',
+  'Jeudi',
+  'Vendredi',
+  'Samedi'
+];
+
+const formatWorkingDays = (workingDays: number[]): string => {
+  return workingDays
+    .sort((a, b) => a - b)
+    .map(day => daysOfWeek[day])
+    .join(', ');
+};
+
 export default function AppointmentCalendar({ onSelectSlot, isAdmin = false }: AppointmentCalendarProps) {
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
@@ -84,6 +101,17 @@ export default function AppointmentCalendar({ onSelectSlot, isAdmin = false }: A
   }, [selectedDate]);
 
   const handleDateChange = (date: string) => {
+    // Check if the selected date is a working day
+    if (settings) {
+      const selectedDay = new Date(date).getDay();
+      if (!settings.workingDays.includes(selectedDay)) {
+        const workingDaysStr = formatWorkingDays(settings.workingDays);
+        setError(`Désolé, nous ne sommes ouverts que ${workingDaysStr}. Veuillez sélectionner un autre jour.`);
+        return;
+      }
+      setError('');
+    }
+    
     setSelectedDate(date);
     setSelectedTime('');
     setAvailableSlots([]);
