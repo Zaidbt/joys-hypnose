@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { connectToDatabase } from '@/lib/mongodb';
+import clientPromise from '@/lib/mongodb';
 import type { NewsletterSubscription } from '@/types/newsletter';
 
 export async function POST(request: Request) {
@@ -13,7 +13,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const { db } = await connectToDatabase();
+    const client = await clientPromise;
+    const db = client.db();
 
     // Check if email already exists
     const existingSubscription = await db

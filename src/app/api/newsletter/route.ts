@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
-import { connectToDatabase } from '@/lib/mongodb';
+import clientPromise from '@/lib/mongodb';
 import type { NewsletterSubscription } from '@/types/newsletter';
 
 // Get all subscriptions
 export async function GET() {
   try {
-    const { db } = await connectToDatabase();
+    const client = await clientPromise;
+    const db = client.db();
     const subscriptions = await db
       .collection<NewsletterSubscription>('newsletter')
       .find()
@@ -34,7 +35,8 @@ export async function DELETE(request: Request) {
       );
     }
 
-    const { db } = await connectToDatabase();
+    const client = await clientPromise;
+    const db = client.db();
     const result = await db
       .collection<NewsletterSubscription>('newsletter')
       .deleteOne({ email });
