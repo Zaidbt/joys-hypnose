@@ -208,8 +208,8 @@ export default function HomePage() {
           >
             <div className="relative w-full h-[200px] sm:h-[300px] rounded-3xl overflow-hidden shadow-2xl">
               <Image
-                src="/images/thematiques.jpg"
-                alt="Séance d'hypnothérapie thématiques"
+                src="/images/meditation-space.webp"
+                alt="Espace de méditation"
                 fill
                 className="object-cover"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 60vw"
@@ -224,15 +224,12 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {[
-              "Gestion du stress et de l'anxiété",
-              "Confiance en soi",
-              "Arrêt du tabac",
-              "Perte de poids",
-              "Phobies",
-              "Douleurs chroniques",
-              "Troubles du sommeil",
-              "Deuil",
-              "Traumatismes"
+              "Les blessures de l'enfant intérieur",
+              "Gestion Émotionnelle",
+              "Hypersensibilité/ Empaths",
+              "Transgénérationnel/ Lignes Ancestrales",
+              "Stress / Anxiété/ Dépression",
+              "Harmonisation Féminin/Masculin"
             ].map((theme, index) => (
               <motion.div
                 key={theme}
