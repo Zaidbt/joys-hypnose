@@ -14,7 +14,7 @@ export async function GET() {
     }
 
     const client = await clientPromise;
-    const db = client.db();
+    const db = client.db('joyshypnose');
 
     // Get blog stats
     const articles = await db.collection('blog_posts').countDocuments();
