@@ -1,72 +1,64 @@
 import { NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
-
-// Function to get today's date at midnight
-const getTodayDate = () => {
-  const date = new Date();
-  date.setHours(0, 0, 0, 0);
-  return date;
-};
-
-export async function POST(request: Request) {
-  const client = await clientPromise;
-  try {
-    const db = client.db('joyshypnose');
-    const visitsCollection = db.collection('visits');
-    const today = getTodayDate();
-
-    // Update or create today's visit count
-    await visitsCollection.updateOne(
-      { date: today },
-      { 
-        $inc: { count: 1 },
-        $setOnInsert: { date: today }
-      },
-      { upsert: true }
-    );
-
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error('Error recording visit:', error);
-    return NextResponse.json(
-      { error: 'Failed to record visit' },
-      { status: 500 }
-    );
-  }
-}
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/utils/authOptions';
 
 export async function GET() {
-  const client = await clientPromise;
   try {
-    const db = client.db('joyshypnose');
-    const visitsCollection = db.collection('visits');
-    const blogCollection = db.collection('blog_posts');
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json(
+        { error: 'Not authenticated' },
+        { status: 401 }
+      );
+    }
 
-    // Get total visits
-    const totalVisits = await visitsCollection.aggregate([
-      {
-        $group: {
-          _id: null,
-          total: { $sum: '$count' }
-        }
-      }
-    ]).toArray();
+    const client = await clientPromise;
+    const db = client.db();
 
-    // Get today's visits
-    const todayVisits = await visitsCollection.findOne({ date: getTodayDate() });
+    // Get blog stats
+    const articles = await db.collection('posts').countDocuments();
 
-    // Get total blog posts
-    const totalPosts = await blogCollection.countDocuments();
+    // Get appointment stats
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const [confirmed, pending, today_appointments] = await Promise.all([
+      db.collection('appointments').countDocuments({ status: 'confirmed' }),
+      db.collection('appointments').countDocuments({ status: 'pending' }),
+      db.collection('appointments').countDocuments({
+        date: {
+          $gte: today,
+          $lt: tomorrow
+        },
+        status: 'confirmed'
+      })
+    ]);
+
+    // Get newsletter stats
+    const [total_subscribers, active_subscribers] = await Promise.all([
+      db.collection('newsletter').countDocuments(),
+      db.collection('newsletter').countDocuments({ status: 'active' })
+    ]);
 
     return NextResponse.json({
-      totalVisits: totalVisits[0]?.total || 0,
-      todayVisits: todayVisits?.count || 0,
-      totalPosts
+      articles,
+      appointments: {
+        confirmed,
+        pending,
+        today: today_appointments
+      },
+      newsletter: {
+        total: total_subscribers,
+        active: active_subscribers
+      }
     });
   } catch (error) {
     console.error('Error fetching stats:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch stats' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

@@ -1,182 +1,146 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
-import {
-  DocumentTextIcon,
-  ChartBarIcon,
-  EyeIcon,
-  CalendarIcon,
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { 
+  DocumentTextIcon, 
+  CalendarIcon, 
   ClockIcon,
-  UserIcon,
+  EnvelopeIcon,
+  ArrowRightIcon
 } from '@heroicons/react/24/outline';
 
-interface Stats {
-  totalPosts: number;
-  totalVisits: number;
-  todayVisits: number;
-  totalAppointments: number;
-  pendingAppointments: number;
-  todayAppointments: number;
+interface DashboardStats {
+  articles: number;
+  appointments: {
+    confirmed: number;
+    pending: number;
+    today: number;
+  };
+  newsletter: {
+    total: number;
+    active: number;
+  };
 }
 
-export default function Dashboard() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
-  const [stats, setStats] = useState<Stats>({
-    totalPosts: 0,
-    totalVisits: 0,
-    todayVisits: 0,
-    totalAppointments: 0,
-    pendingAppointments: 0,
-    todayAppointments: 0
-  });
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchStats = useCallback(async () => {
-    try {
-      // Fetch both stats endpoints
-      const [generalStats, appointmentStats] = await Promise.all([
-        fetch('/api/stats').then(res => res.json()),
-        fetch('/api/appointments/stats').then(res => res.json())
-      ]);
-
-      console.log('General Stats:', generalStats);
-      console.log('Appointment Stats:', appointmentStats);
-
-      // Combine the stats
-      setStats({
-        totalPosts: generalStats.totalPosts || 0,
-        totalVisits: generalStats.totalVisits || 0,
-        todayVisits: generalStats.todayVisits || 0,
-        totalAppointments: appointmentStats.totalAppointments || 0,
-        pendingAppointments: appointmentStats.pendingAppointments || 0,
-        todayAppointments: appointmentStats.todayAppointments || 0
-      });
-    } catch (error) {
-      console.error('Error fetching stats:', error);
-      setError(error instanceof Error ? error.message : 'An error occurred');
-    } finally {
-      setIsLoading(false);
+export default function DashboardPage() {
+  const [stats, setStats] = useState<DashboardStats>({
+    articles: 0,
+    appointments: {
+      confirmed: 0,
+      pending: 0,
+      today: 0
+    },
+    newsletter: {
+      total: 0,
+      active: 0
     }
-  }, []);
+  });
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/joyspanel/login');
-      return;
-    }
+    const fetchStats = async () => {
+      try {
+        const response = await fetch('/api/stats');
+        const data = await response.json();
+        setStats(data);
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+      }
+    };
 
-    if (session) {
-      fetchStats();
-    }
-  }, [session, status, router, fetchStats]);
+    fetchStats();
+  }, []);
 
-  if (status === 'loading' || isLoading) {
-    return <div className="flex items-center justify-center min-h-screen">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
-    </div>;
-  }
-
-  const statItems = [
+  const cards = [
     {
-      name: 'Articles',
-      value: stats.totalPosts,
-      icon: DocumentTextIcon,
+      title: 'Articles',
+      value: stats.articles,
       description: 'Total des articles publiés',
-      onClick: () => router.push('/joyspanel/posts')
+      icon: DocumentTextIcon,
+      href: '/joyspanel/posts',
+      iconBackground: 'bg-blue-100 text-blue-600'
     },
     {
-      name: 'Rendez-vous',
-      value: stats.totalAppointments,
-      icon: CalendarIcon,
+      title: 'Rendez-vous',
+      value: stats.appointments.confirmed,
       description: 'Rendez-vous confirmés',
-      onClick: () => router.push('/joyspanel/appointments?filter=booked')
+      icon: CalendarIcon,
+      href: '/joyspanel/appointments',
+      iconBackground: 'bg-green-100 text-green-600'
     },
     {
-      name: 'À confirmer',
-      value: stats.pendingAppointments,
-      icon: ClockIcon,
+      title: 'À confirmer',
+      value: stats.appointments.pending,
       description: 'En attente de confirmation',
-      onClick: () => router.push('/joyspanel/appointments?filter=pending')
+      icon: ClockIcon,
+      href: '/joyspanel/appointments',
+      iconBackground: 'bg-yellow-100 text-yellow-600'
     },
     {
-      name: "Aujourd'hui",
-      value: stats.todayAppointments,
-      icon: EyeIcon,
-      description: "Rendez-vous confirmés aujourd'hui",
-      onClick: () => router.push('/joyspanel/appointments')
+      title: 'Newsletter',
+      value: stats.newsletter.active,
+      description: 'Abonnés actifs',
+      icon: EnvelopeIcon,
+      href: '/joyspanel/newsletter',
+      iconBackground: 'bg-pink-100 text-pink-600'
     }
   ];
 
   return (
-    <div className="p-8">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="mb-8"
-      >
+    <div className="py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
-        <p className="mt-2 text-sm text-gray-700">
+        <p className="mt-2 text-sm text-gray-600">
           Bienvenue dans votre espace d'administration
         </p>
-      </motion.div>
 
-      <div className="mt-4">
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {statItems.map((item, index) => (
-            <motion.div
-              key={item.name}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="relative overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:px-6 sm:py-6 cursor-pointer hover:shadow-lg transition-shadow"
-              onClick={item.onClick}
+        <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {cards.map((card) => (
+            <Link
+              key={card.title}
+              href={card.href}
+              className="relative bg-white pt-5 px-4 pb-12 sm:pt-6 sm:px-6 shadow rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-200"
             >
               <dt>
-                <div className="absolute rounded-md bg-primary-500 p-3">
-                  <item.icon className="h-6 w-6 text-white" aria-hidden="true" />
+                <div className={`absolute rounded-md p-3 ${card.iconBackground}`}>
+                  <card.icon className="h-6 w-6" aria-hidden="true" />
                 </div>
-                <p className="ml-16 truncate text-sm font-medium text-gray-500">
-                  {item.name}
+                <p className="ml-16 text-sm font-medium text-gray-500 truncate">
+                  {card.title}
                 </p>
               </dt>
               <dd className="ml-16 flex items-baseline">
                 <p className="text-2xl font-semibold text-gray-900">
-                  {item.value}
+                  {card.value}
                 </p>
+                <div className="absolute bottom-0 inset-x-0 bg-gray-50 px-4 py-4 sm:px-6">
+                  <div className="text-sm">
+                    <div className="font-medium text-primary-600 hover:text-primary-700 inline-flex items-center">
+                      {card.description}
+                      <ArrowRightIcon className="ml-2 h-4 w-4" />
+                    </div>
+                  </div>
+                </div>
               </dd>
-              <p className="ml-16 text-sm text-gray-500">
-                {item.description}
-              </p>
-            </motion.div>
+            </Link>
           ))}
         </div>
-      </div>
 
-      {/* Recent Activity Section */}
-      <div className="mt-8">
-        <h2 className="text-lg font-medium text-gray-900">Activité Récente</h2>
-        <div className="mt-4 bg-white shadow rounded-lg p-6">
-          <div className="space-y-4">
-            {/* Recent appointments */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <CalendarIcon className="h-5 w-5 text-primary-600 mr-2" />
-                <span className="text-sm text-gray-600">
-                  {stats.pendingAppointments} nouveaux rendez-vous en attente
-                </span>
-              </div>
-              <button
-                onClick={() => router.push('/joyspanel/appointments?filter=pending')}
-                className="text-primary-600 hover:text-primary-700 text-sm font-medium"
-              >
-                Voir tout
-              </button>
+        {/* Recent Activity */}
+        <div className="mt-8">
+          <h2 className="text-lg font-medium text-gray-900">Activité Récente</h2>
+          <div className="mt-4 bg-white shadow rounded-lg">
+            <div className="px-4 py-5 sm:p-6">
+              {stats.appointments.pending > 0 && (
+                <Link 
+                  href="/joyspanel/appointments"
+                  className="flex items-center text-sm text-primary-600 hover:text-primary-700"
+                >
+                  <CalendarIcon className="h-5 w-5 mr-2" />
+                  {stats.appointments.pending} nouveaux rendez-vous en attente
+                  <ArrowRightIcon className="ml-2 h-4 w-4" />
+                </Link>
+              )}
             </div>
           </div>
         </div>
