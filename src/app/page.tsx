@@ -80,10 +80,29 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8 }}
+              className="relative mb-8 lg:mb-0 lg:order-2"
+            >
+              <div className="relative w-full h-[300px] sm:h-[400px] lg:h-[500px] rounded-3xl overflow-hidden shadow-2xl">
+                <Image
+                  src="/images/hero-image.jpg"
+                  alt="Séance d'hypnothérapie"
+                  fill
+                  className="object-cover"
+                  priority
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 40vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-rose-100/20 to-transparent" />
+              </div>
+            </motion.div>
+
+            <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
-              className="text-center lg:text-left"
+              className="text-center lg:text-left lg:order-1"
             >
               <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-black leading-tight mb-4 sm:mb-6">
                 Retrouvez votre{' '}
@@ -108,25 +127,6 @@ export default function HomePage() {
                 >
                   En savoir plus
                 </Link>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8 }}
-              className="relative mt-8 lg:mt-0"
-            >
-              <div className="relative w-full h-[300px] sm:h-[400px] lg:h-[500px] rounded-3xl overflow-hidden shadow-2xl">
-                <Image
-                  src="/images/hero-image.jpg"
-                  alt="Séance d'hypnothérapie"
-                  fill
-                  className="object-cover"
-                  priority
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 40vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-rose-100/20 to-transparent" />
               </div>
             </motion.div>
           </div>
@@ -184,6 +184,64 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Thématiques Section */}
+      <section className="relative py-20 sm:py-32 bg-white/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-12 sm:mb-16"
+          >
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-4">
+              Thématiques
+            </h2>
+            <p className="text-base sm:text-lg text-black text-justify sm:text-center max-w-2xl mx-auto">
+              Découvrez les différentes thématiques que nous pouvons aborder ensemble
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {[
+              "Gestion du stress et de l'anxiété",
+              "Confiance en soi",
+              "Arrêt du tabac",
+              "Perte de poids",
+              "Phobies",
+              "Douleurs chroniques",
+              "Troubles du sommeil",
+              "Deuil",
+              "Traumatismes"
+            ].map((theme, index) => (
+              <motion.div
+                key={theme}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="relative group"
+              >
+                <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 border border-rose-100/20">
+                  <div className="flex items-center gap-3">
+                    <div className="flex-shrink-0">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-rose-100 flex items-center justify-center">
+                        <span className="text-rose-500 font-semibold text-sm sm:text-base">
+                          {index + 1}
+                        </span>
+                      </div>
+                    </div>
+                    <h3 className="text-base sm:text-lg font-medium text-gray-900">
+                      {theme}
+                    </h3>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Testimonials Section */}
       <section className="relative py-20 sm:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -197,7 +255,7 @@ export default function HomePage() {
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
               Avis Vérifiés
             </h2>
-            <div className="mt-4 flex flex-col items-center gap-2">
+            <div className="mt-4 flex flex-col items-center">
               <div className="inline-flex items-center gap-2 bg-[#00b67a] px-4 py-2 rounded">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => (
@@ -208,9 +266,6 @@ export default function HomePage() {
                   Excellent
                 </span>
               </div>
-              <p className="text-sm text-gray-600">
-                Basé sur {testimonials.length} avis
-              </p>
             </div>
           </motion.div>
 
