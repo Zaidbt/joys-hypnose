@@ -1,24 +1,22 @@
 'use client';
 
 import React from 'react';
-import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { signOut } from 'next-auth/react';
+import { usePathname } from 'next/navigation';
 import { 
-  NewspaperIcon, 
+  DocumentTextIcon, 
   CalendarIcon, 
-  UsersIcon, 
+  ArrowLeftOnRectangleIcon,
   ChartBarIcon,
-  Cog6ToothIcon,
-  ArrowLeftOnRectangleIcon
+  EnvelopeIcon
 } from '@heroicons/react/24/outline';
+import { signOut } from 'next-auth/react';
 
 const navigation = [
-  { name: 'Dashboard', href: '/joyspanel', icon: ChartBarIcon },
-  { name: 'Blog Posts', href: '/joyspanel/posts', icon: NewspaperIcon },
+  { name: 'Blog', href: '/joyspanel/posts', icon: DocumentTextIcon },
   { name: 'Rendez-vous', href: '/joyspanel/appointments', icon: CalendarIcon },
-  { name: 'Clients', href: '/joyspanel/clients', icon: UsersIcon },
-  { name: 'Settings', href: '/joyspanel/settings', icon: Cog6ToothIcon },
+  { name: 'Newsletter', href: '/joyspanel/newsletter', icon: EnvelopeIcon },
+  { name: 'Statistiques', href: '/joyspanel/stats', icon: ChartBarIcon },
 ];
 
 export default function AdminLayout({
@@ -28,71 +26,83 @@ export default function AdminLayout({
 }) {
   const pathname = usePathname();
 
-  const handleLogout = async () => {
-    await signOut({ callbackUrl: '/joyspanel/login' });
-  };
-
   return (
     <div className="min-h-screen bg-gray-100">
-      <div className="flex h-screen">
-        {/* Sidebar */}
-        <div className="hidden md:flex md:w-64 md:flex-col">
-          <div className="flex flex-col flex-grow pt-5 bg-white overflow-y-auto">
-            <div className="flex items-center flex-shrink-0 px-4">
-              <span className="text-xl font-semibold text-primary-600">Joy's Panel</span>
-            </div>
-            <div className="mt-5 flex-grow flex flex-col">
-              <nav className="flex-1 px-2 pb-4 space-y-1">
+      {/* Navigation */}
+      <nav className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex">
+              <div className="flex-shrink-0 flex items-center">
+                <Link href="/joyspanel" className="text-xl font-semibold text-primary-600">
+                  Joy's Panel
+                </Link>
+              </div>
+              <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
                 {navigation.map((item) => {
-                  const isActive = pathname === item.href;
+                  const isActive = pathname?.startsWith(item.href);
                   return (
                     <Link
                       key={item.name}
                       href={item.href}
-                      className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
+                      className={`inline-flex items-center px-1 pt-1 text-sm font-medium ${
                         isActive
-                          ? 'bg-primary-100 text-primary-600'
-                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                          ? 'border-b-2 border-primary-500 text-gray-900'
+                          : 'border-b-2 border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                       }`}
                     >
-                      <item.icon
-                        className={`mr-3 flex-shrink-0 h-6 w-6 ${
-                          isActive ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-500'
-                        }`}
-                        aria-hidden="true"
-                      />
+                      <item.icon className="h-5 w-5 mr-1.5" />
                       {item.name}
                     </Link>
                   );
                 })}
-                
-                {/* Logout button */}
-                <button
-                  onClick={handleLogout}
-                  className="w-full group flex items-center px-2 py-2 text-sm font-medium rounded-md text-red-600 hover:bg-red-50"
-                >
-                  <ArrowLeftOnRectangleIcon
-                    className="mr-3 flex-shrink-0 h-6 w-6 text-red-400 group-hover:text-red-500"
-                    aria-hidden="true"
-                  />
-                  Déconnexion
-                </button>
-              </nav>
+              </div>
+            </div>
+            <div className="hidden sm:ml-6 sm:flex sm:items-center">
+              <button
+                onClick={() => signOut({ callbackUrl: '/joyspanel/login' })}
+                className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              >
+                <ArrowLeftOnRectangleIcon className="h-4 w-4 mr-1.5" />
+                Déconnexion
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Main content */}
-        <div className="flex flex-col flex-1 overflow-hidden">
-          <main className="flex-1 relative overflow-y-auto focus:outline-none">
-            <div className="py-6">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                {children}
-              </div>
-            </div>
-          </main>
+        {/* Mobile menu */}
+        <div className="sm:hidden">
+          <div className="pt-2 pb-3 space-y-1">
+            {navigation.map((item) => {
+              const isActive = pathname?.startsWith(item.href);
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`flex items-center px-3 py-2 text-base font-medium ${
+                    isActive
+                      ? 'bg-primary-50 border-l-4 border-primary-500 text-primary-700'
+                      : 'border-l-4 border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800'
+                  }`}
+                >
+                  <item.icon className="h-5 w-5 mr-3" />
+                  {item.name}
+                </Link>
+              );
+            })}
+            <button
+              onClick={() => signOut({ callbackUrl: '/joyspanel/login' })}
+              className="flex w-full items-center px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-800"
+            >
+              <ArrowLeftOnRectangleIcon className="h-5 w-5 mr-3" />
+              Déconnexion
+            </button>
+          </div>
         </div>
-      </div>
+      </nav>
+
+      {/* Main content */}
+      <main>{children}</main>
     </div>
   );
 } 
