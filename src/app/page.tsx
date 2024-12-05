@@ -76,25 +76,25 @@ export default function HomePage() {
       <NewsletterBanner />
       
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center pt-20">
+      <section className="relative min-h-[calc(100vh-4rem)] flex items-center pt-16 sm:pt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
               className="text-center lg:text-left"
             >
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-black leading-tight mb-6">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-black leading-tight mb-4 sm:mb-6">
                 Retrouvez votre{' '}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-rose-500">
                   harmonie intérieure
                 </span>
               </h1>
-              <p className="text-lg sm:text-xl text-black mb-8 leading-relaxed">
+              <p className="text-base sm:text-lg text-black mb-6 sm:mb-8 leading-relaxed text-justify">
                 Bienvenue dans mon espace d'hypnothérapie, où je vous accompagne vers un mieux-être profond et durable.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
                 <Link
                   href="/contact"
                   className="inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-full text-base font-medium text-white bg-rose-400 hover:bg-rose-500 transition-colors duration-300 shadow-md hover:shadow-lg"
@@ -115,16 +115,16 @@ export default function HomePage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8 }}
-              className="relative"
+              className="relative mt-8 lg:mt-0"
             >
-              <div className="relative w-full h-[500px] rounded-3xl overflow-hidden shadow-2xl">
+              <div className="relative w-full h-[300px] sm:h-[400px] lg:h-[500px] rounded-3xl overflow-hidden shadow-2xl">
                 <Image
                   src="/images/hero-image.jpg"
                   alt="Séance d'hypnothérapie"
                   fill
                   className="object-cover"
                   priority
-                  sizes="(max-width: 768px) 100vw, 50vw"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 40vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-rose-100/20 to-transparent" />
               </div>
@@ -134,18 +134,18 @@ export default function HomePage() {
       </section>
 
       {/* Services Section */}
-      <section className="relative py-32">
+      <section className="relative py-20 sm:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-black mb-4 section-title">
+          <motion.div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-4 section-title">
               Mes <span className="text-rose-500">Services</span>
             </h2>
-            <p className="text-lg text-black">
+            <p className="text-base sm:text-lg text-black text-justify sm:text-center max-w-2xl mx-auto">
               Une approche holistique pour votre bien-être
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {services.map((service, index) => (
               <motion.div
                 key={service.title}
@@ -155,15 +155,15 @@ export default function HomePage() {
                 viewport={{ once: true }}
                 className="group relative"
               >
-                <div className="bg-white/80 p-6 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 border border-rose-100/20">
-                  <div className="flex flex-col items-center text-center gap-4">
+                <div className="bg-white/80 p-4 sm:p-6 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 border border-rose-100/20">
+                  <div className="flex flex-col items-center text-center gap-3 sm:gap-4">
                     <div className="p-3 rounded-xl bg-rose-50">
                       <service.Icon 
-                        className="w-8 h-8 text-rose-500" 
+                        className="w-6 h-6 sm:w-8 sm:h-8 text-rose-500" 
                         weight="duotone"
                       />
                     </div>
-                    <h3 className="text-lg font-semibold text-black service-title">
+                    <h3 className="text-base sm:text-lg font-semibold text-black service-title">
                       {service.title}
                     </h3>
                   </div>
@@ -172,10 +172,10 @@ export default function HomePage() {
             ))}
           </div>
 
-          <motion.div className="mt-12 text-center">
+          <motion.div className="mt-10 sm:mt-12 text-center">
             <Link
               href="/services"
-              className="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-rose-400 hover:bg-rose-500 rounded-full transition-colors duration-300 shadow-sm hover:shadow-md group"
+              className="inline-flex items-center justify-center px-6 sm:px-8 py-3 text-base font-medium text-white bg-rose-400 hover:bg-rose-500 rounded-full transition-colors duration-300 shadow-sm hover:shadow-md group"
             >
               Découvrir tous nos services
               <ArrowRightIcon className="ml-2 h-5 w-5 transform group-hover:translate-x-1 transition-transform duration-300" />
@@ -185,26 +185,26 @@ export default function HomePage() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="relative py-32">
+      <section className="relative py-20 sm:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-12 sm:mb-16"
           >
-            <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl mb-4">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
               Avis Vérifiés
             </h2>
             <div className="mt-4 flex flex-col items-center gap-2">
               <div className="inline-flex items-center gap-2 bg-[#00b67a] px-4 py-2 rounded">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} weight="fill" className="w-5 h-5 text-white" />
+                    <Star key={i} weight="fill" className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                   ))}
                 </div>
-                <span className="text-white font-semibold border-l border-white/30 pl-2 ml-1">
+                <span className="text-sm sm:text-base text-white font-semibold border-l border-white/30 pl-2 ml-1">
                   Excellent
                 </span>
               </div>
@@ -214,7 +214,7 @@ export default function HomePage() {
             </div>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {testimonials.map((testimonial, index) => (
               <motion.div
                 key={index}
@@ -224,12 +224,12 @@ export default function HomePage() {
                 viewport={{ once: true }}
                 className="flex-1"
               >
-                <div className="h-full bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100">
+                <div className="h-full bg-white p-4 sm:p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100">
                   <div className="flex items-center justify-between mb-4">
                     <StarRating rating={testimonial.rating} />
-                    <span className="text-sm text-gray-500">{testimonial.date}</span>
+                    <span className="text-xs sm:text-sm text-gray-500">{testimonial.date}</span>
                   </div>
-                  <blockquote className="text-base leading-relaxed text-gray-700 mb-4">
+                  <blockquote className="text-sm sm:text-base leading-relaxed text-gray-700 mb-4 text-justify">
                     "{testimonial.content}"
                   </blockquote>
                   <div className="flex items-center justify-between pt-4 border-t border-gray-100">
@@ -237,7 +237,7 @@ export default function HomePage() {
                       {testimonial.author}
                     </cite>
                     <div className="flex items-center">
-                      <svg className="w-5 h-5 text-[#00b67a]" viewBox="0 0 24 24" fill="currentColor">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 text-[#00b67a]" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                       </svg>
                       <span className="ml-1 text-xs text-[#00b67a]">Vérifié</span>
