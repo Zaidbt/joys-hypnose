@@ -2,13 +2,15 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { signOut } from 'next-auth/react';
 import { 
   ChartBarIcon,
   DocumentTextIcon,
   CalendarIcon,
   UserGroupIcon,
   Cog6ToothIcon,
-  EnvelopeIcon
+  EnvelopeIcon,
+  ArrowLeftOnRectangleIcon
 } from '@heroicons/react/24/outline';
 
 const navigation = [
@@ -17,7 +19,7 @@ const navigation = [
   { name: 'Rendez-vous', href: '/joyspanel/appointments', icon: CalendarIcon },
   { name: 'Clients', href: '/joyspanel/clients', icon: UserGroupIcon },
   { name: 'Newsletter', href: '/joyspanel/newsletter', icon: EnvelopeIcon },
-  { name: 'Paramètres', href: '/joyspanel/settings', icon: Cog6ToothIcon },
+  { name: 'Paramètres', href: '/joyspanel/appointments/settings', icon: Cog6ToothIcon },
 ];
 
 export default function AdminLayout({
@@ -26,6 +28,11 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+
+  // Don't show the admin layout on the login page
+  if (pathname === '/joyspanel/login') {
+    return <>{children}</>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -36,8 +43,8 @@ export default function AdminLayout({
             Joy's Panel
           </Link>
         </div>
-        <nav className="mt-5 px-2">
-          <div className="space-y-1">
+        <nav className="mt-5 px-2 flex flex-col h-[calc(100vh-4rem)]">
+          <div className="space-y-1 flex-1">
             {navigation.map((item) => {
               const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
               return (
@@ -59,6 +66,19 @@ export default function AdminLayout({
                 </Link>
               );
             })}
+          </div>
+          
+          {/* Disconnect button at bottom */}
+          <div className="pb-4">
+            <button
+              onClick={() => signOut({ callbackUrl: '/joyspanel/login' })}
+              className="w-full group flex items-center px-2 py-2 text-sm font-medium rounded-md text-red-600 hover:bg-red-50"
+            >
+              <ArrowLeftOnRectangleIcon
+                className="mr-3 flex-shrink-0 h-5 w-5 text-red-400 group-hover:text-red-500"
+              />
+              Déconnexion
+            </button>
           </div>
         </nav>
       </div>
