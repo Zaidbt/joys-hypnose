@@ -54,7 +54,7 @@ export default function MonApproche() {
                   <h3 className="text-xl font-semibold mb-4 text-rose-500">
                     {session.title}
                   </h3>
-                  <p className="text-black leading-relaxed">
+                  <p className="text-black leading-relaxed text-justify">
                     {session.content}
                   </p>
                 </div>
