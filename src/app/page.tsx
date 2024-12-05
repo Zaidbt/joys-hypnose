@@ -197,10 +197,30 @@ export default function HomePage() {
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-4">
               Thématiques
             </h2>
-            <p className="text-base sm:text-lg text-black text-justify sm:text-center max-w-2xl mx-auto">
-              Découvrez les différentes thématiques que nous pouvons aborder ensemble
-            </p>
           </motion.div>
+
+          {/* Image - First on mobile */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8 }}
+            className="relative mb-8 sm:mb-12 max-w-3xl mx-auto"
+          >
+            <div className="relative w-full h-[200px] sm:h-[300px] rounded-3xl overflow-hidden shadow-2xl">
+              <Image
+                src="/images/thematiques.jpg"
+                alt="Séance d'hypnothérapie thématiques"
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 60vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-rose-100/20 to-transparent" />
+            </div>
+          </motion.div>
+
+          <p className="text-base sm:text-lg text-black text-justify sm:text-center max-w-2xl mx-auto mb-12">
+            Découvrez les différentes thématiques que nous pouvons aborder ensemble
+          </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {[
