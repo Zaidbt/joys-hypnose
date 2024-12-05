@@ -17,7 +17,7 @@ export async function GET() {
     const db = client.db();
 
     // Get blog stats
-    const articles = await db.collection('posts').countDocuments();
+    const articles = await db.collection('blog_posts').countDocuments();
 
     // Get appointment stats
     const today = new Date();

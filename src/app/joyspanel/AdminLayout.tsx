@@ -8,15 +8,19 @@ import {
   CalendarIcon, 
   ArrowLeftOnRectangleIcon,
   ChartBarIcon,
-  EnvelopeIcon
+  EnvelopeIcon,
+  UserGroupIcon,
+  Cog6ToothIcon
 } from '@heroicons/react/24/outline';
 import { signOut } from 'next-auth/react';
 
 const navigation = [
-  { name: 'Blog', href: '/joyspanel/posts', icon: DocumentTextIcon },
+  { name: 'Dashboard', href: '/joyspanel', icon: ChartBarIcon },
+  { name: 'Blog Posts', href: '/joyspanel/posts', icon: DocumentTextIcon },
   { name: 'Rendez-vous', href: '/joyspanel/appointments', icon: CalendarIcon },
+  { name: 'Clients', href: '/joyspanel/clients', icon: UserGroupIcon },
   { name: 'Newsletter', href: '/joyspanel/newsletter', icon: EnvelopeIcon },
-  { name: 'Statistiques', href: '/joyspanel/stats', icon: ChartBarIcon },
+  { name: 'Paramètres', href: '/joyspanel/settings', icon: Cog6ToothIcon },
 ];
 
 export default function AdminLayout({
