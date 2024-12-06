@@ -38,15 +38,11 @@ export const metadata: Metadata = {
         type: 'image/png',
         sizes: '32x32',
       },
-      {
-        url: '/apple-icon.png',
-        type: 'image/png',
-        sizes: '180x180',
-      },
     ],
     apple: [
       {
         url: '/apple-icon.png',
+        type: 'image/png',
         sizes: '180x180',
       },
     ],
@@ -61,13 +57,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr" className={`${playfair.variable} ${quicksand.variable}`}>
-      <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16" />
-        <link rel="icon" href="/icon.png" type="image/png" sizes="32x32" />
-        <link rel="apple-touch-icon" href="/apple-icon.png" sizes="180x180" />
-        <link rel="manifest" href="/site.webmanifest" />
-      </head>
       <body className={quicksand.className}>
         <ClientLayout>{children}</ClientLayout>
       </body>
