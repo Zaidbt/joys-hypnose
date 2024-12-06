@@ -3,13 +3,9 @@ import {
   Playfair_Display, 
   Quicksand,
 } from "next/font/google";
-import { usePathname } from 'next/navigation';
-import SessionProvider from "./providers/SessionProvider";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import VisitTracker from "./components/VisitTracker";
-import "./globals.css";
 import type { Metadata } from 'next';
+import ClientLayout from './ClientLayout';
+import "./globals.css";
 
 const playfair = Playfair_Display({ 
   subsets: ['latin'],
@@ -38,19 +34,19 @@ export const metadata: Metadata = {
         sizes: '16x16',
       },
       {
-        url: '/favicon-32x32.png',
+        url: '/icon.png',
         type: 'image/png',
         sizes: '32x32',
       },
       {
-        url: '/apple-touch-icon.png',
+        url: '/apple-icon.png',
         type: 'image/png',
         sizes: '180x180',
       },
     ],
     apple: [
       {
-        url: '/apple-touch-icon.png',
+        url: '/apple-icon.png',
         sizes: '180x180',
       },
     ],
@@ -63,18 +59,17 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
-  const isAdminPanel = pathname?.startsWith('/joyspanel');
-
   return (
     <html lang="fr" className={`${playfair.variable} ${quicksand.variable}`}>
+      <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16" />
+        <link rel="icon" href="/icon.png" type="image/png" sizes="32x32" />
+        <link rel="apple-touch-icon" href="/apple-icon.png" sizes="180x180" />
+        <link rel="manifest" href="/site.webmanifest" />
+      </head>
       <body className={quicksand.className}>
-        <SessionProvider>
-          <VisitTracker />
-          {!isAdminPanel && <Header />}
-          {children}
-          {!isAdminPanel && <Footer />}
-        </SessionProvider>
+        <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
   );
