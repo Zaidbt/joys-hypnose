@@ -4,6 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { CheckBadgeIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
+import WhatsAppButton from '../components/WhatsAppButton';
 
 const sessions = [
   {
@@ -235,6 +236,14 @@ export default function MonApproche() {
                 <p className="max-w-[65ch] text-justify mx-auto">
                   En tant que maître praticienne, je m'engage à accompagner mes clients dans leur voyage vers l'harmonie, tout en partageant la conviction profonde que la transformation personnelle n'est pas seulement possible, mais aussi essentielle pour atteindre une vie pleine de sens et de bien-être.
                 </p>
+              </div>
+
+              {/* WhatsApp Button */}
+              <div className="mt-12 text-center">
+                <WhatsAppButton 
+                  phoneNumber="+212660826028"
+                  message="Bonjour Joy, j'ai visité votre site et j'aimerais en savoir plus sur vos séances d'hypnose. Pouvez-vous me donner plus d'informations ?"
+                />
               </div>
             </motion.div>
           </div>

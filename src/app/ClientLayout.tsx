@@ -6,6 +6,7 @@ import SessionProvider from "./providers/SessionProvider";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import VisitTracker from "./components/VisitTracker";
+import WhatsAppButton from "./components/WhatsAppButton";
 
 export default function ClientLayout({
   children,
@@ -20,7 +21,12 @@ export default function ClientLayout({
       <VisitTracker />
       {!isAdminPanel && <Header />}
       {children}
-      {!isAdminPanel && <Footer />}
+      {!isAdminPanel && (
+        <>
+          <Footer />
+          <WhatsAppButton phoneNumber="+212660826028" />
+        </>
+      )}
     </SessionProvider>
   );
 } 
