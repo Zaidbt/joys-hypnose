@@ -1,9 +1,31 @@
-import type { Metadata } from "next";
+import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Joys Hypnose - Thérapie",
-  description: "Cabinet d'hypnothérapie à Genève",
+  title: "Joy's Hypnose | Hypnothérapie à Casablanca",
+  description: "Découvrez l'hypnothérapie à Casablanca avec Joy's Hypnose. Séances personnalisées pour stress, anxiété, confiance en soi et plus encore.",
   icons: {
-    icon: '/favicon.ico',
+    icon: [
+      {
+        url: '/favicon.ico',
+        sizes: 'any',
+      },
+      {
+        url: '/icon.png',
+        type: 'image/png',
+        sizes: '32x32',
+      },
+      {
+        url: '/apple-icon.png',
+        type: 'image/png',
+        sizes: '180x180',
+      },
+    ],
+    apple: [
+      {
+        url: '/apple-icon.png',
+        sizes: '180x180',
+      },
+    ],
   },
+  manifest: '/site.webmanifest',
 }; 
