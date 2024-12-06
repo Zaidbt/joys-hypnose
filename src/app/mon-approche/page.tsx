@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { CheckBadgeIcon } from '@heroicons/react/24/outline';
+import Image from 'next/image';
 
 const sessions = [
   {
@@ -195,13 +196,15 @@ export default function MonApproche() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
-                className="relative w-full h-[300px] md:h-[400px] mb-8 rounded-2xl overflow-hidden"
+                className="relative aspect-[4/3] overflow-hidden rounded-2xl mb-8"
               >
-                <img
-                  src="/histoire.png"
+                <Image
+                  src="/images/histoire.png"
                   alt="Notre Histoire"
-                  className="w-full h-full object-cover rounded-2xl"
+                  fill
+                  className="object-cover rounded-2xl transition-transform duration-300 group-hover:scale-105"
                 />
+                <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-gray-900/10" />
               </motion.div>
 
               <div className="prose prose-lg max-w-none space-y-8 text-black">
