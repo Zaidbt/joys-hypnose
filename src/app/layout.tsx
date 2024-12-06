@@ -1,5 +1,3 @@
-'use client';
-
 import React from "react";
 import { 
   Playfair_Display, 
@@ -11,7 +9,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import VisitTracker from "./components/VisitTracker";
 import "./globals.css";
-import { metadata } from './metadata';
+import type { Metadata } from 'next';
 
 const playfair = Playfair_Display({ 
   subsets: ['latin'],
@@ -25,7 +23,40 @@ const quicksand = Quicksand({
   variable: '--font-quicksand',
 });
 
-export { metadata };
+export const metadata: Metadata = {
+  title: "Joy's Hypnose | Hypnothérapie à Casablanca",
+  description: "Découvrez l'hypnothérapie à Casablanca avec Joy's Hypnose. Séances personnalisées pour stress, anxiété, confiance en soi et plus encore.",
+  icons: {
+    icon: [
+      {
+        url: '/favicon.ico',
+        sizes: 'any',
+      },
+      {
+        url: '/favicon-16x16.png',
+        type: 'image/png',
+        sizes: '16x16',
+      },
+      {
+        url: '/favicon-32x32.png',
+        type: 'image/png',
+        sizes: '32x32',
+      },
+      {
+        url: '/apple-touch-icon.png',
+        type: 'image/png',
+        sizes: '180x180',
+      },
+    ],
+    apple: [
+      {
+        url: '/apple-touch-icon.png',
+        sizes: '180x180',
+      },
+    ],
+  },
+  manifest: '/site.webmanifest',
+};
 
 export default function RootLayout({
   children,
@@ -37,13 +68,6 @@ export default function RootLayout({
 
   return (
     <html lang="fr" className={`${playfair.variable} ${quicksand.variable}`}>
-      <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16" />
-        <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
-        <link rel="manifest" href="/site.webmanifest" />
-      </head>
       <body className={quicksand.className}>
         <SessionProvider>
           <VisitTracker />
