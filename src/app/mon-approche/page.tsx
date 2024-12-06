@@ -178,7 +178,7 @@ export default function MonApproche() {
               transition={{ duration: 0.8 }}
               className="lg:col-span-3"
             >
-              <h1 className="text-4xl font-bold text-rose-500">
+              <h1 className="text-4xl font-bold text-rose-500 mb-6 lg:mb-0">
                 Notre histoire
               </h1>
             </motion.div>
@@ -190,6 +190,20 @@ export default function MonApproche() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="lg:col-span-9"
             >
+              {/* Image for mobile and desktop */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                className="relative w-full h-[300px] md:h-[400px] mb-8 rounded-2xl overflow-hidden"
+              >
+                <img
+                  src="/histoire.png"
+                  alt="Notre Histoire"
+                  className="w-full h-full object-cover rounded-2xl"
+                />
+              </motion.div>
+
               <div className="prose prose-lg max-w-none space-y-8 text-black">
                 <p className="max-w-[65ch] text-justify">
                   Choisir de devenir hypnothérapeute n'est pas simplement une profession pour moi, mais plutôt une mission de vie profondément enracinée dans ma propre expérience et ma conviction profonde.
