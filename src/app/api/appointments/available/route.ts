@@ -60,7 +60,7 @@ export async function GET(request: Request) {
 
     console.log('Found booked slots:', bookedSlots);
 
-    // Parse working hours
+    // Parse working hours with explicit handling of minutes
     const [startHour, startMinute] = settings.workingHours.start.split(':').map(Number);
     const [endHour, endMinute] = settings.workingHours.end.split(':').map(Number);
     
@@ -69,55 +69,65 @@ export async function GET(request: Request) {
     let currentMinute = startMinute;
 
     // Helper function to check if a time slot is booked
-    const isTimeSlotBooked = (hour: number, minute: number, duration: number) => {
-      const slotStart = new Date(date);
-      slotStart.setHours(hour, minute, 0, 0);
-      
-      const slotEnd = new Date(slotStart);
-      slotEnd.setHours(slotStart.getHours() + Math.floor(duration));
-      slotEnd.setMinutes(slotStart.getMinutes() + (duration % 1) * 60);
-
+    const isTimeSlotBooked = (startTime: Date, endTime: Date) => {
       return bookedSlots.some(booking => {
         const bookingStart = new Date(booking.startTime);
         const bookingEnd = new Date(booking.endTime);
-        return (bookingStart < slotEnd && bookingEnd > slotStart);
+        return (bookingStart < endTime && bookingEnd > startTime);
       });
     };
 
+    // Helper function to check if a time is within working hours
+    const isWithinWorkingHours = (time: Date) => {
+      const hour = time.getHours();
+      const minute = time.getMinutes();
+      
+      if (hour < startHour || hour > endHour) return false;
+      if (hour === startHour && minute < startMinute) return false;
+      if (hour === endHour && minute > endMinute) return false;
+      
+      return true;
+    };
+
     // Generate slots
-    while (currentHour < endHour || (currentHour === endHour && currentMinute < endMinute)) {
-      const timeString = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
+    while (currentHour < endHour || (currentHour === endHour && currentMinute <= endMinute)) {
+      const slotStart = new Date(date);
+      slotStart.setHours(currentHour, currentMinute, 0, 0);
       
-      // For first-time clients, check if two hours are available
+      // Calculate slot duration and end time
       const duration = isFirstTime ? 2 : 1;
+      const slotEnd = new Date(slotStart);
+      slotEnd.setHours(slotStart.getHours() + duration);
+
+      // Format time strings
+      const timeString = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
+      const endTimeString = `${slotEnd.getHours().toString().padStart(2, '0')}:${slotEnd.getMinutes().toString().padStart(2, '0')}`;
       
-      // Calculate end time for this slot
-      const slotEndHour = currentHour + Math.floor(duration);
-      const slotEndMinute = currentMinute;
+      // Check if the entire slot (including end time) is within working hours
+      const hasEnoughTime = isWithinWorkingHours(slotStart) && isWithinWorkingHours(slotEnd);
       
-      // Check if slot fits within working hours
-      const hasEnoughTime = 
-        slotEndHour < endHour || 
-        (slotEndHour === endHour && slotEndMinute <= endMinute);
-      
-      // Check availability
-      const isSlotAvailable = hasEnoughTime && !isTimeSlotBooked(currentHour, currentMinute, duration);
+      // For 2-hour slots, check both hours are completely free
+      const isSlotAvailable = hasEnoughTime && !isTimeSlotBooked(slotStart, slotEnd);
 
       console.log(`Checking slot ${timeString}:`, {
         isFirstTime,
         duration,
         hasEnoughTime,
         isAvailable: isSlotAvailable,
-        endTime: `${slotEndHour}:${slotEndMinute}`
+        endTime: endTimeString,
+        slotStart: slotStart.toISOString(),
+        slotEnd: slotEnd.toISOString()
       });
 
-      slots.push({
-        time: timeString,
-        status: isSlotAvailable ? 'available' : 'booked',
-        available: isSlotAvailable,
-        duration: duration,
-        endTime: `${slotEndHour.toString().padStart(2, '0')}:${slotEndMinute.toString().padStart(2, '0')}`
-      });
+      if (hasEnoughTime) {
+        slots.push({
+          time: timeString,
+          status: isSlotAvailable ? 'available' : 'booked',
+          available: isSlotAvailable,
+          duration: duration,
+          endTime: endTimeString
+        });
+      }
 
       // Increment by the slot duration (usually 1 hour)
       currentMinute += settings.slotDuration;
