@@ -7,13 +7,16 @@ import type { AppointmentSettings } from '@/types/appointment';
 
 interface TimeSlot {
   time: string;
+  endTime: string;
   available: boolean;
   status: 'available' | 'booked' | 'pending' | 'fictitious';
+  duration: number;
 }
 
 interface AppointmentCalendarProps {
   onSelectSlot: (date: string, time: string) => void;
   isAdmin?: boolean;
+  isFirstTime?: boolean;
 }
 
 const slotColors = {
@@ -48,7 +51,11 @@ const formatWorkingDays = (workingDays: number[]): string => {
     .join(', ');
 };
 
-export default function AppointmentCalendar({ onSelectSlot, isAdmin = false }: AppointmentCalendarProps) {
+export default function AppointmentCalendar({ 
+  onSelectSlot, 
+  isAdmin = false,
+  isFirstTime = false 
+}: AppointmentCalendarProps) {
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);
@@ -82,7 +89,7 @@ export default function AppointmentCalendar({ onSelectSlot, isAdmin = false }: A
       
       setIsLoading(true);
       try {
-        const response = await fetch(`/api/appointments/available?date=${selectedDate}`);
+        const response = await fetch(`/api/appointments/available?date=${selectedDate}&isFirstTime=${isFirstTime}`);
         if (!response.ok) throw new Error('Failed to fetch slots');
         const data = await response.json();
         console.log('Received slots:', data);
@@ -98,7 +105,7 @@ export default function AppointmentCalendar({ onSelectSlot, isAdmin = false }: A
     if (selectedDate) {
       fetchSlots();
     }
-  }, [selectedDate]);
+  }, [selectedDate, isFirstTime]);
 
   const handleDateChange = (date: string) => {
     // Check if the selected date is a working day
@@ -117,11 +124,11 @@ export default function AppointmentCalendar({ onSelectSlot, isAdmin = false }: A
     setAvailableSlots([]);
   };
 
-  const handleTimeSelect = (time: string, status: string) => {
-    if (status !== 'available') return;
+  const handleTimeSelect = (slot: TimeSlot) => {
+    if (slot.status !== 'available') return;
     
-    setSelectedTime(time);
-    onSelectSlot(selectedDate, time);
+    setSelectedTime(slot.time);
+    onSelectSlot(selectedDate, slot.time);
   };
 
   const getSlotColor = (slot: TimeSlot) => {
@@ -152,7 +159,7 @@ export default function AppointmentCalendar({ onSelectSlot, isAdmin = false }: A
       {selectedDate && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-4">
-            Créneaux disponibles
+            Créneaux disponibles {isFirstTime && "(2 heures pour première séance)"}
           </label>
           {isLoading ? (
             <div className="flex justify-center py-8">
@@ -164,13 +171,20 @@ export default function AppointmentCalendar({ onSelectSlot, isAdmin = false }: A
                 <button
                   key={slot.time}
                   type="button"
-                  onClick={() => handleTimeSelect(slot.time, slot.status)}
-                  className={`flex items-center justify-center px-4 py-3 border rounded-md text-sm font-medium transition-colors duration-200 ${getSlotColor(slot)}`}
+                  onClick={() => handleTimeSelect(slot)}
+                  className={`flex flex-col items-center justify-center px-4 py-3 border rounded-md text-sm font-medium transition-colors duration-200 ${getSlotColor(slot)}`}
                   disabled={slot.status !== 'available'}
                   title={slotLabels[slot.status]}
                 >
-                  <ClockIcon className="h-4 w-4 mr-2" />
-                  {slot.time}
+                  <div className="flex items-center">
+                    <ClockIcon className="h-4 w-4 mr-2" />
+                    <span>{slot.time}</span>
+                  </div>
+                  {slot.duration > 1 && (
+                    <span className="text-xs mt-1">
+                      jusqu'à {slot.endTime}
+                    </span>
+                  )}
                 </button>
               ))}
             </div>

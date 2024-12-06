@@ -60,58 +60,71 @@ export async function GET(request: Request) {
 
     console.log('Found booked slots:', bookedSlots);
 
-    // Generate all possible slots
+    // Parse working hours
     const [startHour, startMinute] = settings.workingHours.start.split(':').map(Number);
     const [endHour, endMinute] = settings.workingHours.end.split(':').map(Number);
     
     const slots = [];
     let currentHour = startHour;
+    let currentMinute = startMinute;
 
     // Helper function to check if a time slot is booked
-    const isTimeSlotBooked = (hour: number, duration: number) => {
-      // Create fresh date objects for each check
+    const isTimeSlotBooked = (hour: number, minute: number, duration: number) => {
       const slotStart = new Date(date);
-      slotStart.setHours(hour, 0, 0, 0);
+      slotStart.setHours(hour, minute, 0, 0);
       
-      const slotEnd = new Date(date);
-      slotEnd.setHours(hour + duration, 0, 0, 0);
+      const slotEnd = new Date(slotStart);
+      slotEnd.setHours(slotStart.getHours() + Math.floor(duration));
+      slotEnd.setMinutes(slotStart.getMinutes() + (duration % 1) * 60);
 
       return bookedSlots.some(booking => {
         const bookingStart = new Date(booking.startTime);
         const bookingEnd = new Date(booking.endTime);
-        
-        // Check if there's any overlap
         return (bookingStart < slotEnd && bookingEnd > slotStart);
       });
     };
 
     // Generate slots
-    while (currentHour < endHour) {
-      const timeString = `${currentHour.toString().padStart(2, '0')}:00`;
+    while (currentHour < endHour || (currentHour === endHour && currentMinute < endMinute)) {
+      const timeString = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
       
-      // For first-time clients, check if both hours are available
+      // For first-time clients, check if two hours are available
       const duration = isFirstTime ? 2 : 1;
       
-      // Only show slot if we have enough hours left in the day
-      const hasEnoughTime = currentHour + duration <= endHour;
+      // Calculate end time for this slot
+      const slotEndHour = currentHour + Math.floor(duration);
+      const slotEndMinute = currentMinute;
+      
+      // Check if slot fits within working hours
+      const hasEnoughTime = 
+        slotEndHour < endHour || 
+        (slotEndHour === endHour && slotEndMinute <= endMinute);
       
       // Check availability
-      const isSlotAvailable = hasEnoughTime && !isTimeSlotBooked(currentHour, duration);
+      const isSlotAvailable = hasEnoughTime && !isTimeSlotBooked(currentHour, currentMinute, duration);
 
       console.log(`Checking slot ${timeString}:`, {
         isFirstTime,
         duration,
         hasEnoughTime,
-        isAvailable: isSlotAvailable
+        isAvailable: isSlotAvailable,
+        endTime: `${slotEndHour}:${slotEndMinute}`
       });
 
       slots.push({
         time: timeString,
         status: isSlotAvailable ? 'available' : 'booked',
-        available: isSlotAvailable
+        available: isSlotAvailable,
+        duration: duration,
+        endTime: `${slotEndHour.toString().padStart(2, '0')}:${slotEndMinute.toString().padStart(2, '0')}`
       });
 
-      currentHour += 1;
+      // Increment by the slot duration (usually 1 hour)
+      currentMinute += settings.slotDuration;
+      if (currentMinute >= 60) {
+        currentHour += Math.floor(currentMinute / 60);
+        currentMinute = currentMinute % 60;
+      }
     }
 
     return NextResponse.json(slots);
