@@ -171,72 +171,68 @@ export default function MonApproche() {
       {/* Notre Histoire Section - Moved down */}
       <section className="relative py-24 bg-[#fff5f5]">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-            {/* Title Column */}
+          <div className="grid grid-cols-1 gap-12">
+            {/* Title and Image Container */}
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="lg:col-span-3"
+              className="text-center"
             >
-              <h1 className="text-4xl font-bold text-rose-500 mb-6 lg:mb-0">
+              <h1 className="text-4xl font-bold text-rose-500 mb-8">
                 Notre histoire
               </h1>
+              
+              {/* Image */}
+              <div className="max-w-3xl mx-auto">
+                <div className="relative aspect-[4/3] overflow-hidden rounded-2xl mb-12">
+                  <Image
+                    src="/images/histoire.png"
+                    alt="Notre Histoire"
+                    fill
+                    className="object-cover rounded-2xl transition-transform duration-300 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-gray-900/10" />
+                </div>
+              </div>
             </motion.div>
 
-            {/* Content Column */}
+            {/* Content */}
             <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="lg:col-span-9"
             >
-              {/* Image for mobile and desktop */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
-                className="relative aspect-[4/3] overflow-hidden rounded-2xl mb-8"
-              >
-                <Image
-                  src="/images/histoire.png"
-                  alt="Notre Histoire"
-                  fill
-                  className="object-cover rounded-2xl transition-transform duration-300 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-gray-900/10" />
-              </motion.div>
-
               <div className="prose prose-lg max-w-none space-y-8 text-black">
-                <p className="max-w-[65ch] text-justify">
+                <p className="max-w-[65ch] text-justify mx-auto">
                   Choisir de devenir hypnothérapeute n'est pas simplement une profession pour moi, mais plutôt une mission de vie profondément enracinée dans ma propre expérience et ma conviction profonde.
                 </p>
 
-                <p className="max-w-[65ch] text-justify">
+                <p className="max-w-[65ch] text-justify mx-auto">
                   Depuis toujours, j'ai été naturellement attirée par l'écoute des autres et la recherche de solutions pour les aider à surmonter les défis de la vie.
                 </p>
 
-                <p className="max-w-[65ch] text-justify">
+                <p className="max-w-[65ch] text-justify mx-auto">
                   Ayant moi-même traversé des périodes tumultueuses et étant dotée d'une sensibilité aiguë, d'une empathie profonde, et d'une âme ancienne, j'ai trouvé dans le voyage intérieur une boussole pour ma propre transformation.
                 </p>
 
-                <p className="max-w-[65ch] text-justify">
+                <p className="max-w-[65ch] text-justify mx-auto">
                   Ce parcours personnel, parsemé d'expériences qui ont forgé ma compréhension des profondeurs de l'âme humaine, m'a conduit à comprendre que le véritable alignement et l'harmonie ne peuvent être atteints qu'en travaillant sur tous les niveaux de notre être.
                 </p>
 
-                <p className="max-w-[65ch] text-justify">
+                <p className="max-w-[65ch] text-justify mx-auto">
                   Pour moi, l'esprit, l'âme et le corps sont intrinsèquement liés, et la clé de l'harmonie intérieure réside dans l'équilibre holistique de ces aspects.
                 </p>
 
-                <p className="max-w-[65ch] text-justify">
+                <p className="max-w-[65ch] text-justify mx-auto">
                   En embrassant ma propre hypersensibilité et en apprenant à canaliser cette énergie unique, j'ai découvert que ma mission est d'aider les autres à faire de même.
                 </p>
 
-                <p className="max-w-[65ch] text-justify">
+                <p className="max-w-[65ch] text-justify mx-auto">
                   Mon objectif est d'offrir un espace bienveillant où les individus peuvent explorer leurs propres profondeurs, libérer leurs blessures émotionnelles, et trouver un équilibre durable.
                 </p>
 
-                <p className="max-w-[65ch] text-justify">
+                <p className="max-w-[65ch] text-justify mx-auto">
                   En tant que maître praticienne, je m'engage à accompagner mes clients dans leur voyage vers l'harmonie, tout en partageant la conviction profonde que la transformation personnelle n'est pas seulement possible, mais aussi essentielle pour atteindre une vie pleine de sens et de bien-être.
                 </p>
               </div>
