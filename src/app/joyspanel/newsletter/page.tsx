@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { 
   EnvelopeIcon, 
   TrashIcon,
@@ -9,172 +10,179 @@ import {
   CheckCircleIcon,
   XCircleIcon
 } from '@heroicons/react/24/outline';
-import type { NewsletterSubscription } from '@/types/newsletter';
+
+interface Subscriber {
+  _id: string;
+  email: string;
+  status: 'active' | 'unsubscribed';
+  createdAt: string;
+  updatedAt: string;
+}
 
 export default function NewsletterPage() {
-  const [subscriptions, setSubscriptions] = useState<NewsletterSubscription[]>([]);
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchSubscriptions();
-  }, []);
+    if (status === 'unauthenticated') {
+      router.push('/joyspanel/login');
+      return;
+    }
 
-  const fetchSubscriptions = async () => {
+    fetchSubscribers();
+  }, [status, router]);
+
+  const fetchSubscribers = async () => {
     try {
-      const response = await fetch('/api/newsletter');
-      if (!response.ok) throw new Error('Failed to fetch subscriptions');
+      const response = await fetch('/api/newsletter/subscribers');
+      if (!response.ok) throw new Error('Failed to fetch subscribers');
       const data = await response.json();
-      setSubscriptions(data);
+      setSubscribers(data);
     } catch (error) {
-      setError('Failed to load subscriptions');
-      console.error('Error:', error);
+      setError(error instanceof Error ? error.message : 'An error occurred');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleStatusToggle = async (email: string, currentStatus: string) => {
+  const handleDelete = async (id: string) => {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer cet abonné ?')) return;
+
     try {
-      const response = await fetch('/api/newsletter/status', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          status: currentStatus === 'active' ? 'unsubscribed' : 'active',
-        }),
+      const response = await fetch(`/api/newsletter/subscribers/${id}`, {
+        method: 'DELETE',
       });
 
-      if (!response.ok) throw new Error('Failed to update status');
-      fetchSubscriptions();
+      if (!response.ok) throw new Error('Failed to delete subscriber');
+      
+      setSubscribers(prev => prev.filter(sub => sub._id !== id));
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error deleting subscriber:', error);
+      alert('Une erreur est survenue lors de la suppression');
     }
   };
 
-  const handleDelete = async (email: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cette inscription ?')) return;
-
+  const handleStatusToggle = async (id: string, currentStatus: string) => {
     try {
-      const response = await fetch('/api/newsletter', {
-        method: 'DELETE',
+      const newStatus = currentStatus === 'active' ? 'unsubscribed' : 'active';
+      const response = await fetch(`/api/newsletter/subscribers/${id}`, {
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ status: newStatus }),
       });
 
-      if (!response.ok) throw new Error('Failed to delete subscription');
-      fetchSubscriptions();
+      if (!response.ok) throw new Error('Failed to update subscriber status');
+      
+      setSubscribers(prev => prev.map(sub => 
+        sub._id === id ? { ...sub, status: newStatus } : sub
+      ));
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error updating subscriber status:', error);
+      alert('Une erreur est survenue lors de la mise à jour');
     }
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-100 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-center items-center h-64">
-            <ArrowPathIcon className="h-8 w-8 text-primary-500 animate-spin" />
-          </div>
-        </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="px-4 py-5 sm:px-6 bg-primary-50">
-            <h3 className="text-lg leading-6 font-medium text-primary-900 flex items-center">
-              <EnvelopeIcon className="h-6 w-6 mr-2" />
-              Newsletter Subscriptions
-            </h3>
-            <p className="mt-1 text-sm text-primary-600">
-              Manage your newsletter subscribers
-            </p>
-          </div>
+    <div className="p-8">
+      <div className="sm:flex sm:items-center">
+        <div className="sm:flex-auto">
+          <h1 className="text-2xl font-semibold text-gray-900">Newsletter</h1>
+          <p className="mt-2 text-sm text-gray-700">
+            Liste des abonnés à la newsletter
+          </p>
+        </div>
+        <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+          <button
+            onClick={fetchSubscribers}
+            className="inline-flex items-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+          >
+            <ArrowPathIcon className="h-4 w-4 mr-2" />
+            Actualiser
+          </button>
+        </div>
+      </div>
 
-          {error && (
-            <div className="p-4 bg-red-50 border-l-4 border-red-400 text-red-700">
-              {error}
-            </div>
-          )}
-
-          <div className="flex flex-col">
-            <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-              <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-                <div className="overflow-hidden">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Email
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Status
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Date d'inscription
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {subscriptions.map((subscription) => (
-                        <motion.tr
-                          key={subscription.email}
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ duration: 0.3 }}
+      <div className="mt-8 flex flex-col">
+        <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+          <div className="inline-block min-w-full py-2 align-middle">
+            <div className="overflow-hidden shadow-sm ring-1 ring-black ring-opacity-5">
+              <table className="min-w-full divide-y divide-gray-300">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8">
+                      Email
+                    </th>
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                      Status
+                    </th>
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                      Date d'inscription
+                    </th>
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                      Dernière mise à jour
+                    </th>
+                    <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8">
+                      <span className="sr-only">Actions</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 bg-white">
+                  {subscribers.map((subscriber) => (
+                    <tr key={subscriber._id}>
+                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8">
+                        <div className="flex items-center">
+                          <EnvelopeIcon className="h-5 w-5 text-gray-400 mr-2" />
+                          {subscriber.email}
+                        </div>
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        <button
+                          onClick={() => handleStatusToggle(subscriber._id, subscriber.status)}
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            subscriber.status === 'active'
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-red-100 text-red-800'
+                          }`}
                         >
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium text-gray-900">
-                              {subscription.email}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              subscription.status === 'active'
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-red-100 text-red-800'
-                            }`}>
-                              {subscription.status === 'active' ? 'Actif' : 'Désabonné'}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {new Date(subscription.createdAt).toLocaleDateString('fr-FR')}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <button
-                              onClick={() => handleStatusToggle(subscription.email, subscription.status)}
-                              className="text-primary-600 hover:text-primary-900 mr-4"
-                            >
-                              {subscription.status === 'active' ? (
-                                <XCircleIcon className="h-5 w-5" />
-                              ) : (
-                                <CheckCircleIcon className="h-5 w-5" />
-                              )}
-                            </button>
-                            <button
-                              onClick={() => handleDelete(subscription.email)}
-                              className="text-red-600 hover:text-red-900"
-                            >
-                              <TrashIcon className="h-5 w-5" />
-                            </button>
-                          </td>
-                        </motion.tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+                          {subscriber.status === 'active' ? (
+                            <CheckCircleIcon className="h-4 w-4 mr-1" />
+                          ) : (
+                            <XCircleIcon className="h-4 w-4 mr-1" />
+                          )}
+                          {subscriber.status === 'active' ? 'Actif' : 'Désabonné'}
+                        </button>
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        {new Date(subscriber.createdAt).toLocaleDateString('fr-FR')}
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        {new Date(subscriber.updatedAt).toLocaleDateString('fr-FR')}
+                      </td>
+                      <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
+                        <button
+                          onClick={() => handleDelete(subscriber._id)}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          <TrashIcon className="h-5 w-5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

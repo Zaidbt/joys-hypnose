@@ -48,6 +48,58 @@ const nextConfig = {
   async headers() {
     return [
       {
+        source: '/favicon.ico',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'image/x-icon'
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable'
+          }
+        ],
+      },
+      {
+        source: '/favicon-16x16.png',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'image/png'
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable'
+          }
+        ],
+      },
+      {
+        source: '/icon.png',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'image/png'
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable'
+          }
+        ],
+      },
+      {
+        source: '/apple-icon.png',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'image/png'
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable'
+          }
+        ],
+      },
+      {
         source: '/uploads/:path*',
         headers: [
           {
@@ -69,10 +121,6 @@ const nextConfig = {
           {
             key: 'Access-Control-Allow-Methods',
             value: 'GET',
-          },
-          {
-            key: 'Content-Type',
-            value: 'image/jpeg',
           },
         ],
       },

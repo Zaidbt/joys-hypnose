@@ -23,31 +23,16 @@ export const metadata: Metadata = {
   title: "Joy's Hypnose | Hypnothérapie à Casablanca",
   description: "Découvrez l'hypnothérapie à Casablanca avec Joy's Hypnose. Séances personnalisées pour stress, anxiété, confiance en soi et plus encore.",
   icons: {
-    icon: [
-      {
-        url: '/favicon.ico',
-        sizes: 'any',
-      },
-      {
-        url: '/favicon-16x16.png',
-        type: 'image/png',
-        sizes: '16x16',
-      },
-      {
-        url: '/icon.png',
-        type: 'image/png',
-        sizes: '32x32',
-      },
-    ],
-    apple: [
-      {
-        url: '/apple-icon.png',
-        type: 'image/png',
-        sizes: '180x180',
-      },
-    ],
+    icon: '/favicon.ico',
+    shortcut: '/favicon-16x16.png',
+    apple: '/apple-icon.png',
   },
   manifest: '/site.webmanifest',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: "Joy's Hypnose",
+  },
 };
 
 export default function RootLayout({
