@@ -1,7 +1,7 @@
 import React from "react";
 import { 
   Playfair_Display, 
-  Quicksand,
+  Raleway,
 } from "next/font/google";
 import type { Metadata } from 'next';
 import ClientLayout from './ClientLayout';
@@ -13,10 +13,10 @@ const playfair = Playfair_Display({
   variable: '--font-playfair',
 });
 
-const quicksand = Quicksand({ 
+const raleway = Raleway({ 
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-quicksand',
+  variable: '--font-raleway',
 });
 
 export const metadata: Metadata = {
@@ -41,8 +41,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" className={`${playfair.variable} ${quicksand.variable}`}>
-      <body className={quicksand.className}>
+    <html lang="fr" className={`${playfair.variable} ${raleway.variable}`}>
+      <body className={raleway.className}>
         <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
