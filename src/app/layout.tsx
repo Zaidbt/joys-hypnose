@@ -11,12 +11,18 @@ const playfair = Playfair_Display({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-playfair',
+  preload: true,
+  fallback: ['serif'],
+  adjustFontFallback: true,
 });
 
 const raleway = Raleway({ 
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-raleway',
+  preload: true,
+  fallback: ['system-ui', 'arial'],
+  adjustFontFallback: true,
 });
 
 export const metadata: Metadata = {
