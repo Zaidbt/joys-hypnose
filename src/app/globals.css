@@ -10,7 +10,8 @@
 
 /* Global font styles */
 body {
-  font-family: var(--font-raleway);
+  font-family: var(--font-cormorant);
+  font-weight: 400;
 }
 
 /* Rich text editor font variables */
@@ -99,8 +100,8 @@ h1, h2, h3, h4, h5, h6,
 .section-title, 
 .service-title,
 .logo-text {
-  font-family: var(--font-raleway);
-  font-weight: 500;
+  font-family: var(--font-cormorant);
+  font-weight: 600;
 }
 
 /* Blog content */
@@ -110,24 +111,24 @@ h1, h2, h3, h4, h5, h6,
 .blog-content h4,
 .blog-content h5,
 .blog-content h6 {
-  font-family: var(--font-raleway);
-  font-weight: 500;
+  font-family: var(--font-cormorant);
+  font-weight: 600;
 }
 
 /* Editor headings */
 .prose-editor .ql-editor h1,
 .prose-editor .ql-editor h2,
 .prose-editor .ql-editor h3 {
-  font-family: var(--font-raleway);
-  font-weight: 500;
+  font-family: var(--font-cormorant);
+  font-weight: 600;
 }
 
 /* Specific components */
 .hero-title,
 .page-title,
 .section-heading {
-  font-family: var(--font-raleway);
-  font-weight: 500;
+  font-family: var(--font-cormorant);
+  font-weight: 600;
 }
 
 /* Existing styles */

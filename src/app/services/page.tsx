@@ -109,7 +109,7 @@ export default function Services() {
               <div className="mt-10 flex justify-center">
                 <Link
                   href="/contact"
-                  className="inline-flex items-center justify-center px-8 py-4 text-base font-medium text-white bg-rose-400 hover:bg-rose-500 rounded-full transition-colors duration-300 shadow-md hover:shadow-lg group"
+                  className="inline-flex items-center justify-center px-8 py-4 text-base font-medium text-white bg-rose-400 hover:bg-rose-500 rounded-full transition-colors duration-300 shadow-md hover:shadow-lg group no-underline"
                 >
                   Prends rendez-vous aujourd'hui
                   <ArrowRightIcon className="ml-2 h-5 w-5 transform group-hover:translate-x-1 transition-transform duration-300" />

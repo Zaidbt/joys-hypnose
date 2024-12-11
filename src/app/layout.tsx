@@ -1,7 +1,7 @@
 import React from "react";
 import { 
-  Playfair_Display, 
-  Raleway,
+  Playfair_Display,
+  Cormorant_Garamond,
 } from "next/font/google";
 import type { Metadata } from 'next';
 import ClientLayout from './ClientLayout';
@@ -16,12 +16,13 @@ const playfair = Playfair_Display({
   adjustFontFallback: true,
 });
 
-const raleway = Raleway({ 
+const cormorant = Cormorant_Garamond({ 
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-raleway',
+  variable: '--font-cormorant',
   preload: true,
-  fallback: ['system-ui', 'arial'],
+  weight: ['300', '400', '500', '600', '700'],
+  fallback: ['serif'],
   adjustFontFallback: true,
 });
 
@@ -47,8 +48,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" className={`${playfair.variable} ${raleway.variable}`}>
-      <body className={raleway.className}>
+    <html lang="fr" className={`${playfair.variable} ${cormorant.variable}`}>
+      <body className={cormorant.className}>
         <ClientLayout>{children}</ClientLayout>
       </body>
     </html>

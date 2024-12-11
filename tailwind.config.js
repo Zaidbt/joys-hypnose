@@ -8,7 +8,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        'raleway': ['var(--font-raleway)', 'sans-serif'],
+        'cormorant': ['var(--font-cormorant)', 'serif'],
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
@@ -33,22 +33,22 @@ module.exports = {
       typography: {
         DEFAULT: {
           css: {
-            fontFamily: 'var(--font-raleway)',
+            fontFamily: 'var(--font-cormorant)',
             h1: {
-              fontFamily: 'var(--font-raleway)',
-              fontWeight: '500',
+              fontFamily: 'var(--font-cormorant)',
+              fontWeight: '600',
             },
             h2: {
-              fontFamily: 'var(--font-raleway)',
-              fontWeight: '500',
+              fontFamily: 'var(--font-cormorant)',
+              fontWeight: '600',
             },
             h3: {
-              fontFamily: 'var(--font-raleway)',
-              fontWeight: '500',
+              fontFamily: 'var(--font-cormorant)',
+              fontWeight: '600',
             },
             h4: {
-              fontFamily: 'var(--font-raleway)',
-              fontWeight: '500',
+              fontFamily: 'var(--font-cormorant)',
+              fontWeight: '600',
             },
           },
         },
