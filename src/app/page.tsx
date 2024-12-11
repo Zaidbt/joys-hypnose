@@ -107,7 +107,7 @@ export default function HomePage() {
               <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-black leading-tight mb-4 sm:mb-6">
                 Retrouvez votre{' '}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-rose-500">
-                  harmonie intérieure
+                  harmonie intérieure FOR TEST
                 </span>
               </h1>
               <p className="text-base sm:text-lg text-black mb-6 sm:mb-8 leading-relaxed text-justify">
