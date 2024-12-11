@@ -35,12 +35,12 @@ export default function Services() {
               transition={{ duration: 0.8 }}
               className="relative mb-12 max-w-2xl mx-auto"
             >
-              <div className="relative w-full h-[200px] sm:h-[300px] rounded-3xl overflow-hidden shadow-2xl">
+              <div className="relative w-full h-[400px] sm:h-[600px] rounded-3xl overflow-hidden shadow-2xl">
                 <Image
                   src="/images/joys.jpg"
                   alt="Joy's Hypnose"
                   fill
-                  className="object-cover"
+                  className="object-contain"
                   priority
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 60vw"
                 />
