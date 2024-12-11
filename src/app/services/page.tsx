@@ -3,6 +3,7 @@
 import React, { useEffect } from "react";
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import ServicesGrid from '../components/ServicesGrid';
 
@@ -27,6 +28,25 @@ export default function Services() {
             <h2 className="text-3xl font-bold tracking-tight text-rose-500 sm:text-4xl mb-6">
               À propos
             </h2>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8 }}
+              className="relative mb-12 max-w-2xl mx-auto"
+            >
+              <div className="relative w-full h-[200px] sm:h-[300px] rounded-3xl overflow-hidden shadow-2xl">
+                <Image
+                  src="/images/joys.jpg"
+                  alt="Joy's Hypnose"
+                  fill
+                  className="object-cover"
+                  priority
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 60vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-rose-100/20 to-transparent" />
+              </div>
+            </motion.div>
           </motion.div>
 
           <div className="mx-auto max-w-3xl space-y-8">
