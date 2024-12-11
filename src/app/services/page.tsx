@@ -1,12 +1,16 @@
 'use client';
 
-import React from "react";
+import React, { useEffect } from "react";
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import ServicesGrid from '../components/ServicesGrid';
 
 export default function Services() {
+  useEffect(() => {
+    console.log('Services page mounted');
+  }, []);
+
   return (
     <main className="flex min-h-screen flex-col pt-16 bg-gradient-to-b from-white via-primary-50/30 to-white">
       <ServicesGrid />
@@ -21,7 +25,7 @@ export default function Services() {
             className="mx-auto max-w-3xl text-center mb-16"
           >
             <h2 className="text-3xl font-bold tracking-tight text-rose-500 sm:text-4xl mb-6">
-              À propos
+              À propos TEST
             </h2>
           </motion.div>
 
