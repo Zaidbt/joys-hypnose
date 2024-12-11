@@ -25,7 +25,7 @@ export default function Services() {
             className="mx-auto max-w-3xl text-center mb-16"
           >
             <h2 className="text-3xl font-bold tracking-tight text-rose-500 sm:text-4xl mb-6">
-              À propos TEST
+              À propos
             </h2>
           </motion.div>
 

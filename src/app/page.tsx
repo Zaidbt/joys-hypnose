@@ -107,11 +107,11 @@ export default function HomePage() {
               <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-black leading-tight mb-4 sm:mb-6">
                 Retrouvez votre{' '}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-rose-500">
-                  harmonie intérieure FOR TEST
+                  harmonie intérieure
                 </span>
               </h1>
               <p className="text-base sm:text-lg text-black mb-6 sm:mb-8 leading-relaxed text-justify">
-                Bienvenue dans mon espace d'hypnothérapie, où je vous accompagne vers un mieux-être profond et durable.
+                Bienvenue dans mon espace d'hypnothérapie, où je vous accompagne vers un mieux-être profond et durable. À travers une approche holistique et bienveillante, nous explorerons ensemble les chemins de votre transformation intérieure. Mon rôle est de vous guider avec douceur vers la reconnexion avec votre essence profonde, en libérant les blocages qui vous empêchent d'avancer.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
                 <Link
