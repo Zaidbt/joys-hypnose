@@ -106,15 +106,100 @@ export async function sendAppointmentNotification(appointment: TimeSlot) {
   });
 
   const emailContent = `
-    <h2>Nouvelle demande de rendez-vous</h2>
-    <p><strong>Client:</strong> ${appointment.clientName}</p>
-    <p><strong>Email:</strong> ${appointment.clientEmail}</p>
-    <p><strong>Téléphone:</strong> ${appointment.clientPhone}</p>
-    <p><strong>Date:</strong> ${formattedDate}</p>
-    <p><strong>Heure:</strong> ${formattedTime}</p>
-    <p><strong>Première séance:</strong> ${appointment.isFirstTime ? 'Oui' : 'Non'}</p>
-    ${appointment.notes ? `<p><strong>Notes:</strong> ${appointment.notes}</p>` : ''}
-    <p>Connectez-vous au <a href="${process.env.NEXT_PUBLIC_BASE_URL}/joyspanel">panneau d'administration</a> pour gérer ce rendez-vous.</p>
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .details { background-color: #ffffff; padding: 20px; border: 1px solid #e9ecef; border-radius: 8px; }
+        .detail-row { margin-bottom: 10px; }
+        .label { font-weight: bold; color: #495057; }
+        .value { color: #212529; }
+        .first-time-badge { 
+          display: inline-block;
+          background-color: #cce5ff;
+          color: #004085;
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-size: 0.9em;
+          margin-left: 8px;
+        }
+        .notes { 
+          margin-top: 20px;
+          padding: 15px;
+          background-color: #f8f9fa;
+          border-left: 4px solid #6c757d;
+          border-radius: 4px;
+        }
+        .admin-link {
+          display: inline-block;
+          margin-top: 20px;
+          padding: 10px 20px;
+          background-color: #0056b3;
+          color: #ffffff;
+          text-decoration: none;
+          border-radius: 4px;
+        }
+        .admin-link:hover {
+          background-color: #004494;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h2 style="margin: 0; color: #0056b3;">Nouvelle demande de rendez-vous</h2>
+          <p style="margin: 10px 0 0 0; color: #6c757d;">Un nouveau client souhaite prendre rendez-vous</p>
+        </div>
+        
+        <div class="details">
+          <div class="detail-row">
+            <span class="label">Client:</span>
+            <span class="value">${appointment.clientName}</span>
+            ${appointment.isFirstTime ? '<span class="first-time-badge">Première séance</span>' : ''}
+          </div>
+          
+          <div class="detail-row">
+            <span class="label">Email:</span>
+            <span class="value">${appointment.clientEmail}</span>
+          </div>
+          
+          <div class="detail-row">
+            <span class="label">Téléphone:</span>
+            <span class="value">${appointment.clientPhone || 'Non renseigné'}</span>
+          </div>
+          
+          <div class="detail-row">
+            <span class="label">Date:</span>
+            <span class="value">${formattedDate}</span>
+          </div>
+          
+          <div class="detail-row">
+            <span class="label">Heure:</span>
+            <span class="value">${formattedTime}</span>
+          </div>
+          
+          <div class="detail-row">
+            <span class="label">Durée:</span>
+            <span class="value">${appointment.isFirstTime ? '2 heures' : '1 heure'}</span>
+          </div>
+          
+          ${appointment.notes ? `
+          <div class="notes">
+            <div class="label">Notes du client:</div>
+            <div class="value" style="margin-top: 5px;">${appointment.notes}</div>
+          </div>
+          ` : ''}
+        </div>
+
+        <a href="${process.env.NEXT_PUBLIC_BASE_URL}/joyspanel" class="admin-link">
+          Accéder au panneau d'administration
+        </a>
+      </div>
+    </body>
+    </html>
   `;
 
   // Create email message in base64 format
