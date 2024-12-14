@@ -86,7 +86,23 @@ export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
     const body = await request.json();
-    const isAdmin = !!session;
+    
+    // Log the session and request origin
+    console.log('Request details:', {
+      hasSession: !!session,
+      requestOrigin: request.headers.get('origin'),
+      requestReferer: request.headers.get('referer')
+    });
+
+    // Check if request is coming from the contact page
+    const isContactPage = request.headers.get('referer')?.includes('/contact');
+    const isAdmin = !!session && !isContactPage;
+
+    console.log('Authorization check:', {
+      isAdmin,
+      isContactPage,
+      hasSession: !!session
+    });
 
     // Validate the request
     if (!body.startTime || !body.endTime) {
@@ -162,6 +178,7 @@ export async function POST(request: Request) {
     } else {
       console.log('Skipping email notification:', {
         isAdmin,
+        isContactPage,
         status: appointment.status
       });
     }
