@@ -108,19 +108,24 @@ export async function sendAppointmentNotification(appointment: TimeSlot) {
   const appointmentDate = new Date(appointment.startTime);
   console.log('Appointment time:', appointmentDate.toISOString());
   
-  // Format the date and time without timezone conversion
-  const formattedDate = appointmentDate.toLocaleDateString('fr-FR', {
+  // Format the date and time with Morocco timezone
+  const formatter = new Intl.DateTimeFormat('fr-FR', {
+    timeZone: 'Africa/Casablanca',
     weekday: 'long',
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   });
   
-  const formattedTime = appointmentDate.toLocaleTimeString('fr-FR', {
+  const timeFormatter = new Intl.DateTimeFormat('fr-FR', {
+    timeZone: 'Africa/Casablanca',
     hour: '2-digit',
     minute: '2-digit',
     hour12: false
   });
+  
+  const formattedDate = formatter.format(appointmentDate);
+  const formattedTime = timeFormatter.format(appointmentDate);
 
   console.log('Formatted date and time:', { formattedDate, formattedTime });
 
