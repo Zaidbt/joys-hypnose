@@ -139,8 +139,8 @@ export async function POST(request: Request) {
     }
 
     const appointment = {
-      startTime: new Date(new Date(body.startTime).getTime() + (60 * 60 * 1000)),
-      endTime: new Date(new Date(body.endTime).getTime() + (60 * 60 * 1000)),
+      startTime: new Date(body.startTime),
+      endTime: new Date(body.endTime),
       status: isAdmin ? (body.status || 'available') : 'pending',
       clientName: body.clientName,
       clientEmail: body.clientEmail,

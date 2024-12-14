@@ -104,24 +104,23 @@ export async function sendAppointmentNotification(appointment: TimeSlot) {
     return;
   }
 
-  // Create a date object and adjust for UTC+1
+  // Create a date object and use it directly
   const appointmentDate = new Date(appointment.startTime);
-  console.log('Original appointment time:', appointmentDate.toISOString());
+  console.log('Appointment time:', appointmentDate.toISOString());
   
-  // Format the date and time with explicit timezone options
-  const formattedDate = new Intl.DateTimeFormat('fr-FR', {
+  // Format the date and time without timezone conversion
+  const formattedDate = appointmentDate.toLocaleDateString('fr-FR', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
-    day: 'numeric',
-    timeZone: 'Europe/Paris'
-  }).format(appointmentDate);
+    day: 'numeric'
+  });
   
-  const formattedTime = new Intl.DateTimeFormat('fr-FR', {
+  const formattedTime = appointmentDate.toLocaleTimeString('fr-FR', {
     hour: '2-digit',
     minute: '2-digit',
-    timeZone: 'Europe/Paris'
-  }).format(appointmentDate);
+    hour12: false
+  });
 
   console.log('Formatted date and time:', { formattedDate, formattedTime });
 
