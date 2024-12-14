@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { sendTestEmail } from '@/lib/gmail';
 
-export async function GET() {
+export async function POST(request: Request) {
   // Check environment variables
   const config = {
     clientId: process.env.GMAIL_CLIENT_ID ? 'Set' : 'Not set',

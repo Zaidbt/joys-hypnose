@@ -82,8 +82,20 @@ export async function sendTestEmail() {
 }
 
 export async function sendAppointmentNotification(appointment: TimeSlot) {
+  console.log('Starting sendAppointmentNotification with appointment:', {
+    clientName: appointment.clientName,
+    startTime: appointment.startTime,
+    status: appointment.status
+  });
+
   if (!gmail) {
-    console.warn('Gmail client not initialized - skipping email notification');
+    console.warn('Gmail client not initialized - check environment variables:', {
+      clientId: process.env.GMAIL_CLIENT_ID ? 'Set' : 'Not set',
+      clientSecret: process.env.GMAIL_CLIENT_SECRET ? 'Set' : 'Not set',
+      redirectUri: process.env.GMAIL_REDIRECT_URI,
+      refreshToken: process.env.GMAIL_REFRESH_TOKEN ? 'Set' : 'Not set',
+      adminEmail: process.env.ADMIN_EMAIL
+    });
     return;
   }
 
@@ -220,6 +232,7 @@ export async function sendAppointmentNotification(appointment: TimeSlot) {
     .replace(/=+$/, '');
 
   try {
+    console.log('Sending email via Gmail API...');
     const response = await gmail.users.messages.send({
       userId: 'me',
       requestBody: {
@@ -229,6 +242,13 @@ export async function sendAppointmentNotification(appointment: TimeSlot) {
     console.log('Notification email sent successfully, response:', response.data);
   } catch (error) {
     console.error('Error sending notification email:', error);
-    // Don't throw error, just log it
+    // Log more details about the error
+    if (error instanceof Error) {
+      console.error('Error details:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
+    }
   }
 } 
