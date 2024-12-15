@@ -9,6 +9,7 @@ import {
   CalendarIcon,
   ClockIcon,
   ChatBubbleLeftIcon,
+  TrashIcon,
 } from '@heroicons/react/24/outline';
 import type { TimeSlot } from '@/types/appointment';
 
@@ -51,6 +52,29 @@ export default function ClientsPage() {
     
     return matchesSearch && matchesStatus;
   });
+
+  const handleDeleteClient = async (clientId: string) => {
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce client ?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/clients/${clientId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete client');
+      }
+
+      // Remove the client from the state
+      setClients(prevClients => 
+        prevClients.filter(client => client._id !== clientId)
+      );
+    } catch (error) {
+      setError('Failed to delete client');
+    }
+  };
 
   if (isLoading) {
     return <div className="flex justify-center items-center min-h-[400px]">
@@ -119,13 +143,22 @@ export default function ClientsPage() {
                       </p>
                     </div>
                   </div>
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                    ${client.status === 'booked' ? 'bg-green-100 text-green-800' : 
-                      client.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
-                      'bg-red-100 text-red-800'}`}>
-                    {client.status === 'booked' ? 'Confirmé' : 
-                     client.status === 'pending' ? 'En attente' : 'Annulé'}
-                  </span>
+                  <div className="flex items-center space-x-2">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                      ${client.status === 'booked' ? 'bg-green-100 text-green-800' : 
+                        client.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
+                        'bg-red-100 text-red-800'}`}>
+                      {client.status === 'booked' ? 'Confirmé' : 
+                       client.status === 'pending' ? 'En attente' : 'Annulé'}
+                    </span>
+                    <button
+                      onClick={() => handleDeleteClient(client._id!)}
+                      className="p-1 text-red-600 hover:text-red-900 transition-colors"
+                      title="Supprimer le client"
+                    >
+                      <TrashIcon className="h-5 w-5" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="mt-4 space-y-2">
