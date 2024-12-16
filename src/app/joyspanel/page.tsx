@@ -1,148 +1,352 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { 
-  DocumentTextIcon, 
-  CalendarIcon, 
-  ClockIcon,
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
+import {
+  CalendarIcon,
+  UsersIcon,
   EnvelopeIcon,
-  ArrowRightIcon
+  ChartBarIcon,
+  ClockIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  ArrowTrendingUpIcon,
+  ArrowTrendingDownIcon,
 } from '@heroicons/react/24/outline';
+import Link from 'next/link';
 
 interface DashboardStats {
-  articles: number;
   appointments: {
-    confirmed: number;
+    total: number;
     pending: number;
-    today: number;
+    confirmed: number;
+    cancelled: number;
+    todayCount: number;
+    weekCount: number;
+    monthCount: number;
+  };
+  clients: {
+    total: number;
+    new: number;
+    returning: number;
+    firstTime: number;
   };
   newsletter: {
     total: number;
     active: number;
+    unsubscribed: number;
+    recentSubscribers: number;
   };
 }
 
+const StatCard = ({ title, value, icon: Icon, trend, color = "primary" }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="bg-white rounded-lg shadow-sm p-6 border border-gray-100"
+  >
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-sm font-medium text-gray-600">{title}</p>
+        <p className="mt-2 text-3xl font-semibold text-gray-900">{value}</p>
+        {trend && (
+          <div className="mt-2 flex items-center text-sm">
+            {trend > 0 ? (
+              <ArrowTrendingUpIcon className="h-4 w-4 text-green-500 mr-1" />
+            ) : (
+              <ArrowTrendingDownIcon className="h-4 w-4 text-red-500 mr-1" />
+            )}
+            <span className={trend > 0 ? "text-green-600" : "text-red-600"}>
+              {Math.abs(trend)}% vs dernier mois
+            </span>
+          </div>
+        )}
+      </div>
+      <div className={`p-3 rounded-lg bg-${color}-50`}>
+        <Icon className={`h-6 w-6 text-${color}-600`} />
+      </div>
+    </div>
+  </motion.div>
+);
+
+const AppointmentTimeline = ({ appointments }) => (
+  <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
+    <h3 className="text-lg font-medium text-gray-900 mb-4">Rendez-vous à venir</h3>
+    <div className="flow-root">
+      <ul className="-mb-8">
+        {appointments.map((appointment, idx) => (
+          <li key={appointment._id}>
+            <div className="relative pb-8">
+              {idx !== appointments.length - 1 && (
+                <span
+                  className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"
+                  aria-hidden="true"
+                />
+              )}
+              <div className="relative flex space-x-3">
+                <div>
+                  <span className={`h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white ${
+                    appointment.status === 'confirmed' ? 'bg-green-500' : 
+                    appointment.status === 'pending' ? 'bg-yellow-500' : 'bg-red-500'
+                  }`}>
+                    <ClockIcon className="h-5 w-5 text-white" />
+                  </span>
+                </div>
+                <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+                  <div>
+                    <p className="text-sm text-gray-900">
+                      {appointment.clientName} 
+                      {appointment.isFirstTime && (
+                        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                          Première séance
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                  <div className="whitespace-nowrap text-right text-sm text-gray-500">
+                    <time dateTime={appointment.startTime}>
+                      {new Date(appointment.startTime).toLocaleString('fr-FR', {
+                        day: 'numeric',
+                        month: 'short',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </time>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+);
+
+const ClientActivity = ({ clients }) => (
+  <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
+    <h3 className="text-lg font-medium text-gray-900 mb-4">Activité récente</h3>
+    <div className="flow-root">
+      <ul className="-mb-8">
+        {clients.map((client, idx) => (
+          <li key={client._id}>
+            <div className="relative pb-8">
+              {idx !== clients.length - 1 && (
+                <span
+                  className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"
+                  aria-hidden="true"
+                />
+              )}
+              <div className="relative flex space-x-3">
+                <div>
+                  <span className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center ring-8 ring-white">
+                    <UsersIcon className="h-5 w-5 text-white" />
+                  </span>
+                </div>
+                <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+                  <div>
+                    <p className="text-sm text-gray-900">{client.clientName}</p>
+                    <p className="text-sm text-gray-500">{client.action}</p>
+                  </div>
+                  <div className="whitespace-nowrap text-right text-sm text-gray-500">
+                    <time dateTime={client.date}>
+                      {new Date(client.date).toLocaleString('fr-FR', {
+                        day: 'numeric',
+                        month: 'short',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </time>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+);
+
 export default function DashboardPage() {
-  const [stats, setStats] = useState<DashboardStats>({
-    articles: 0,
-    appointments: {
-      confirmed: 0,
-      pending: 0,
-      today: 0
-    },
-    newsletter: {
-      total: 0,
-      active: 0
-    }
-  });
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [recentAppointments, setRecentAppointments] = useState([]);
+  const [recentActivity, setRecentActivity] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchStats = async () => {
+    if (status === 'unauthenticated') {
+      router.push('/joyspanel/login');
+      return;
+    }
+
+    const fetchDashboardData = async () => {
       try {
-        const response = await fetch('/api/stats');
-        const data = await response.json();
-        setStats(data);
+        setIsLoading(true);
+        
+        // Fetch appointments
+        const appointmentsResponse = await fetch('/api/appointments');
+        const appointmentsData = await appointmentsResponse.json();
+
+        // Debug logging
+        console.log('Total appointments:', appointmentsData.length);
+        console.log('Appointment statuses:', appointmentsData.map(a => a.status));
+        console.log('Confirmed appointments:', appointmentsData.filter(a => a.status === 'confirmed').length);
+
+        // Fetch newsletter subscribers
+        const newsletterResponse = await fetch('/api/newsletter/subscribers');
+        const newsletterData = await newsletterResponse.json();
+
+        // Calculate stats
+        const now = new Date();
+        const todayStart = new Date(now.setHours(0, 0, 0, 0));
+        const weekStart = new Date(now.setDate(now.getDate() - 7));
+        const monthStart = new Date(now.setMonth(now.getMonth() - 1));
+
+        const stats: DashboardStats = {
+          appointments: {
+            total: appointmentsData.length,
+            pending: appointmentsData.filter(a => a.status === 'pending').length,
+            confirmed: appointmentsData.filter(a => a.status === 'confirmed').length,
+            cancelled: appointmentsData.filter(a => a.status === 'cancelled').length,
+            todayCount: appointmentsData.filter(a => new Date(a.startTime) >= todayStart).length,
+            weekCount: appointmentsData.filter(a => new Date(a.startTime) >= weekStart).length,
+            monthCount: appointmentsData.filter(a => new Date(a.startTime) >= monthStart).length,
+          },
+          clients: {
+            total: new Set(appointmentsData.map(a => a.clientEmail)).size,
+            new: appointmentsData.filter(a => a.isFirstTime).length,
+            returning: appointmentsData.filter(a => !a.isFirstTime).length,
+            firstTime: appointmentsData.filter(a => a.isFirstTime).length,
+          },
+          newsletter: {
+            total: newsletterData.length,
+            active: newsletterData.filter(s => s.status === 'active').length,
+            unsubscribed: newsletterData.filter(s => s.status === 'unsubscribed').length,
+            recentSubscribers: newsletterData.filter(s => new Date(s.createdAt) >= monthStart).length,
+          },
+        };
+
+        setStats(stats);
+
+        // Get recent appointments
+        const recentAppointments = appointmentsData
+          .filter(a => new Date(a.startTime) >= now)
+          .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
+          .slice(0, 5);
+        setRecentAppointments(recentAppointments);
+
+        // Generate recent activity
+        const recentActivity = appointmentsData
+          .map(a => ({
+            _id: a._id,
+            clientName: a.clientName,
+            date: a.createdAt,
+            action: 'a pris rendez-vous'
+          }))
+          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+          .slice(0, 5);
+        setRecentActivity(recentActivity);
+
       } catch (error) {
-        console.error('Error fetching stats:', error);
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchStats();
-  }, []);
+    fetchDashboardData();
+  }, [status, router]);
 
-  const cards = [
-    {
-      title: 'Articles',
-      value: stats.articles,
-      description: 'Total des articles publiés',
-      icon: DocumentTextIcon,
-      href: '/joyspanel/posts',
-      iconBackground: 'bg-blue-100 text-blue-600'
-    },
-    {
-      title: 'Rendez-vous',
-      value: stats.appointments.confirmed,
-      description: 'Rendez-vous confirmés',
-      icon: CalendarIcon,
-      href: '/joyspanel/appointments',
-      iconBackground: 'bg-green-100 text-green-600'
-    },
-    {
-      title: 'À confirmer',
-      value: stats.appointments.pending,
-      description: 'En attente de confirmation',
-      icon: ClockIcon,
-      href: '/joyspanel/appointments',
-      iconBackground: 'bg-yellow-100 text-yellow-600'
-    },
-    {
-      title: 'Newsletter',
-      value: stats.newsletter.active,
-      description: 'Abonnés actifs',
-      icon: EnvelopeIcon,
-      href: '/joyspanel/newsletter',
-      iconBackground: 'bg-pink-100 text-pink-600'
-    }
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
+
+  if (!stats) {
+    return null;
+  }
+
+  const quickLinks = [
+    { name: 'Rendez-vous', href: '/joyspanel/appointments', icon: CalendarIcon },
+    { name: 'Clients', href: '/joyspanel/clients', icon: UsersIcon },
+    { name: 'Newsletter', href: '/joyspanel/newsletter', icon: EnvelopeIcon },
+    { name: 'Statistiques', href: '/joyspanel/stats', icon: ChartBarIcon },
   ];
 
   return (
-    <div className="py-8">
+    <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
-        <p className="mt-2 text-sm text-gray-600">
-          Bienvenue dans votre espace d'administration
-        </p>
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-semibold text-gray-900">Tableau de bord</h1>
+          <p className="mt-1 text-sm text-gray-500">
+            Bienvenue dans votre espace d'administration
+          </p>
+        </div>
 
-        <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {cards.map((card) => (
+        {/* Quick Links */}
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 mb-8">
+          {quickLinks.map((link) => (
             <Link
-              key={card.title}
-              href={card.href}
-              className="relative bg-white pt-5 px-4 pb-12 sm:pt-6 sm:px-6 shadow rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-200"
+              key={link.name}
+              href={link.href}
+              className="relative group bg-white p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
             >
-              <dt>
-                <div className={`absolute rounded-md p-3 ${card.iconBackground}`}>
-                  <card.icon className="h-6 w-6" aria-hidden="true" />
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <link.icon className="h-6 w-6 text-primary-600" />
                 </div>
-                <p className="ml-16 text-sm font-medium text-gray-500 truncate">
-                  {card.title}
-                </p>
-              </dt>
-              <dd className="ml-16 flex items-baseline">
-                <p className="text-2xl font-semibold text-gray-900">
-                  {card.value}
-                </p>
-                <div className="absolute bottom-0 inset-x-0 bg-gray-50 px-4 py-4 sm:px-6">
-                  <div className="text-sm">
-                    <div className="font-medium text-primary-600 hover:text-primary-700 inline-flex items-center">
-                      {card.description}
-                      <ArrowRightIcon className="ml-2 h-4 w-4" />
-                    </div>
-                  </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-gray-900">{link.name}</h3>
                 </div>
-              </dd>
+              </div>
             </Link>
           ))}
         </div>
 
-        {/* Recent Activity */}
-        <div className="mt-8">
-          <h2 className="text-lg font-medium text-gray-900">Activité Récente</h2>
-          <div className="mt-4 bg-white shadow rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              {stats.appointments.pending > 0 && (
-                <Link 
-                  href="/joyspanel/appointments"
-                  className="flex items-center text-sm text-primary-600 hover:text-primary-700"
-                >
-                  <CalendarIcon className="h-5 w-5 mr-2" />
-                  {stats.appointments.pending} nouveaux rendez-vous en attente
-                  <ArrowRightIcon className="ml-2 h-4 w-4" />
-                </Link>
-              )}
-            </div>
-          </div>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+          <StatCard
+            title="Rendez-vous aujourd'hui"
+            value={stats.appointments.todayCount}
+            icon={CalendarIcon}
+            trend={10}
+          />
+          <StatCard
+            title="Nouveaux clients"
+            value={stats.clients.new}
+            icon={UsersIcon}
+            trend={5}
+            color="blue"
+          />
+          <StatCard
+            title="Abonnés newsletter"
+            value={stats.newsletter.active}
+            icon={EnvelopeIcon}
+            trend={-2}
+            color="green"
+          />
+          <StatCard
+            title="Taux de confirmation"
+            value={`${Math.round((stats.appointments.confirmed / stats.appointments.total) * 100)}%`}
+            icon={CheckCircleIcon}
+            trend={3}
+            color="indigo"
+          />
+        </div>
+
+        {/* Two-column layout for timeline and activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <AppointmentTimeline appointments={recentAppointments} />
+          <ClientActivity clients={recentActivity} />
         </div>
       </div>
     </div>
