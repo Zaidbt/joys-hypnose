@@ -240,19 +240,63 @@ export default function NewsletterPage() {
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to send newsletter');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to send newsletter');
+      }
       
       const result = await response.json();
-      setSendingStatus(result);
-      alert('Newsletter envoyée avec succès !');
+      setSendingStatus(result.stats);
       
-      // Reset form
-      setEmailSubject('');
-      setEmailContent('');
-      setSelectedTemplate(null);
+      if (result.stats.success > 0) {
+        alert(`Newsletter envoyée avec succès à ${result.stats.success} abonnés !`);
+        // Reset form only if at least one email was sent successfully
+        setEmailSubject('');
+        setEmailContent('');
+        setSelectedTemplate(null);
+      } else {
+        alert('Aucun email n\'a pu être envoyé. Veuillez vérifier les logs pour plus de détails.');
+      }
     } catch (error) {
       console.error('Error sending newsletter:', error);
-      alert('Une erreur est survenue lors de l\'envoi de la newsletter');
+      alert('Une erreur est survenue lors de l\'envoi de la newsletter: ' + (error instanceof Error ? error.message : 'Erreur inconnue'));
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleTestEmail = async () => {
+    if (!emailSubject || !emailContent) {
+      alert('Veuillez remplir le sujet et le contenu de l\'email');
+      return;
+    }
+
+    const testEmail = prompt('Entrez l\'adresse email pour le test:');
+    if (!testEmail) return;
+
+    setIsSending(true);
+    try {
+      const response = await fetch('/api/newsletter/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          subject: emailSubject,
+          content: emailContent,
+          subscribers: [{ email: testEmail, status: 'active' }]
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to send test email');
+      }
+
+      alert('Email de test envoyé avec succès !');
+    } catch (error) {
+      console.error('Error sending test email:', error);
+      alert('Erreur lors de l\'envoi de l\'email de test: ' + (error instanceof Error ? error.message : 'Erreur inconnue'));
     } finally {
       setIsSending(false);
     }
