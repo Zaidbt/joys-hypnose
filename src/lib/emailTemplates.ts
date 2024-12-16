@@ -1,7 +1,6 @@
 export const generateNewsletterEmail = (content: string, subscriberEmail: string) => {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://joys-coiffure.fr';
-  const unsubscribeToken = Buffer.from(subscriberEmail).toString('base64');
-  const unsubscribeUrl = `${baseUrl}/api/newsletter/unsubscribe?email=${encodeURIComponent(subscriberEmail)}&token=${unsubscribeToken}`;
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.joyshypnose-therapies.com';
+  const unsubscribeUrl = `${baseUrl}/api/newsletter/unsubscribe?email=${encodeURIComponent(subscriberEmail)}`;
 
   return `
     <!DOCTYPE html>
@@ -9,7 +8,7 @@ export const generateNewsletterEmail = (content: string, subscriberEmail: string
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Newsletter Joy's Coiffure</title>
+        <title>Newsletter Joy's Hypnose</title>
         <style>
           body {
             font-family: Arial, sans-serif;
@@ -44,15 +43,16 @@ export const generateNewsletterEmail = (content: string, subscriberEmail: string
       </head>
       <body>
         <div class="header">
-          <h1>Joy's Coiffure</h1>
+          <h1>Joy's Hypnose</h1>
         </div>
         <div class="content">
           ${content}
         </div>
         <div class="footer">
-          <p>Joy's Coiffure<br>
-          4 rue de la Gare<br>
-          67120 Molsheim</p>
+          <p>Joy's Hypnose<br>
+          17 Rue Bab El Mandab, Residence El Prado 2,<br>
+          1er étage appart #2 Bourgogne,<br>
+          Casablanca</p>
           <p>
             <a href="${unsubscribeUrl}" class="unsubscribe">
               Cliquez ici pour vous désabonner de la newsletter
