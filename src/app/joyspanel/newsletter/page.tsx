@@ -140,6 +140,7 @@ export default function NewsletterPage() {
   const [sendingStatus, setSendingStatus] = useState<{
     success: number;
     failed: number;
+    total: number;
   } | null>(null);
 
   useEffect(() => {
@@ -151,14 +152,22 @@ export default function NewsletterPage() {
     fetchSubscribers();
   }, [status, router]);
 
+  useEffect(() => {
+    // Reset sending status when content changes
+    setSendingStatus(null);
+  }, [emailContent, emailSubject]);
+
   const fetchSubscribers = async () => {
     try {
+      setIsLoading(true);
       const response = await fetch('/api/newsletter/subscribers');
       if (!response.ok) throw new Error('Failed to fetch subscribers');
       const data = await response.json();
       setSubscribers(data);
+      setError(null);
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'An error occurred');
+      console.error('Error fetching subscribers:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load subscribers');
     } finally {
       setIsLoading(false);
     }
@@ -207,6 +216,7 @@ export default function NewsletterPage() {
     setSelectedTemplate(template);
     setEmailSubject(template.subject);
     setEmailContent(template.content);
+    setSendingStatus(null); // Reset sending status when template changes
   };
 
   const handlePreview = () => {
@@ -409,12 +419,29 @@ export default function NewsletterPage() {
               {showPreview ? 'Masquer l\'aperçu' : 'Aperçu'}
             </button>
             <button
-              onClick={handleSendNewsletter}
+              onClick={handleTestEmail}
               disabled={isSending || !emailSubject || !emailContent}
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center px-4 py-2 border border-primary-200 rounded-md shadow-sm text-sm font-medium text-primary-700 bg-primary-50 hover:bg-primary-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <PaperAirplaneIcon className="h-4 w-4 mr-2" />
-              {isSending ? 'Envoi en cours...' : 'Envoyer la newsletter'}
+              Email de test
+            </button>
+            <button
+              onClick={handleSendNewsletter}
+              disabled={isSending || !emailSubject || !emailContent || activeSubscribersCount === 0}
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSending ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                  Envoi en cours...
+                </>
+              ) : (
+                <>
+                  <PaperAirplaneIcon className="h-4 w-4 mr-2" />
+                  Envoyer la newsletter
+                </>
+              )}
             </button>
           </div>
         </div>
