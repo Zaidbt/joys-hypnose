@@ -19,19 +19,18 @@ export default function Login() {
     try {
       setIsLoading(true);
       setError('');
-      
-      const result = await signIn('credentials', {
+
+      const res = await signIn('credentials', {
         email,
         password,
         redirect: false,
-        callbackUrl,
       });
 
-      if (result?.error) {
-        setError(result.error);
-      } else {
+      if (!res?.error) {
         router.push(callbackUrl);
         router.refresh();
+      } else {
+        setError('Invalid email or password');
       }
     } catch (error) {
       setError('An error occurred during login');
