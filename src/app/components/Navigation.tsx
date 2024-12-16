@@ -27,9 +27,9 @@ export default function Navigation() {
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="flex h-16 justify-between">
-              <div className="flex">
-                <div className="flex flex-shrink-0 items-center">
+            <div className="flex h-16 justify-between items-center">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
                   <Link href="/" className="text-xl font-semibold text-rose-500">
                     Joy's Hypnose
                   </Link>
@@ -52,20 +52,20 @@ export default function Navigation() {
                 </div>
               </div>
               
-              <div className="hidden sm:ml-6 sm:flex sm:items-center">
+              {/* Language Switcher - Always visible */}
+              <div className="flex items-center space-x-4">
                 <LanguageSwitcher />
-              </div>
-
-              <div className="-mr-2 flex items-center sm:hidden">
-                {/* Mobile menu button */}
-                <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-rose-500">
-                  <span className="sr-only">Open main menu</span>
-                  {open ? (
-                    <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
-                  ) : (
-                    <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
-                  )}
-                </Disclosure.Button>
+                <div className="sm:hidden">
+                  {/* Mobile menu button */}
+                  <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-rose-500">
+                    <span className="sr-only">Open main menu</span>
+                    {open ? (
+                      <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
+                    ) : (
+                      <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
+                    )}
+                  </Disclosure.Button>
+                </div>
               </div>
             </div>
           </div>
@@ -87,11 +87,6 @@ export default function Navigation() {
                   {item.name}
                 </Disclosure.Button>
               ))}
-              <div className="border-t border-gray-200 pt-4 pb-3">
-                <div className="flex items-center px-4">
-                  <LanguageSwitcher />
-                </div>
-              </div>
             </div>
           </Disclosure.Panel>
         </>
