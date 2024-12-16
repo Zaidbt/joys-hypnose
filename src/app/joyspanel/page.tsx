@@ -188,18 +188,22 @@ export default function DashboardPage() {
       try {
         setIsLoading(true);
         
-        // Fetch appointments
-        const appointmentsResponse = await fetch('/api/appointments');
-        const appointmentsData = await appointmentsResponse.json();
+        // Fetch appointments and stats
+        const [appointmentsResponse, statsResponse] = await Promise.all([
+          fetch('/api/appointments'),
+          fetch('/api/stats')
+        ]);
+
+        const [appointmentsData, statsData] = await Promise.all([
+          appointmentsResponse.json(),
+          statsResponse.json()
+        ]);
 
         // Debug logging
+        console.log('Stats data:', statsData);
         console.log('Total appointments:', appointmentsData.length);
         console.log('Appointment statuses:', appointmentsData.map(a => a.status));
         console.log('Confirmed appointments:', appointmentsData.filter(a => a.status === 'confirmed').length);
-
-        // Fetch newsletter subscribers
-        const newsletterResponse = await fetch('/api/newsletter/subscribers');
-        const newsletterData = await newsletterResponse.json();
 
         // Calculate stats
         const now = new Date();
@@ -209,25 +213,25 @@ export default function DashboardPage() {
 
         const stats: DashboardStats = {
           appointments: {
-            total: appointmentsData.length,
-            pending: appointmentsData.filter(a => a.status === 'pending').length,
-            confirmed: appointmentsData.filter(a => a.status === 'confirmed').length,
-            cancelled: appointmentsData.filter(a => a.status === 'cancelled').length,
+            total: statsData.appointments.total,
+            pending: statsData.appointments.pending,
+            confirmed: statsData.appointments.confirmed,
+            cancelled: statsData.appointments.cancelled,
             todayCount: appointmentsData.filter(a => new Date(a.startTime) >= todayStart).length,
             weekCount: appointmentsData.filter(a => new Date(a.startTime) >= weekStart).length,
             monthCount: appointmentsData.filter(a => new Date(a.startTime) >= monthStart).length,
           },
           clients: {
-            total: new Set(appointmentsData.map(a => a.clientEmail)).size,
-            new: appointmentsData.filter(a => a.isFirstTime).length,
-            returning: appointmentsData.filter(a => !a.isFirstTime).length,
-            firstTime: appointmentsData.filter(a => a.isFirstTime).length,
+            total: statsData.clients.total,
+            new: statsData.clients.firstTime,
+            returning: statsData.clients.returning,
+            firstTime: statsData.clients.firstTime,
           },
           newsletter: {
-            total: newsletterData.length,
-            active: newsletterData.filter(s => s.status === 'active').length,
-            unsubscribed: newsletterData.filter(s => s.status === 'unsubscribed').length,
-            recentSubscribers: newsletterData.filter(s => new Date(s.createdAt) >= monthStart).length,
+            total: 0, // We'll update these when we implement newsletter stats
+            active: 0,
+            unsubscribed: 0,
+            recentSubscribers: 0,
           },
         };
 

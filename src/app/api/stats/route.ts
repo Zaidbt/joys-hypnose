@@ -1,65 +1,48 @@
 import { NextResponse } from 'next/server';
-import clientPromise from '@/lib/mongodb';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/utils/authOptions';
+import clientPromise from '@/lib/mongodb';
 
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
-      return NextResponse.json(
-        { error: 'Not authenticated' },
-        { status: 401 }
-      );
+      return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+      });
     }
 
     const client = await clientPromise;
-    const db = client.db('joyshypnose');
-
-    // Get blog stats
-    const articles = await db.collection('blog_posts').countDocuments();
-
-    // Get appointment stats
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    const [confirmed, pending, today_appointments] = await Promise.all([
-      db.collection('appointments').countDocuments({ status: 'confirmed' }),
-      db.collection('appointments').countDocuments({ status: 'pending' }),
-      db.collection('appointments').countDocuments({
-        date: {
-          $gte: today,
-          $lt: tomorrow
-        },
-        status: 'confirmed'
-      })
-    ]);
-
-    // Get newsletter stats
-    const [total_subscribers, active_subscribers] = await Promise.all([
-      db.collection('newsletter').countDocuments(),
-      db.collection('newsletter').countDocuments({ status: 'active' })
-    ]);
-
-    return NextResponse.json({
-      articles,
+    const db = client.db('joys_db');
+    
+    // Get all appointments
+    const appointments = await db.collection('appointments').find({}).toArray();
+    
+    // Calculate stats
+    const stats = {
       appointments: {
-        confirmed,
-        pending,
-        today: today_appointments
+        total: appointments.length,
+        confirmed: appointments.filter(a => a.status === 'confirmed').length,
+        pending: appointments.filter(a => a.status === 'pending').length,
+        cancelled: appointments.filter(a => a.status === 'cancelled').length,
       },
-      newsletter: {
-        total: total_subscribers,
-        active: active_subscribers
-      }
-    });
+      clients: {
+        total: new Set(appointments.map(a => a.clientEmail)).size,
+        firstTime: appointments.filter(a => a.isFirstTime).length,
+        returning: appointments.filter(a => !a.isFirstTime).length,
+      },
+    };
+
+    return NextResponse.json(stats);
   } catch (error) {
     console.error('Error fetching stats:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return new NextResponse(JSON.stringify({ error: 'Internal Server Error' }), {
+      status: 500,
+    });
   }
+}
+
+export async function POST() {
+  // Handle POST the same way as GET for now
+  return GET();
 } 
