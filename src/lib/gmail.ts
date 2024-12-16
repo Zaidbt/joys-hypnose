@@ -40,6 +40,112 @@ function createGmailClient() {
 // Create Gmail API client
 const gmail = createGmailClient();
 
+async function sendClientConfirmation(appointment: TimeSlot) {
+  if (!gmail) {
+    console.warn('Gmail client not initialized - skipping client confirmation');
+    return;
+  }
+
+  const appointmentDate = new Date(appointment.startTime);
+  const formatter = new Intl.DateTimeFormat('fr-FR', {
+    timeZone: 'Africa/Casablanca',
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+  
+  const timeFormatter = new Intl.DateTimeFormat('fr-FR', {
+    timeZone: 'Africa/Casablanca',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  });
+  
+  const formattedDate = formatter.format(appointmentDate);
+  const formattedTime = timeFormatter.format(appointmentDate);
+
+  const clientEmailContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+      </style>
+    </head>
+    <body>
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <h1 style="color: #6b46c1; margin-bottom: 10px;">Joy's Hypnose</h1>
+          <p style="font-size: 18px; color: #4a5568;">Confirmation de rendez-vous</p>
+        </div>
+
+        <div style="background-color: #f7fafc; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+          <p style="margin-bottom: 15px;">Cher(e) ${appointment.clientName},</p>
+          <p style="margin-bottom: 15px;">Je vous confirme votre rendez-vous d'hypnothérapie :</p>
+          
+          <div style="background-color: white; padding: 15px; border-radius: 6px; margin: 20px 0;">
+            <p style="margin: 5px 0;"><strong>Date :</strong> ${formattedDate}</p>
+            <p style="margin: 5px 0;"><strong>Heure :</strong> ${formattedTime}</p>
+            <p style="margin: 5px 0;"><strong>Lieu :</strong> Cabinet Joy's Hypnose, Casablanca</p>
+          </div>
+
+          ${appointment.isFirstTime ? `
+          <div style="background-color: #ebf4ff; padding: 15px; border-radius: 6px; margin: 20px 0;">
+            <p style="margin: 5px 0; color: #4c51bf;"><strong>Information importante :</strong></p>
+            <p style="margin: 5px 0;">Pour votre première séance, prévoyez d'arriver 5-10 minutes en avance pour vous installer confortablement.</p>
+          </div>
+          ` : ''}
+
+          <p style="margin-top: 20px;">Pour toute question ou besoin de modification, n'hésitez pas à me contacter :</p>
+          <ul style="list-style: none; padding: 0;">
+            <li style="margin: 5px 0;">📞 Téléphone : +212 660-826028</li>
+            <li style="margin: 5px 0;">✉️ Email : joyshypnose@gmail.com</li>
+          </ul>
+        </div>
+
+        <div style="text-align: center; color: #718096; font-size: 14px; margin-top: 30px;">
+          <p>À très bientôt,</p>
+          <p style="font-weight: bold;">Joy's Hypnose</p>
+          <p style="margin-top: 15px;">
+            <a href="https://www.joyshypnose-therapies.com" style="color: #6b46c1; text-decoration: none;">www.joyshypnose-therapies.com</a>
+          </p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  const clientMessage = [
+    'Content-Type: text/html; charset=utf-8',
+    'MIME-Version: 1.0',
+    `To: ${appointment.clientEmail}`,
+    'From: Joy\'s Hypnose <noreply@joyshypnose-therapies.com>',
+    'Subject: Confirmation de votre rendez-vous - Joy\'s Hypnose',
+    '',
+    clientEmailContent
+  ].join('\n');
+
+  const encodedClientMessage = Buffer.from(clientMessage)
+    .toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+
+  try {
+    await gmail.users.messages.send({
+      userId: 'me',
+      requestBody: {
+        raw: encodedClientMessage,
+      },
+    });
+    console.log('Client confirmation email sent successfully');
+  } catch (error) {
+    console.error('Error sending client confirmation email:', error);
+    // Don't throw error to not block admin notification
+  }
+}
+
 // Test function to verify configuration
 export async function sendTestEmail() {
   if (!gmail) {
@@ -244,23 +350,21 @@ export async function sendAppointmentNotification(appointment: TimeSlot) {
     .replace(/=+$/, '');
 
   try {
-    console.log('Sending email via Gmail API...');
-    const response = await gmail.users.messages.send({
+    console.log('Sending admin notification email...');
+    await gmail.users.messages.send({
       userId: 'me',
       requestBody: {
         raw: encodedMessage,
       },
     });
-    console.log('Notification email sent successfully, response:', response.data);
+    console.log('Admin notification email sent successfully');
+
+    // Send client confirmation email
+    console.log('Sending client confirmation email...');
+    await sendClientConfirmation(appointment);
   } catch (error) {
     console.error('Error sending notification email:', error);
-    // Log more details about the error
-    if (error instanceof Error) {
-      console.error('Error details:', {
-        name: error.name,
-        message: error.message,
-        stack: error.stack
-      });
-    }
+    throw error;
   }
+} 
 } 
