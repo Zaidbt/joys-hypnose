@@ -9,7 +9,9 @@ const nextConfig = {
     domains: [
       '77.37.122.81', 
       'joyshypnose-therapies.com',
-      'www.joyshypnose-therapies.com'
+      'www.joyshypnose-therapies.com',
+      'fonts.gstatic.com',
+      'fonts.googleapis.com'
     ],
     remotePatterns: [
       {
@@ -25,6 +27,16 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'www.joyshypnose-therapies.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'fonts.gstatic.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'fonts.googleapis.com',
         pathname: '/**',
       }
     ],
@@ -47,6 +59,15 @@ const nextConfig = {
   },
   eslint: {
     ignoreDuringBuilds: true,
+  },
+  i18n: {
+    locales: ['en', 'fr'],
+    defaultLocale: 'fr',
+    localeDetection: true
+  },
+  env: {
+    _next_intl_trailing_slash: 'never',
+    NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL || 'https://www.joyshypnose-therapies.com'
   },
   async rewrites() {
     return [
@@ -135,6 +156,19 @@ const nextConfig = {
           },
         ],
       },
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*'
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET'
+          }
+        ]
+      }
     ];
   },
 }

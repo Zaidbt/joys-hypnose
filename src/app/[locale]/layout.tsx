@@ -16,6 +16,7 @@ const playfair = Playfair_Display({
   preload: true,
   fallback: ['serif'],
   adjustFontFallback: true,
+  weight: ['400', '500', '600', '700'],
 });
 
 const cormorant = Cormorant_Garamond({ 
@@ -26,6 +27,7 @@ const cormorant = Cormorant_Garamond({
   weight: ['300', '400', '500', '600', '700'],
   fallback: ['serif'],
   adjustFontFallback: true,
+  style: ['normal'],
 });
 
 export const metadata: Metadata = {
@@ -63,7 +65,7 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} className={`${playfair.variable} ${cormorant.variable}`}>
-      <body className={cormorant.className}>
+      <body className={`${cormorant.className} antialiased`}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ClientLayout>{children}</ClientLayout>
         </NextIntlClientProvider>
