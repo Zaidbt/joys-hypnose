@@ -366,5 +366,4 @@ export async function sendAppointmentNotification(appointment: TimeSlot) {
     console.error('Error sending notification email:', error);
     throw error;
   }
-} 
-} 
+}
