@@ -1,0 +1,55 @@
+{
+  "Navigation": {
+    "home": "Home",
+    "services": "Services",
+    "contact": "Contact",
+    "about": "About"
+  },
+  "Index": {
+    "title": "Find your inner harmony",
+    "subtitle": "Welcome to my hypnotherapy space, where I guide you towards deep and lasting well-being. Through a holistic and caring approach, we will explore together the paths of your inner transformation. My role is to gently guide you towards reconnecting with your deep essence, by releasing the blockages that prevent you from moving forward.",
+    "bookAppointment": "Book an appointment",
+    "learnMore": "Learn more"
+  },
+  "Services": {
+    "title": "My Services",
+    "subtitle": "A holistic approach to your well-being",
+    "viewAll": "Discover all our services",
+    "services": {
+      "hypnotherapy": "Hypnotherapy",
+      "familyConstellation": "Individual Family Constellation",
+      "soundTherapy": "Sound Therapy/Sound Bath",
+      "numerology": "Numerology",
+      "shamanicHypnosis": "Shamanic Hypnosis",
+      "quantumProgramming": "Quantum Neuro-programming"
+    }
+  },
+  "Contact": {
+    "title": "Contact & Appointments",
+    "subtitle": "Schedule a hypnotherapy session",
+    "form": {
+      "firstTime": "This is my first session (2 hours)",
+      "name": "Full name",
+      "email": "Email",
+      "phone": "Phone",
+      "message": "Message (optional)",
+      "messagePlaceholder": "Briefly describe the reason for your consultation...",
+      "submit": "Request appointment",
+      "success": "Your appointment request has been sent successfully. We will contact you shortly to confirm.",
+      "error": "An error occurred while submitting your request."
+    }
+  },
+  "Common": {
+    "loading": "Loading...",
+    "noResults": "No results found",
+    "error": "An error occurred",
+    "required": "Required",
+    "optional": "Optional",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "save": "Save",
+    "close": "Close"
+  }
+} 

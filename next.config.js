@@ -1,3 +1,5 @@
+const withNextIntl = require('next-intl/plugin')();
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
@@ -36,6 +38,7 @@ const nextConfig = {
         'node_modules/@esbuild/linux-x64',
       ],
     },
+    serverActions: true,
   },
   async rewrites() {
     return [
@@ -128,4 +131,4 @@ const nextConfig = {
   },
 }
 
-module.exports = nextConfig 
+module.exports = withNextIntl(nextConfig); 
