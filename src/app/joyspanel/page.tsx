@@ -194,16 +194,22 @@ export default function DashboardPage() {
           fetch('/api/stats')
         ]);
 
+        if (!appointmentsResponse.ok || !statsResponse.ok) {
+          console.error('API Error:', {
+            appointments: appointmentsResponse.statusText,
+            stats: statsResponse.statusText
+          });
+          throw new Error('Failed to fetch data');
+        }
+
         const [appointmentsData, statsData] = await Promise.all([
           appointmentsResponse.json(),
           statsResponse.json()
         ]);
 
         // Debug logging
-        console.log('Stats data:', statsData);
-        console.log('Total appointments:', appointmentsData.length);
-        console.log('Appointment statuses:', appointmentsData.map(a => a.status));
-        console.log('Confirmed appointments:', appointmentsData.filter(a => a.status === 'confirmed').length);
+        console.log('Raw appointments data:', appointmentsData);
+        console.log('Raw stats data:', statsData);
 
         // Calculate stats
         const now = new Date();
@@ -213,28 +219,29 @@ export default function DashboardPage() {
 
         const stats: DashboardStats = {
           appointments: {
-            total: statsData.appointments.total,
-            pending: statsData.appointments.pending,
-            confirmed: statsData.appointments.confirmed,
-            cancelled: statsData.appointments.cancelled,
+            total: statsData.appointments.total || 0,
+            pending: statsData.appointments.pending || 0,
+            confirmed: statsData.appointments.confirmed || 0,
+            cancelled: statsData.appointments.cancelled || 0,
             todayCount: appointmentsData.filter(a => new Date(a.startTime) >= todayStart).length,
             weekCount: appointmentsData.filter(a => new Date(a.startTime) >= weekStart).length,
             monthCount: appointmentsData.filter(a => new Date(a.startTime) >= monthStart).length,
           },
           clients: {
-            total: statsData.clients.total,
-            new: statsData.clients.firstTime,
-            returning: statsData.clients.returning,
-            firstTime: statsData.clients.firstTime,
+            total: statsData.clients.total || 0,
+            new: statsData.clients.firstTime || 0,
+            returning: statsData.clients.returning || 0,
+            firstTime: statsData.clients.firstTime || 0,
           },
           newsletter: {
-            total: 0, // We'll update these when we implement newsletter stats
+            total: 0,
             active: 0,
             unsubscribed: 0,
             recentSubscribers: 0,
           },
         };
 
+        console.log('Processed stats:', stats);
         setStats(stats);
 
         // Get recent appointments
@@ -242,6 +249,8 @@ export default function DashboardPage() {
           .filter(a => new Date(a.startTime) >= now)
           .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
           .slice(0, 5);
+        
+        console.log('Recent appointments:', recentAppointments);
         setRecentAppointments(recentAppointments);
 
         // Generate recent activity

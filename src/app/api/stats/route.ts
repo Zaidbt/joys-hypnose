@@ -13,10 +13,13 @@ export async function GET() {
     }
 
     const client = await clientPromise;
-    const db = client.db('joys_db');
+    const db = client.db('joyshypnose');
     
-    // Get all appointments
+    // Get all appointments with debug logging
+    console.log('Fetching appointments from database...');
     const appointments = await db.collection('appointments').find({}).toArray();
+    console.log('Total appointments found:', appointments.length);
+    console.log('Appointment statuses:', appointments.map(a => a.status));
     
     // Calculate stats
     const stats = {
@@ -33,16 +36,20 @@ export async function GET() {
       },
     };
 
+    console.log('Calculated stats:', stats);
     return NextResponse.json(stats);
   } catch (error) {
     console.error('Error fetching stats:', error);
-    return new NextResponse(JSON.stringify({ error: 'Internal Server Error' }), {
+    return new NextResponse(JSON.stringify({ 
+      error: 'Internal Server Error',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }), {
       status: 500,
     });
   }
 }
 
+// Handle both GET and POST methods
 export async function POST() {
-  // Handle POST the same way as GET for now
   return GET();
 } 
