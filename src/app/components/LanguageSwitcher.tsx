@@ -1,7 +1,7 @@
 'use client';
 
 import { useLocale } from 'next-intl';
-import { usePathname, useRouter } from 'next-intl/client';
+import { useRouter, usePathname } from 'next/navigation';
 import { GlobeAltIcon } from '@heroicons/react/24/outline';
 
 export default function LanguageSwitcher() {
@@ -11,7 +11,8 @@ export default function LanguageSwitcher() {
 
   const toggleLocale = () => {
     const newLocale = locale === 'fr' ? 'en' : 'fr';
-    router.replace(pathname, { locale: newLocale });
+    const newPath = pathname.replace(`/${locale}`, `/${newLocale}`);
+    router.push(newPath);
   };
 
   return (
