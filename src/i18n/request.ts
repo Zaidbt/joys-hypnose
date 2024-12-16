@@ -1,8 +1,11 @@
 import { getRequestConfig } from 'next-intl/server';
-import { locales } from './settings';
+import { locales, defaultLocale } from './settings';
 
 export default getRequestConfig(async ({ locale }) => {
   return {
-    messages: (await import(`../../messages/${locale}.json`)).default
+    messages: (await import(`../../messages/${locale}.json`)).default,
+    defaultLocale,
+    locales,
+    timeZone: 'Africa/Casablanca'
   };
 }); 
