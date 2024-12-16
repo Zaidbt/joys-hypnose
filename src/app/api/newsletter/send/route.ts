@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/utils/authOptions';
 import { google } from 'googleapis';
 import type { NewsletterSubscription } from '@/types/newsletter';
+import nodemailer from 'nodemailer';
 
 // Create Gmail client
 function createGmailClient() {
@@ -77,63 +78,64 @@ async function sendEmail(gmail: any, to: string, subject: string, htmlContent: s
 
 export async function POST(request: Request) {
   try {
-    // Check authentication
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json(
-        { error: 'Not authenticated' },
-        { status: 401 }
-      );
-    }
+    const { subject, content, testEmail } = await request.json();
 
-    // Get request body
-    const body = await request.json();
-    const { subject, content, subscribers } = body;
+    const client = await clientPromise;
+    const db = client.db();
 
-    if (!subject || !content || !subscribers || !Array.isArray(subscribers)) {
-      return NextResponse.json(
-        { error: 'Invalid request data' },
-        { status: 400 }
-      );
-    }
-
-    // Initialize Gmail client
-    const gmail = createGmailClient();
-    if (!gmail) {
-      return NextResponse.json(
-        { error: 'Gmail client initialization failed' },
-        { status: 500 }
-      );
-    }
-
-    // Send emails to all subscribers
-    let successCount = 0;
-    let failedCount = 0;
-
-    for (const subscriber of subscribers) {
-      if (subscriber.status === 'active' && subscriber.email) {
-        const success = await sendEmail(gmail, subscriber.email, subject, content);
-        if (success) {
-          successCount++;
-        } else {
-          failedCount++;
-        }
-        // Add a small delay between sends to avoid rate limits
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
-    }
-
-    return NextResponse.json({
-      success: successCount,
-      failed: failedCount,
-      total: subscribers.length
+    // Configure transporter
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        type: 'OAuth2',
+        user: process.env.GMAIL_USER,
+        clientId: process.env.GMAIL_CLIENT_ID,
+        clientSecret: process.env.GMAIL_CLIENT_SECRET,
+        refreshToken: process.env.GMAIL_REFRESH_TOKEN,
+      },
     });
 
+    if (testEmail) {
+      // Send test email
+      await transporter.sendMail({
+        from: process.env.GMAIL_USER,
+        to: testEmail,
+        subject: subject,
+        html: content,
+      });
+      
+      return NextResponse.json({ success: true });
+    }
+
+    // Get all active subscribers
+    const subscribers = await db.collection('newsletter')
+      .find({ status: 'subscribed' })
+      .toArray();
+
+    // Send to all subscribers
+    for (const subscriber of subscribers) {
+      const unsubscribeUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/newsletter/unsubscribe?email=${encodeURIComponent(subscriber.email)}`;
+      
+      const emailContentWithUnsubscribe = content + `
+        <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+          <p style="color: #666; font-size: 12px;">
+            Pour vous désabonner de cette newsletter, 
+            <a href="${unsubscribeUrl}" style="color: #be185d; text-decoration: underline;">cliquez ici</a>
+          </p>
+        </div>
+      `;
+
+      await transporter.sendMail({
+        from: process.env.GMAIL_USER,
+        to: subscriber.email,
+        subject: subject,
+        html: emailContentWithUnsubscribe,
+      });
+    }
+
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error sending newsletter:', error);
-    return NextResponse.json(
-      { error: 'Failed to send newsletter' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to send newsletter' }, { status: 500 });
   }
 } 

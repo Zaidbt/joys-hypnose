@@ -38,17 +38,28 @@ const defaultTemplates: EmailTemplate[] = [
     name: 'Nouveau Blog',
     subject: 'Nouveau blog - Joy\'s Hypnose',
     content: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h1 style="color: #be185d;">Nouveau blog sur Joy's Hypnose</h1>
-        <p>Cher(e) abonné(e),</p>
-        <p>Un nouveau blog vient d'être publié sur notre site :</p>
-        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
-          <h2 style="color: #be185d;">[TITRE DU BLOG]</h2>
-          <p>[DESCRIPTION]</p>
-          <a href="[LIEN]" style="display: inline-block; background-color: #be185d; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-top: 10px;">Lire l'article</a>
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #fff;">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <h1 style="color: #be185d; font-size: 28px; margin-bottom: 10px;">Nouveau blog sur Joy's Hypnose</h1>
+          <div style="width: 50px; height: 2px; background-color: #be185d; margin: 0 auto;"></div>
         </div>
-        <p>À très bientôt,</p>
-        <p style="font-weight: bold;">Joy's Hypnose</p>
+        
+        <p style="color: #4a5568; font-size: 16px; line-height: 1.6;">Cher(e) abonné(e),</p>
+        <p style="color: #4a5568; font-size: 16px; line-height: 1.6;">Un nouveau blog vient d'être publié sur notre site :</p>
+        
+        <div style="background-color: #fdf2f8; padding: 25px; border-radius: 12px; margin: 25px 0; border: 1px solid #fbcfe8;">
+          <h2 style="color: #be185d; font-size: 22px; margin-top: 0;">[TITRE DU BLOG]</h2>
+          <p style="color: #4a5568; font-size: 16px; line-height: 1.6;">[DESCRIPTION]</p>
+          <a href="[LIEN]" style="display: inline-block; background-color: #be185d; color: white; padding: 12px 25px; text-decoration: none; border-radius: 25px; margin-top: 15px; font-weight: bold; transition: background-color 0.3s ease;">Lire l'article</a>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+          <p style="color: #4a5568; margin-bottom: 5px;">À très bientôt,</p>
+          <p style="color: #be185d; font-weight: bold; font-size: 18px;">Joy's Hypnose</p>
+          <div style="margin-top: 20px;">
+            <a href="https://www.joyshypnose-therapies.com" style="color: #be185d; text-decoration: none;">www.joyshypnose-therapies.com</a>
+          </div>
+        </div>
       </div>
     `
   },
@@ -57,15 +68,59 @@ const defaultTemplates: EmailTemplate[] = [
     name: 'Newsletter Mensuelle',
     subject: 'Actualités mensuelles - Joy\'s Hypnose',
     content: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h1 style="color: #be185d;">Newsletter Mensuelle</h1>
-        <p>Cher(e) abonné(e),</p>
-        <p>Voici les dernières actualités de Joy's Hypnose :</p>
-        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #fff;">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <h1 style="color: #be185d; font-size: 28px; margin-bottom: 10px;">Newsletter Mensuelle</h1>
+          <div style="width: 50px; height: 2px; background-color: #be185d; margin: 0 auto;"></div>
+        </div>
+
+        <p style="color: #4a5568; font-size: 16px; line-height: 1.6;">Cher(e) abonné(e),</p>
+        <p style="color: #4a5568; font-size: 16px; line-height: 1.6;">Voici les dernières actualités de Joy's Hypnose :</p>
+
+        <div style="background-color: #fdf2f8; padding: 25px; border-radius: 12px; margin: 25px 0; border: 1px solid #fbcfe8;">
           [CONTENU DE LA NEWSLETTER]
         </div>
-        <p>À très bientôt,</p>
-        <p style="font-weight: bold;">Joy's Hypnose</p>
+
+        <div style="text-align: center; margin-top: 30px;">
+          <p style="color: #4a5568; margin-bottom: 5px;">À très bientôt,</p>
+          <p style="color: #be185d; font-weight: bold; font-size: 18px;">Joy's Hypnose</p>
+          <div style="margin-top: 20px;">
+            <a href="https://www.joyshypnose-therapies.com" style="color: #be185d; text-decoration: none;">www.joyshypnose-therapies.com</a>
+          </div>
+        </div>
+      </div>
+    `
+  },
+  {
+    id: 'promotion',
+    name: 'Offre Spéciale',
+    subject: 'Offre spéciale - Joy\'s Hypnose',
+    content: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #fff;">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <h1 style="color: #be185d; font-size: 32px; margin-bottom: 10px;">⭐ Offre Spéciale ⭐</h1>
+          <div style="width: 50px; height: 2px; background-color: #be185d; margin: 0 auto;"></div>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #fdf2f8 0%, #fff 100%); padding: 30px; border-radius: 15px; margin: 25px 0; border: 2px solid #fbcfe8; text-align: center;">
+          <h2 style="color: #be185d; font-size: 24px; margin-top: 0;">[TITRE DE L'OFFRE]</h2>
+          <div style="font-size: 48px; color: #be185d; margin: 20px 0; font-weight: bold;">[RÉDUCTION]</div>
+          <p style="color: #4a5568; font-size: 18px; line-height: 1.6; margin-bottom: 25px;">[DESCRIPTION DE L'OFFRE]</p>
+          <div style="background-color: #fecdd3; padding: 15px; border-radius: 8px; display: inline-block; margin-bottom: 20px;">
+            <p style="color: #be185d; font-weight: bold; margin: 0;">Code promo : [CODE]</p>
+          </div>
+          <br>
+          <a href="[LIEN]" style="display: inline-block; background-color: #be185d; color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; font-weight: bold; font-size: 18px; transition: background-color 0.3s ease;">Réserver maintenant</a>
+          <p style="color: #666; font-size: 14px; margin-top: 15px;">Offre valable jusqu'au [DATE]</p>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+          <p style="color: #4a5568; margin-bottom: 5px;">À très bientôt,</p>
+          <p style="color: #be185d; font-weight: bold; font-size: 18px;">Joy's Hypnose</p>
+          <div style="margin-top: 20px;">
+            <a href="https://www.joyshypnose-therapies.com" style="color: #be185d; text-decoration: none;">www.joyshypnose-therapies.com</a>
+          </div>
+        </div>
       </div>
     `
   }
@@ -264,6 +319,22 @@ export default function NewsletterPage() {
               value={emailContent}
               onChange={setEmailContent}
               theme="snow"
+              modules={{
+                toolbar: [
+                  [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                  [{ 'font': [] }],
+                  [{ 'size': ['small', false, 'large', 'huge'] }],
+                  ['bold', 'italic', 'underline', 'strike'],
+                  [{ 'color': [] }, { 'background': [] }],
+                  [{ 'script': 'sub'}, { 'script': 'super' }],
+                  [{ 'align': [] }],
+                  [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                  [{ 'indent': '-1'}, { 'indent': '+1' }],
+                  ['blockquote', 'code-block'],
+                  ['link', 'image', 'video'],
+                  ['clean']
+                ]
+              }}
               className="h-64 mb-12"
             />
           </div>
