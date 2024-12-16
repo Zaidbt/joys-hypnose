@@ -213,11 +213,16 @@ export default function DashboardPage() {
         console.log('Raw appointments data:', appointmentsData);
         console.log('Raw stats data:', statsData);
 
-        // Calculate stats
+        // Calculate dates for filtering
         const now = new Date();
-        const todayStart = new Date(now.setHours(0, 0, 0, 0));
-        const weekStart = new Date(now.setDate(now.getDate() - 7));
-        const monthStart = new Date(now.setMonth(now.getMonth() - 1));
+        const todayStart = new Date(now.getTime());
+        todayStart.setHours(0, 0, 0, 0);
+        
+        const weekStart = new Date(todayStart.getTime());
+        weekStart.setDate(weekStart.getDate() - 7);
+        
+        const monthStart = new Date(todayStart.getTime());
+        monthStart.setMonth(monthStart.getMonth() - 1);
 
         const stats: DashboardStats = {
           appointments: {
@@ -247,7 +252,6 @@ export default function DashboardPage() {
         setStats(stats);
 
         // Get upcoming appointments (filter out past appointments)
-        const now = new Date();
         const upcomingAppointments = appointmentsData
           .filter(a => new Date(a.startTime) >= now)
           .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
