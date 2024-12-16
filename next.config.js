@@ -1,7 +1,3 @@
-const createNextIntlPlugin = require('next-intl/plugin');
-
-const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
@@ -60,13 +56,7 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  i18n: {
-    locales: ['en', 'fr'],
-    defaultLocale: 'fr',
-    localeDetection: true
-  },
   env: {
-    _next_intl_trailing_slash: 'never',
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL || 'https://www.joyshypnose-therapies.com'
   },
   async rewrites() {
@@ -173,4 +163,4 @@ const nextConfig = {
   },
 }
 
-module.exports = withNextIntl(nextConfig); 
+module.exports = nextConfig; 

@@ -1,12 +1,9 @@
 import React from "react";
-import { notFound } from "next/navigation";
-import { NextIntlClientProvider } from 'next-intl';
 import { 
   Playfair_Display,
   Cormorant_Garamond,
 } from "next/font/google";
 import type { Metadata } from 'next';
-import ClientLayout from '../ClientLayout';
 import "../globals.css";
 
 const playfair = Playfair_Display({ 
@@ -46,29 +43,15 @@ export const metadata: Metadata = {
   },
 };
 
-async function getMessages(locale: string) {
-  try {
-    return (await import(`../../../messages/${locale}.json`)).default;
-  } catch (error) {
-    notFound();
-  }
-}
-
-export default async function RootLayout({
+export default function RootLayout({
   children,
-  params: { locale }
 }: {
   children: React.ReactNode;
-  params: { locale: string };
 }) {
-  const messages = await getMessages(locale);
-
   return (
-    <html lang={locale} className={`${playfair.variable} ${cormorant.variable}`}>
+    <html lang="fr" className={`${playfair.variable} ${cormorant.variable}`}>
       <body className={`${cormorant.className} antialiased`}>
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <ClientLayout>{children}</ClientLayout>
-        </NextIntlClientProvider>
+        {children}
       </body>
     </html>
   );

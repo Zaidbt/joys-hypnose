@@ -1,12 +1,10 @@
 'use client';
 
 import { Fragment } from 'react';
-import { useTranslations } from 'next-intl';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import LanguageSwitcher from './LanguageSwitcher';
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
@@ -14,12 +12,11 @@ function classNames(...classes: string[]) {
 
 export default function Navigation() {
   const pathname = usePathname();
-  const t = useTranslations('Navigation');
 
   const navigation = [
-    { name: t('home'), href: '/' },
-    { name: t('services'), href: '/services' },
-    { name: t('contact'), href: '/contact' },
+    { name: 'Accueil', href: '/' },
+    { name: 'Services', href: '/services' },
+    { name: 'Contact', href: '/contact' },
   ];
 
   return (
@@ -52,20 +49,16 @@ export default function Navigation() {
                 </div>
               </div>
               
-              {/* Language Switcher - Always visible */}
-              <div className="flex items-center space-x-4">
-                <LanguageSwitcher />
-                <div className="sm:hidden">
-                  {/* Mobile menu button */}
-                  <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-rose-500">
-                    <span className="sr-only">Open main menu</span>
-                    {open ? (
-                      <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
-                    ) : (
-                      <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
-                    )}
-                  </Disclosure.Button>
-                </div>
+              <div className="sm:hidden">
+                {/* Mobile menu button */}
+                <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-rose-500">
+                  <span className="sr-only">Open main menu</span>
+                  {open ? (
+                    <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
+                  ) : (
+                    <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
+                  )}
+                </Disclosure.Button>
               </div>
             </div>
           </div>
