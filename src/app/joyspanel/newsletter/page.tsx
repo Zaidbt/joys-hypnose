@@ -3,13 +3,19 @@
 import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { 
   EnvelopeIcon, 
   TrashIcon,
   ArrowPathIcon,
   CheckCircleIcon,
-  XCircleIcon
+  XCircleIcon,
+  PaperAirplaneIcon,
+  EyeIcon
 } from '@heroicons/react/24/outline';
+
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+import 'react-quill/dist/quill.snow.css';
 
 interface Subscriber {
   _id: string;
@@ -19,12 +25,67 @@ interface Subscriber {
   updatedAt: string;
 }
 
+interface EmailTemplate {
+  id: string;
+  name: string;
+  subject: string;
+  content: string;
+}
+
+const defaultTemplates: EmailTemplate[] = [
+  {
+    id: 'new-blog',
+    name: 'Nouveau Blog',
+    subject: 'Nouveau blog - Joy\'s Hypnose',
+    content: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h1 style="color: #be185d;">Nouveau blog sur Joy's Hypnose</h1>
+        <p>Cher(e) abonné(e),</p>
+        <p>Un nouveau blog vient d'être publié sur notre site :</p>
+        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h2 style="color: #be185d;">[TITRE DU BLOG]</h2>
+          <p>[DESCRIPTION]</p>
+          <a href="[LIEN]" style="display: inline-block; background-color: #be185d; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-top: 10px;">Lire l'article</a>
+        </div>
+        <p>À très bientôt,</p>
+        <p style="font-weight: bold;">Joy's Hypnose</p>
+      </div>
+    `
+  },
+  {
+    id: 'monthly-news',
+    name: 'Newsletter Mensuelle',
+    subject: 'Actualités mensuelles - Joy\'s Hypnose',
+    content: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h1 style="color: #be185d;">Newsletter Mensuelle</h1>
+        <p>Cher(e) abonné(e),</p>
+        <p>Voici les dernières actualités de Joy's Hypnose :</p>
+        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          [CONTENU DE LA NEWSLETTER]
+        </div>
+        <p>À très bientôt,</p>
+        <p style="font-weight: bold;">Joy's Hypnose</p>
+      </div>
+    `
+  }
+];
+
 export default function NewsletterPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null);
+  const [emailSubject, setEmailSubject] = useState('');
+  const [emailContent, setEmailContent] = useState('');
+  const [isSending, setIsSending] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [sendingStatus, setSendingStatus] = useState<{
+    success: number;
+    failed: number;
+  } | null>(null);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -87,6 +148,61 @@ export default function NewsletterPage() {
     }
   };
 
+  const handleTemplateSelect = (template: EmailTemplate) => {
+    setSelectedTemplate(template);
+    setEmailSubject(template.subject);
+    setEmailContent(template.content);
+  };
+
+  const handlePreview = () => {
+    setShowPreview(!showPreview);
+  };
+
+  const handleSendNewsletter = async () => {
+    if (!emailSubject || !emailContent) {
+      alert('Veuillez remplir le sujet et le contenu de l\'email');
+      return;
+    }
+
+    if (!confirm('Êtes-vous sûr de vouloir envoyer cette newsletter à tous les abonnés actifs ?')) {
+      return;
+    }
+
+    setIsSending(true);
+    setSendingStatus(null);
+
+    try {
+      const activeSubscribers = subscribers.filter(sub => sub.status === 'active');
+      const response = await fetch('/api/newsletter/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          subject: emailSubject,
+          content: emailContent,
+          subscribers: activeSubscribers
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to send newsletter');
+      
+      const result = await response.json();
+      setSendingStatus(result);
+      alert('Newsletter envoyée avec succès !');
+      
+      // Reset form
+      setEmailSubject('');
+      setEmailContent('');
+      setSelectedTemplate(null);
+    } catch (error) {
+      console.error('Error sending newsletter:', error);
+      alert('Une erreur est survenue lors de l\'envoi de la newsletter');
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -95,11 +211,113 @@ export default function NewsletterPage() {
     );
   }
 
+  const activeSubscribersCount = subscribers.filter(sub => sub.status === 'active').length;
+
   return (
     <div className="p-8">
+      {/* Email Composer Section */}
+      <div className="mb-12 bg-white rounded-lg shadow-sm p-6">
+        <h2 className="text-xl font-semibold text-gray-900 mb-6">Composer une Newsletter</h2>
+        
+        {/* Template Selection */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Modèle d'email
+          </label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {defaultTemplates.map(template => (
+              <button
+                key={template.id}
+                onClick={() => handleTemplateSelect(template)}
+                className={`p-4 border rounded-lg text-left hover:bg-gray-50 transition-colors ${
+                  selectedTemplate?.id === template.id ? 'border-primary-500 ring-2 ring-primary-200' : 'border-gray-200'
+                }`}
+              >
+                <h3 className="font-medium text-gray-900">{template.name}</h3>
+                <p className="text-sm text-gray-500 mt-1">{template.subject}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Email Subject */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Sujet de l'email
+          </label>
+          <input
+            type="text"
+            value={emailSubject}
+            onChange={(e) => setEmailSubject(e.target.value)}
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+            placeholder="Entrez le sujet de l'email"
+          />
+        </div>
+
+        {/* Email Content */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Contenu de l'email
+          </label>
+          <div className="prose-editor">
+            <ReactQuill
+              value={emailContent}
+              onChange={setEmailContent}
+              theme="snow"
+              className="h-64 mb-12"
+            />
+          </div>
+        </div>
+
+        {/* Preview */}
+        {showPreview && (
+          <div className="mb-6 border rounded-lg p-4">
+            <h3 className="font-medium text-gray-900 mb-2">Aperçu</h3>
+            <div className="bg-gray-50 p-4 rounded">
+              <h4 className="font-medium">Sujet: {emailSubject}</h4>
+              <div className="mt-4 prose max-w-none" dangerouslySetInnerHTML={{ __html: emailContent }} />
+            </div>
+          </div>
+        )}
+
+        {/* Action Buttons */}
+        <div className="flex items-center justify-between mt-6">
+          <div className="text-sm text-gray-600">
+            {activeSubscribersCount} abonnés actifs recevront cette newsletter
+          </div>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handlePreview}
+              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+            >
+              <EyeIcon className="h-4 w-4 mr-2" />
+              {showPreview ? 'Masquer l\'aperçu' : 'Aperçu'}
+            </button>
+            <button
+              onClick={handleSendNewsletter}
+              disabled={isSending || !emailSubject || !emailContent}
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <PaperAirplaneIcon className="h-4 w-4 mr-2" />
+              {isSending ? 'Envoi en cours...' : 'Envoyer la newsletter'}
+            </button>
+          </div>
+        </div>
+
+        {/* Sending Status */}
+        {sendingStatus && (
+          <div className="mt-4 p-4 bg-gray-50 rounded-md">
+            <p className="text-sm text-gray-600">
+              Envoi terminé : {sendingStatus.success} succès, {sendingStatus.failed} échecs
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Existing Subscribers Section */}
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
-          <h1 className="text-2xl font-semibold text-gray-900">Newsletter</h1>
+          <h2 className="text-xl font-semibold text-gray-900">Abonnés</h2>
           <p className="mt-2 text-sm text-gray-700">
             Liste des abonnés à la newsletter
           </p>
