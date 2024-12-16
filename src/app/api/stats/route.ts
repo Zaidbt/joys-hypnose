@@ -15,12 +15,27 @@ export async function GET() {
     const client = await clientPromise;
     const db = client.db('joyshypnose');
     
-    // Get all appointments with debug logging
-    console.log('Fetching appointments from database...');
-    const appointments = await db.collection('appointments').find({}).toArray();
+    // Get all data in parallel
+    const [appointments, subscribers] = await Promise.all([
+      db.collection('appointments').find({}).toArray(),
+      db.collection('newsletter').find({}).toArray()
+    ]);
+
+    console.log('Fetching data from database...');
     console.log('Total appointments found:', appointments.length);
-    console.log('Appointment statuses:', appointments.map(a => a.status));
+    console.log('Total subscribers found:', subscribers.length);
     
+    // Calculate today's appointments
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    const todayAppointments = appointments.filter(a => {
+      const appointmentDate = new Date(a.startTime);
+      return appointmentDate >= today && appointmentDate < tomorrow;
+    });
+
     // Calculate stats
     const stats = {
       appointments: {
@@ -28,13 +43,26 @@ export async function GET() {
         confirmed: appointments.filter(a => a.status === 'confirmed').length,
         pending: appointments.filter(a => a.status === 'pending').length,
         cancelled: appointments.filter(a => a.status === 'cancelled').length,
+        today: todayAppointments.length,
+        upcoming: appointments.filter(a => new Date(a.startTime) >= today).length
       },
       clients: {
         total: new Set(appointments.map(a => a.clientEmail)).size,
         firstTime: appointments.filter(a => a.isFirstTime).length,
         returning: appointments.filter(a => !a.isFirstTime).length,
       },
+      newsletter: {
+        total: subscribers.length,
+        active: subscribers.filter(s => s.status === 'Actif').length,
+        unsubscribed: subscribers.filter(s => s.status !== 'Actif').length,
+      }
     };
+
+    // Calculate confirmation rate
+    const totalNonCancelled = stats.appointments.confirmed + stats.appointments.pending;
+    stats.appointments.confirmationRate = totalNonCancelled > 0 
+      ? Math.round((stats.appointments.confirmed / totalNonCancelled) * 100)
+      : 0;
 
     console.log('Calculated stats:', stats);
     return NextResponse.json(stats);
@@ -49,7 +77,6 @@ export async function GET() {
   }
 }
 
-// Handle both GET and POST methods
 export async function POST() {
   return GET();
 } 

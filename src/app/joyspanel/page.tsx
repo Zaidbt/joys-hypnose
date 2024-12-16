@@ -50,7 +50,9 @@ const StatCard = ({ title, value, icon: Icon, trend, color = "primary" }) => (
     <div className="flex items-center justify-between">
       <div>
         <p className="text-sm font-medium text-gray-600">{title}</p>
-        <p className="mt-2 text-3xl font-semibold text-gray-900">{value}</p>
+        <p className="mt-2 text-3xl font-semibold text-gray-900">
+          {typeof value === 'number' && title.toLowerCase().includes('taux') ? `${value}%` : value}
+        </p>
         {trend && (
           <div className="mt-2 flex items-center text-sm">
             {trend > 0 ? (
@@ -223,7 +225,7 @@ export default function DashboardPage() {
             pending: statsData.appointments.pending || 0,
             confirmed: statsData.appointments.confirmed || 0,
             cancelled: statsData.appointments.cancelled || 0,
-            todayCount: appointmentsData.filter(a => new Date(a.startTime) >= todayStart).length,
+            todayCount: statsData.appointments.today || 0,
             weekCount: appointmentsData.filter(a => new Date(a.startTime) >= weekStart).length,
             monthCount: appointmentsData.filter(a => new Date(a.startTime) >= monthStart).length,
           },
@@ -234,32 +236,33 @@ export default function DashboardPage() {
             firstTime: statsData.clients.firstTime || 0,
           },
           newsletter: {
-            total: 0,
-            active: 0,
-            unsubscribed: 0,
-            recentSubscribers: 0,
+            total: statsData.newsletter.total || 0,
+            active: statsData.newsletter.active || 0,
+            unsubscribed: statsData.newsletter.unsubscribed || 0,
+            recentSubscribers: statsData.newsletter.active || 0,
           },
         };
 
         console.log('Processed stats:', stats);
         setStats(stats);
 
-        // Get recent appointments
-        const recentAppointments = appointmentsData
+        // Get upcoming appointments (filter out past appointments)
+        const now = new Date();
+        const upcomingAppointments = appointmentsData
           .filter(a => new Date(a.startTime) >= now)
           .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
           .slice(0, 5);
         
-        console.log('Recent appointments:', recentAppointments);
-        setRecentAppointments(recentAppointments);
+        console.log('Upcoming appointments:', upcomingAppointments);
+        setRecentAppointments(upcomingAppointments);
 
-        // Generate recent activity
+        // Generate recent activity (include both appointments and newsletter subscriptions)
         const recentActivity = appointmentsData
           .map(a => ({
             _id: a._id,
             clientName: a.clientName,
-            date: a.createdAt,
-            action: 'a pris rendez-vous'
+            date: a.createdAt || a.startTime,
+            action: `${a.status === 'confirmed' ? 'a confirmé' : 'a pris'} rendez-vous`
           }))
           .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
           .slice(0, 5);
