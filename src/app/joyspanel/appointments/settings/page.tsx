@@ -70,13 +70,17 @@ export default function SettingsPage() {
         body: JSON.stringify(settings),
       });
 
-      if (!response.ok) throw new Error('Failed to update settings');
+      const data = await response.json();
 
-      const updatedSettings = await response.json();
-      setSettings(updatedSettings);
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update settings');
+      }
+
+      setSettings(data);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (error) {
+      console.error('Error updating settings:', error);
       setError(error instanceof Error ? error.message : 'Failed to update settings');
     } finally {
       setIsLoading(false);

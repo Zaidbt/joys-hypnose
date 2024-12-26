@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/utils/authOptions';
 import clientPromise from '@/lib/mongodb';
 import type { AppointmentSettings } from '@/types/appointment';
 
@@ -38,12 +40,26 @@ export async function GET() {
 
 export async function PUT(request: Request) {
   try {
+    // Check authentication
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const settings: AppointmentSettings = await request.json();
     console.log('Received settings update:', settings);
 
     const client = await clientPromise;
     const db = client.db('joyshypnose');
     const settingsCollection = db.collection('appointment_settings');
+
+    // Validate required fields
+    if (!settings.workingHours || !settings.workingDays || !settings.slotDuration) {
+      return NextResponse.json(
+        { error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
 
     // Ensure blockedDateRanges is an array
     if (!Array.isArray(settings.blockedDateRanges)) {
@@ -65,11 +81,20 @@ export async function PUT(request: Request) {
       // Update existing document
       result = await settingsCollection.updateOne(
         { _id: existingSettings._id },
-        { $set: settings }
+        { 
+          $set: {
+            ...settings,
+            updatedAt: new Date()
+          }
+        }
       );
     } else {
       // Insert new document
-      result = await settingsCollection.insertOne(settings);
+      result = await settingsCollection.insertOne({
+        ...settings,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
     }
 
     console.log('Settings update result:', result);
@@ -84,7 +109,7 @@ export async function PUT(request: Request) {
   } catch (error) {
     console.error('Error updating settings:', error);
     return NextResponse.json(
-      { error: 'Failed to update settings' },
+      { error: error instanceof Error ? error.message : 'Failed to update settings' },
       { status: 500 }
     );
   }
