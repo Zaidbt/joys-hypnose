@@ -89,7 +89,6 @@ export async function GET(request: Request) {
     const slotInterval = isAdmin ? 30 : settings.slotDuration;
 
     while (currentHour < endHour || (currentHour === endHour && currentMinute < endMinute)) {
-      const timeString = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
       const slotDate = new Date(date);
       slotDate.setHours(currentHour, currentMinute, 0, 0);
 
@@ -121,12 +120,12 @@ export async function GET(request: Request) {
         }
       }
 
-      if (isAvailable) {
+      if (isAvailable || !isAdmin) {
         slots.push({
           time: formattedTime,
           endTime: formattedEndTime,
-          available: true,
-          status: 'available',
+          available: isAvailable,
+          status: slotStatus,
           duration: duration / 60  // Duration in hours
         });
       }
