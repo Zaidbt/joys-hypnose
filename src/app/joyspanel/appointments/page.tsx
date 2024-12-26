@@ -200,48 +200,51 @@ export default function AppointmentsPage() {
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8">
-      <div className="sm:flex sm:items-center">
-        <div className="sm:flex-auto">
+      {/* Header Section */}
+      <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+        <div>
           <h1 className="text-2xl font-semibold text-gray-900">Rendez-vous</h1>
           <p className="mt-2 text-sm text-gray-700">
             Gérez vos rendez-vous et créez des créneaux fictifs
           </p>
         </div>
-        <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none space-x-4">
+        
+        {/* Action Buttons - Stack on mobile */}
+        <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-4">
           <button
             onClick={() => router.push('/joyspanel/appointments/settings')}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+            className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
           >
-            <CalendarIcon className="-ml-1 mr-2 h-5 w-5" />
+            <CalendarIcon className="h-5 w-5 mr-2" />
             Paramètres
           </button>
           <button
             onClick={generateFictitiousAppointments}
-            className="inline-flex items-center px-4 py-2 border border-purple-300 rounded-md shadow-sm text-sm font-medium text-purple-700 bg-purple-50 hover:bg-purple-100"
+            className="inline-flex items-center justify-center px-4 py-2 border border-purple-300 rounded-md shadow-sm text-sm font-medium text-purple-700 bg-purple-50 hover:bg-purple-100"
           >
-            <SparklesIcon className="-ml-1 mr-2 h-5 w-5" />
+            <SparklesIcon className="h-5 w-5 mr-2" />
             Générer Fictifs
           </button>
           <button
             onClick={deleteFictitiousAppointments}
-            className="inline-flex items-center px-4 py-2 border border-red-300 rounded-md shadow-sm text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100"
+            className="inline-flex items-center justify-center px-4 py-2 border border-red-300 rounded-md shadow-sm text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100"
           >
-            <NoSymbolIcon className="-ml-1 mr-2 h-5 w-5" />
+            <NoSymbolIcon className="h-5 w-5 mr-2" />
             Supprimer Fictifs
           </button>
           <button
             onClick={() => router.push('/joyspanel/appointments/new')}
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700"
+            className="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700"
           >
-            <PlusIcon className="-ml-1 mr-2 h-5 w-5" />
+            <PlusIcon className="h-5 w-5 mr-2" />
             Nouveau créneau
           </button>
         </div>
       </div>
 
-      {/* Filter section */}
+      {/* Filter section - Stack on mobile */}
       <div className="mt-6 bg-white p-4 rounded-lg shadow">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-4">
           <div className="flex-1">
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -252,16 +255,16 @@ export default function AppointmentsPage() {
                 placeholder="Rechercher par nom, email ou téléphone..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
               />
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <FunnelIcon className="h-5 w-5 text-gray-400" />
+          <div className="flex items-center gap-2 min-w-[200px]">
+            <FunnelIcon className="h-5 w-5 text-gray-400 flex-shrink-0" />
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md"
+              className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md"
             >
               <option value="all">Tous les rendez-vous</option>
               <option value="booked">Confirmés</option>
@@ -286,77 +289,86 @@ export default function AppointmentsPage() {
                   {formatDate(new Date(date))}
                 </h3>
               </div>
-              <table className="min-w-full divide-y divide-gray-300">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                      Horaire
-                    </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                      Client
-                    </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                      Statut
-                    </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                      Type
-                    </th>
-                    <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                      <span className="sr-only">Actions</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 bg-white">
-                  {dateAppointments.map((appointment) => (
-                    <motion.tr
-                      key={appointment._id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                    >
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
-                        {new Date(appointment.startTime).toLocaleTimeString('fr-FR', {
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                        {' - '}
-                        {new Date(appointment.endTime).toLocaleTimeString('fr-FR', {
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
-                        {appointment.clientName || '-'}
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[appointment.status]}`}>
-                          {statusLabels[appointment.status]}
-                        </span>
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
-                        {appointment.isFictitious ? 'Fictif' : 'Réel'}
-                        {!appointment.isFictitious && appointment.isFirstTime && (
-                          <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                            Première séance
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-300">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                        Horaire
+                      </th>
+                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 hidden sm:table-cell">
+                        Client
+                      </th>
+                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                        Statut
+                      </th>
+                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 hidden sm:table-cell">
+                        Type
+                      </th>
+                      <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                        <span className="sr-only">Actions</span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 bg-white">
+                    {dateAppointments.map((appointment) => (
+                      <motion.tr
+                        key={appointment._id}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="hover:bg-gray-50"
+                      >
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
+                          <div className="font-medium">{formatTime(new Date(appointment.startTime))}</div>
+                          <div className="text-gray-500">{formatTime(new Date(appointment.endTime))}</div>
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900 hidden sm:table-cell">
+                          {appointment.clientName && (
+                            <>
+                              <div className="font-medium">{appointment.clientName}</div>
+                              <div className="text-gray-500">{appointment.clientEmail}</div>
+                              <div className="text-gray-500">{appointment.clientPhone}</div>
+                            </>
+                          )}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[appointment.status]}`}>
+                            {statusLabels[appointment.status]}
                           </span>
-                        )}
-                      </td>
-                      <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                        {statusActions[appointment.status as keyof typeof statusActions]?.map((action, index) => (
-                          <button
-                            key={action.status}
-                            onClick={() => handleAction(appointment._id!, action.status)}
-                            className={`${action.color} ${index > 0 ? 'ml-2' : ''}`}
-                            title={action.label}
-                          >
-                            <action.icon className="h-5 w-5" />
-                            <span className="sr-only">{action.label}</span>
-                          </button>
-                        ))}
-                      </td>
-                    </motion.tr>
-                  ))}
-                </tbody>
-              </table>
+                          {/* Mobile-only client info */}
+                          <div className="sm:hidden mt-1">
+                            {appointment.clientName && (
+                              <div className="text-gray-500 text-xs">
+                                {appointment.clientName}<br />
+                                {appointment.clientPhone}
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900 hidden sm:table-cell">
+                          {appointment.isFirstTime ? 'Première séance' : 'Séance normale'}
+                        </td>
+                        <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                          <div className="flex justify-end space-x-2">
+                            {statusActions[appointment.status as keyof typeof statusActions]?.map((action) => (
+                              <button
+                                key={action.status}
+                                onClick={() => handleAction(appointment._id!, action.status)}
+                                className={`${action.color} p-1 rounded-full hover:bg-gray-100`}
+                                title={action.label}
+                              >
+                                <action.icon className="h-5 w-5" />
+                                <span className="sr-only">{action.label}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           ))}
 

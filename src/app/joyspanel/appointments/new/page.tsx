@@ -79,32 +79,32 @@ export default function NewAppointmentPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="mb-4 sm:mb-8">
-          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">Nouveau rendez-vous</h1>
+        <div className="mb-8">
+          <h1 className="text-2xl font-semibold text-gray-900">Nouveau rendez-vous</h1>
           <p className="mt-1 text-sm text-gray-600">
             Créez un nouveau rendez-vous manuellement
           </p>
         </div>
 
         {error && (
-          <div className="mb-4 p-3 sm:p-4 bg-red-50 border border-red-200 text-red-600 rounded-md text-sm">
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-600 rounded-md">
             {error}
           </div>
         )}
 
         {success && (
-          <div className="mb-4 p-3 sm:p-4 bg-green-50 border border-green-200 text-green-600 rounded-md text-sm">
+          <div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-600 rounded-md">
             Rendez-vous créé avec succès
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8 bg-white p-4 sm:p-6 rounded-lg shadow">
+        <form onSubmit={handleSubmit} className="space-y-8 bg-white p-4 sm:p-6 rounded-lg shadow">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Durée de la séance
@@ -129,9 +129,9 @@ export default function NewAppointmentPage() {
             selectedDuration={duration}
           />
 
-          <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-6">
+          <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Nom du client
               </label>
               <input
@@ -144,7 +144,7 @@ export default function NewAppointmentPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Email du client
               </label>
               <input
@@ -157,7 +157,7 @@ export default function NewAppointmentPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Téléphone du client
               </label>
               <input
@@ -170,7 +170,7 @@ export default function NewAppointmentPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Notes (optionnel)
               </label>
               <textarea
