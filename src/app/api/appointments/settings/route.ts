@@ -76,6 +76,9 @@ export async function PUT(request: Request) {
     // Find the existing settings document
     const existingSettings = await settingsCollection.findOne({});
 
+    // Remove _id from settings object if it exists
+    const { _id, ...settingsWithoutId } = settings as any;
+
     let result;
     if (existingSettings) {
       // Update existing document
@@ -83,7 +86,7 @@ export async function PUT(request: Request) {
         { _id: existingSettings._id },
         { 
           $set: {
-            ...settings,
+            ...settingsWithoutId,
             updatedAt: new Date()
           }
         }
@@ -91,7 +94,7 @@ export async function PUT(request: Request) {
     } else {
       // Insert new document
       result = await settingsCollection.insertOne({
-        ...settings,
+        ...settingsWithoutId,
         createdAt: new Date(),
         updatedAt: new Date()
       });
