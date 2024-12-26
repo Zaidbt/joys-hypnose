@@ -98,10 +98,10 @@ export default function SettingsPage() {
     }));
   };
 
-  const addBlockedRange = () => {
+  const addBlockedRange = async () => {
     if (!settings || !newBlockedRange.startDate || !newBlockedRange.endDate) return;
 
-    setSettings({
+    const updatedSettings = {
       ...settings,
       blockedDateRanges: [
         ...settings.blockedDateRanges,
@@ -110,7 +110,33 @@ export default function SettingsPage() {
           ...newBlockedRange
         }
       ]
-    });
+    };
+
+    setSettings(updatedSettings);
+
+    // Save changes immediately
+    try {
+      const response = await fetch('/api/appointments/settings', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedSettings),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update settings');
+      }
+
+      setSettings(data);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (error) {
+      console.error('Error updating settings:', error);
+      setError(error instanceof Error ? error.message : 'Failed to update settings');
+    }
 
     setNewBlockedRange({
       startDate: '',
@@ -119,13 +145,39 @@ export default function SettingsPage() {
     });
   };
 
-  const removeBlockedRange = (id: string) => {
+  const removeBlockedRange = async (id: string) => {
     if (!settings) return;
 
-    setSettings({
+    const updatedSettings = {
       ...settings,
       blockedDateRanges: settings.blockedDateRanges.filter(range => range.id !== id)
-    });
+    };
+
+    setSettings(updatedSettings);
+
+    // Save changes immediately
+    try {
+      const response = await fetch('/api/appointments/settings', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedSettings),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update settings');
+      }
+
+      setSettings(data);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (error) {
+      console.error('Error updating settings:', error);
+      setError(error instanceof Error ? error.message : 'Failed to update settings');
+    }
   };
 
   if (!settings) {
