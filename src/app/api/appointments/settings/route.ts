@@ -1,21 +1,27 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/utils/authOptions';
 import clientPromise from '@/lib/mongodb';
 import type { AppointmentSettings } from '@/types/appointment';
 
 export async function GET() {
-  const client = await clientPromise;
   try {
+    const client = await clientPromise;
     const db = client.db('joyshypnose');
     const settingsCollection = db.collection('appointment_settings');
 
     const settings = await settingsCollection.findOne({});
     if (!settings) {
-      return NextResponse.json(
-        { error: 'Settings not found' },
-        { status: 404 }
-      );
+      const defaultSettings: AppointmentSettings = {
+        workingHours: { start: '09:00', end: '18:00' },
+        workingDays: [1, 2, 3, 4, 5],
+        slotDuration: 60,
+        breakDuration: 15,
+        maxAdvanceBooking: 30,
+        fictionalBookingPercentage: 30,
+        blockedDateRanges: []
+      };
+      
+      await settingsCollection.insertOne(defaultSettings);
+      return NextResponse.json(defaultSettings);
     }
 
     return NextResponse.json(settings);
@@ -29,57 +35,35 @@ export async function GET() {
 }
 
 export async function PUT(request: Request) {
-  const client = await clientPromise;
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const body = await request.json();
-    console.log('Updating settings with:', body);
-
-    const {
-      workingHours,
-      workingDays,
-      slotDuration,
-      breakDuration,
-      maxAdvanceBooking,
-      fictionalBookingPercentage
-    } = body as AppointmentSettings;
-
-    // Validate settings
-    if (!workingHours || !workingDays || !slotDuration) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      );
-    }
-
+    const settings: AppointmentSettings = await request.json();
+    const client = await clientPromise;
     const db = client.db('joyshypnose');
     const settingsCollection = db.collection('appointment_settings');
 
-    const result = await settingsCollection.findOneAndUpdate(
+    // Ensure blockedDateRanges is an array
+    if (!Array.isArray(settings.blockedDateRanges)) {
+      settings.blockedDateRanges = [];
+    }
+
+    // Convert date strings to Date objects for proper storage
+    settings.blockedDateRanges = settings.blockedDateRanges.map(range => ({
+      ...range,
+      startDate: new Date(range.startDate).toISOString(),
+      endDate: new Date(range.endDate).toISOString()
+    }));
+
+    const result = await settingsCollection.updateOne(
       {},
-      {
-        $set: {
-          workingHours,
-          workingDays,
-          slotDuration,
-          breakDuration,
-          maxAdvanceBooking,
-          fictionalBookingPercentage,
-          updatedAt: new Date()
-        }
-      },
-      { upsert: true, returnDocument: 'after' }
+      { $set: settings },
+      { upsert: true }
     );
 
-    return NextResponse.json({
-      success: true,
-      data: result
-    });
-
+    if (result.acknowledged) {
+      return NextResponse.json({ message: 'Settings updated successfully' });
+    } else {
+      throw new Error('Failed to update settings');
+    }
   } catch (error) {
     console.error('Error updating settings:', error);
     return NextResponse.json(

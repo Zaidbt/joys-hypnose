@@ -95,7 +95,35 @@ export default function AppointmentCalendar({
         console.log('Received slots:', data);
         
         if (data.length === 0 && !isAdmin) {
-          setError('Cette date n\'est pas disponible pour les réservations.');
+          // Check if date is in blocked range
+          const dateObj = new Date(selectedDate);
+          dateObj.setHours(0, 0, 0, 0);
+          
+          const isBlocked = settings?.blockedDateRanges?.some(range => {
+            const rangeStart = new Date(range.startDate);
+            rangeStart.setHours(0, 0, 0, 0);
+            const rangeEnd = new Date(range.endDate);
+            rangeEnd.setHours(23, 59, 59, 999);
+            return dateObj >= rangeStart && dateObj <= rangeEnd;
+          });
+
+          if (isBlocked) {
+            const blockedRange = settings?.blockedDateRanges?.find(range => {
+              const rangeStart = new Date(range.startDate);
+              rangeStart.setHours(0, 0, 0, 0);
+              const rangeEnd = new Date(range.endDate);
+              rangeEnd.setHours(23, 59, 59, 999);
+              return dateObj >= rangeStart && dateObj <= rangeEnd;
+            });
+
+            setError(
+              blockedRange?.reason
+                ? `Cette période n'est pas disponible pour les réservations : ${blockedRange.reason}`
+                : 'Cette période n'est pas disponible pour les réservations.'
+            );
+          } else {
+            setError('Cette date n\'est pas disponible pour les réservations.');
+          }
           setSelectedTime('');
         } else {
           setError('');
@@ -112,7 +140,7 @@ export default function AppointmentCalendar({
     if (selectedDate) {
       fetchSlots();
     }
-  }, [selectedDate, isFirstTime, isAdmin]);
+  }, [selectedDate, isFirstTime, isAdmin, settings]);
 
   const handleDateChange = (date: string) => {
     // Check if the selected date is a working day, but only for non-admin users
