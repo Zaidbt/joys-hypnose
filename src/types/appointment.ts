@@ -22,6 +22,9 @@ export interface AppointmentSettings {
     end: string;
   };
   slotDuration: number;
+  breakDuration: number;
+  maxAdvanceBooking: number;
+  fictionalBookingPercentage: number;
   blockedDateRanges: Array<{
     id: string;
     startDate: string;
