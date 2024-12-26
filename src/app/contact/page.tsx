@@ -13,6 +13,7 @@ import {
 } from '@heroicons/react/24/outline';
 import type { AppointmentSettings } from '@/types/appointment';
 import AppointmentCalendar from '@/app/components/AppointmentCalendar';
+import BookingConfirmationModal from '@/app/components/BookingConfirmationModal';
 
 export default function ContactPage() {
   const [settings, setSettings] = useState<AppointmentSettings | null>(null);
@@ -27,6 +28,7 @@ export default function ContactPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     async function fetchSettings() {
@@ -122,6 +124,7 @@ export default function ContactPage() {
       }
 
       setSuccess(true);
+      setIsModalOpen(true);
       setName('');
       setEmail('');
       setPhone('');
@@ -325,6 +328,11 @@ export default function ContactPage() {
           </div>
         </div>
       </div>
+      
+      <BookingConfirmationModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
     </div>
   );
 } 
