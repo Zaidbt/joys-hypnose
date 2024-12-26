@@ -94,6 +94,13 @@ export default function AppointmentCalendar({
         const data = await response.json();
         console.log('Received slots:', data);
         
+        if (data.length === 0 && !isAdmin) {
+          setError('Cette date n\'est pas disponible pour les réservations.');
+          setSelectedTime('');
+        } else {
+          setError('');
+        }
+        
         setAvailableSlots(data);
       } catch (error) {
         setError('Failed to load available slots');
@@ -116,7 +123,6 @@ export default function AppointmentCalendar({
         setError(`Désolé, nous ne sommes ouverts que ${workingDaysStr}. Veuillez sélectionner un autre jour.`);
         return;
       }
-      setError('');
     }
     
     setSelectedDate(date);

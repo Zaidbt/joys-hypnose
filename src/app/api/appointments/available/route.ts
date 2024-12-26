@@ -34,13 +34,20 @@ export async function GET(request: Request) {
     // Check if the date is in a blocked range for non-admin users
     if (!isAdmin && settings.blockedDateRanges) {
       const selectedDate = new Date(date);
+      selectedDate.setHours(0, 0, 0, 0);  // Set to start of day for proper comparison
+      
       const isBlocked = settings.blockedDateRanges.some(range => {
         const rangeStart = new Date(range.startDate);
+        rangeStart.setHours(0, 0, 0, 0);
+        
         const rangeEnd = new Date(range.endDate);
+        rangeEnd.setHours(23, 59, 59, 999);  // Set to end of day
+        
         return selectedDate >= rangeStart && selectedDate <= rangeEnd;
       });
 
       if (isBlocked) {
+        console.log('Date is blocked:', date);
         return NextResponse.json([]);  // Return empty slots for blocked dates
       }
     }
