@@ -15,23 +15,14 @@ import {
   MagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
 import type { TimeSlot } from '@/types/appointment';
+import { formatInTimeZone, zonedTimeToUtc } from 'date-fns-tz';
 
 const formatDate = (date: Date) => {
-  return new Intl.DateTimeFormat('fr-FR', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  }).format(date);
+  return formatInTimeZone(date, 'Africa/Casablanca', 'EEEE d MMMM yyyy', { locale: require('date-fns/locale/fr') });
 };
 
 const formatTime = (date: Date) => {
-  return new Intl.DateTimeFormat('fr-FR', {
-    timeZone: 'Africa/Casablanca',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false
-  }).format(date);
+  return formatInTimeZone(date, 'Africa/Casablanca', 'HH:mm');
 };
 
 const statusColors = {
@@ -77,11 +68,15 @@ export default function AppointmentsPage() {
 
   const fetchAppointments = useCallback(async () => {
     try {
-      const startDate = new Date();
-      startDate.setHours(0, 0, 0, 0);
-      const endDate = new Date();
-      endDate.setMonth(endDate.getMonth() + 6);
-      endDate.setHours(23, 59, 59, 999);
+      const now = new Date();
+      const startDate = zonedTimeToUtc(
+        new Date(now.getFullYear(), now.getMonth(), now.getDate()),
+        'Africa/Casablanca'
+      );
+      const endDate = zonedTimeToUtc(
+        new Date(now.getFullYear(), now.getMonth() + 6, now.getDate(), 23, 59, 59, 999),
+        'Africa/Casablanca'
+      );
 
       const response = await fetch(
         `/api/appointments?start=${startDate.toISOString()}&end=${endDate.toISOString()}&t=${Date.now()}`,
@@ -197,9 +192,9 @@ export default function AppointmentsPage() {
     return matchesStatus && matchesSearch;
   });
 
-  // Group appointments by date
+  // Group appointments by date in Casablanca timezone
   const appointmentsByDate = filteredAppointments.reduce((acc: { [key: string]: TimeSlot[] }, appointment) => {
-    const dateKey = new Date(appointment.startTime).toDateString();
+    const dateKey = formatInTimeZone(new Date(appointment.startTime), 'Africa/Casablanca', 'yyyy-MM-dd');
     if (!acc[dateKey]) {
       acc[dateKey] = [];
     }

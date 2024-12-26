@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import AppointmentCalendar from '@/app/components/AppointmentCalendar';
 import { useRouter } from 'next/navigation';
+import { formatInTimeZone, zonedTimeToUtc } from 'date-fns-tz';
 
 const durations = [
   { value: 30, label: '30 minutes' },
@@ -35,8 +36,13 @@ export default function NewAppointmentPage() {
     setError('');
 
     try {
-      const startTime = new Date(`${selectedDate}T${selectedTime}`);
-      const endTime = new Date(startTime.getTime() + duration * 60000);
+      // Convert the selected date and time to UTC while considering Casablanca timezone
+      const localDateTime = `${selectedDate}T${selectedTime}`;
+      const startTime = zonedTimeToUtc(new Date(localDateTime), 'Africa/Casablanca');
+      const endTime = zonedTimeToUtc(
+        new Date(new Date(localDateTime).getTime() + duration * 60000),
+        'Africa/Casablanca'
+      );
 
       const response = await fetch('/api/appointments', {
         method: 'POST',
@@ -77,6 +83,15 @@ export default function NewAppointmentPage() {
     setSelectedDate(date);
     setSelectedTime(time);
   };
+
+  // Get min and max dates in Casablanca timezone
+  const now = new Date();
+  const minDate = formatInTimeZone(now, 'Africa/Casablanca', 'yyyy-MM-dd');
+  const maxDate = formatInTimeZone(
+    new Date(now.setMonth(now.getMonth() + 3)),
+    'Africa/Casablanca',
+    'yyyy-MM-dd'
+  );
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

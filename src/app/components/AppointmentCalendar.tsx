@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { CalendarIcon, ClockIcon } from '@heroicons/react/24/outline';
 import type { AppointmentSettings } from '@/types/appointment';
+import { formatInTimeZone, zonedTimeToUtc } from 'date-fns-tz';
 
 interface TimeSlot {
   time: string;
@@ -65,10 +66,14 @@ export default function AppointmentCalendar({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Get min and max dates
-  const today = new Date();
-  const minDate = today.toISOString().split('T')[0];
-  const maxDate = new Date(today.setMonth(today.getMonth() + 3)).toISOString().split('T')[0];
+  // Get min and max dates in Casablanca timezone
+  const now = new Date();
+  const minDate = formatInTimeZone(now, 'Africa/Casablanca', 'yyyy-MM-dd');
+  const maxDate = formatInTimeZone(
+    new Date(now.setMonth(now.getMonth() + 3)),
+    'Africa/Casablanca',
+    'yyyy-MM-dd'
+  );
 
   useEffect(() => {
     async function fetchSettings() {
@@ -91,30 +96,31 @@ export default function AppointmentCalendar({
       
       setIsLoading(true);
       try {
-        const response = await fetch(`/api/appointments/available?date=${selectedDate}&isFirstTime=${isFirstTime}&isAdmin=${isAdmin}&duration=${selectedDuration}`);
+        // Convert selected date to UTC while considering Casablanca timezone
+        const localDate = zonedTimeToUtc(new Date(selectedDate), 'Africa/Casablanca');
+        
+        const response = await fetch(
+          `/api/appointments/available?date=${localDate.toISOString()}&isFirstTime=${isFirstTime}&isAdmin=${isAdmin}&duration=${selectedDuration}`
+        );
+        
         if (!response.ok) throw new Error('Failed to fetch slots');
         const data = await response.json();
         console.log('Received slots:', data);
         
         if (data.length === 0 && !isAdmin) {
           // Check if date is in blocked range
-          const dateObj = new Date(selectedDate);
-          dateObj.setHours(0, 0, 0, 0);
+          const dateObj = zonedTimeToUtc(new Date(selectedDate), 'Africa/Casablanca');
           
           const isBlocked = settings?.blockedDateRanges?.some(range => {
-            const rangeStart = new Date(range.startDate);
-            rangeStart.setHours(0, 0, 0, 0);
-            const rangeEnd = new Date(range.endDate);
-            rangeEnd.setHours(23, 59, 59, 999);
+            const rangeStart = zonedTimeToUtc(new Date(range.startDate), 'Africa/Casablanca');
+            const rangeEnd = zonedTimeToUtc(new Date(range.endDate), 'Africa/Casablanca');
             return dateObj >= rangeStart && dateObj <= rangeEnd;
           });
 
           if (isBlocked) {
             const blockedRange = settings?.blockedDateRanges?.find(range => {
-              const rangeStart = new Date(range.startDate);
-              rangeStart.setHours(0, 0, 0, 0);
-              const rangeEnd = new Date(range.endDate);
-              rangeEnd.setHours(23, 59, 59, 999);
+              const rangeStart = zonedTimeToUtc(new Date(range.startDate), 'Africa/Casablanca');
+              const rangeEnd = zonedTimeToUtc(new Date(range.endDate), 'Africa/Casablanca');
               return dateObj >= rangeStart && dateObj <= rangeEnd;
             });
 
