@@ -16,6 +16,24 @@ import {
 } from '@heroicons/react/24/outline';
 import type { TimeSlot } from '@/types/appointment';
 
+const formatDate = (date: Date) => {
+  return new Intl.DateTimeFormat('fr-FR', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }).format(date);
+};
+
+const formatTime = (date: Date) => {
+  return new Intl.DateTimeFormat('fr-FR', {
+    timeZone: 'Africa/Casablanca',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  }).format(date);
+};
+
 const statusColors = {
   available: 'bg-green-50 text-green-700',
   booked: 'bg-blue-50 text-blue-700',
@@ -127,15 +145,6 @@ export default function AppointmentsPage() {
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to process action');
     }
-  };
-
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString('fr-FR', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
   };
 
   const generateFictitiousAppointments = async () => {
