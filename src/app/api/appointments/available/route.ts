@@ -7,6 +7,7 @@ export async function GET(request: Request) {
     const date = searchParams.get('date');
     const isFirstTime = searchParams.get('isFirstTime') === 'true';
     const isAdmin = searchParams.get('isAdmin') === 'true';
+    const duration = parseInt(searchParams.get('duration') || '60');
     
     if (!date) {
       return NextResponse.json(
@@ -34,21 +35,19 @@ export async function GET(request: Request) {
     // Check if the date is in a blocked range for non-admin users
     if (!isAdmin && settings.blockedDateRanges) {
       const selectedDate = new Date(date);
-      selectedDate.setHours(0, 0, 0, 0);  // Set to start of day for proper comparison
+      selectedDate.setHours(0, 0, 0, 0);
       
       const isBlocked = settings.blockedDateRanges.some(range => {
         const rangeStart = new Date(range.startDate);
         rangeStart.setHours(0, 0, 0, 0);
-        
         const rangeEnd = new Date(range.endDate);
-        rangeEnd.setHours(23, 59, 59, 999);  // Set to end of day
-        
+        rangeEnd.setHours(23, 59, 59, 999);
         return selectedDate >= rangeStart && selectedDate <= rangeEnd;
       });
 
       if (isBlocked) {
         console.log('Date is blocked:', date);
-        return NextResponse.json([]);  // Return empty slots for blocked dates
+        return NextResponse.json([]);
       }
     }
 
@@ -66,7 +65,7 @@ export async function GET(request: Request) {
           $lte: endDate
         },
         status: { 
-          $in: ['booked', 'pending', 'fictitious'] // Include fictitious appointments
+          $in: ['booked', 'pending', 'fictitious']
         }
       })
       .toArray();
@@ -86,6 +85,9 @@ export async function GET(request: Request) {
       hour12: false
     });
 
+    // Calculate slot interval based on duration and break time
+    const slotInterval = isAdmin ? 30 : settings.slotDuration;
+
     while (currentHour < endHour || (currentHour === endHour && currentMinute < endMinute)) {
       const timeString = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
       const slotDate = new Date(date);
@@ -94,38 +96,42 @@ export async function GET(request: Request) {
       // Format the time in Casablanca timezone
       const formattedTime = formatter.format(slotDate);
       const endTime = new Date(slotDate);
-      endTime.setMinutes(endTime.getMinutes() + 60);
+      endTime.setMinutes(endTime.getMinutes() + duration);
       const formattedEndTime = formatter.format(endTime);
 
       // Check if slot overlaps with any booking
       let isAvailable = true;
       let slotStatus = 'available';
       
-      const slotEnd = new Date(slotDate);
-      slotEnd.setMinutes(slotEnd.getMinutes() + 60);
-      
-      const overlappingBooking = bookedSlots.find(booking => {
-        const bookingStart = new Date(booking.startTime);
-        const bookingEnd = new Date(booking.endTime);
-        
-        // A slot overlaps if it starts before the booking ends AND ends after the booking starts
-        return (slotDate < bookingEnd && slotEnd > bookingStart);
-      });
-
-      if (overlappingBooking) {
+      // Don't allow bookings that would end after 22:00
+      if (endTime.getHours() > 22 || (endTime.getHours() === 22 && endTime.getMinutes() > 0)) {
         isAvailable = false;
-        slotStatus = overlappingBooking.status;
+      } else {
+        const overlappingBooking = bookedSlots.find(booking => {
+          const bookingStart = new Date(booking.startTime);
+          const bookingEnd = new Date(booking.endTime);
+          
+          // A slot overlaps if it starts before the booking ends AND ends after the booking starts
+          return (slotDate < bookingEnd && endTime > bookingStart);
+        });
+
+        if (overlappingBooking) {
+          isAvailable = false;
+          slotStatus = overlappingBooking.status;
+        }
       }
 
-      slots.push({
-        time: formattedTime,
-        endTime: formattedEndTime,
-        available: isAvailable,
-        status: isAvailable ? 'available' : slotStatus,
-        duration: 1  // Always 1 hour
-      });
+      if (isAvailable) {
+        slots.push({
+          time: formattedTime,
+          endTime: formattedEndTime,
+          available: true,
+          status: 'available',
+          duration: duration / 60  // Duration in hours
+        });
+      }
 
-      currentMinute += settings.slotDuration;
+      currentMinute += slotInterval;
       if (currentMinute >= 60) {
         currentHour += Math.floor(currentMinute / 60);
         currentMinute = currentMinute % 60;

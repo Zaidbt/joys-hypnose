@@ -17,6 +17,7 @@ interface AppointmentCalendarProps {
   onSelectSlot: (date: string, time: string) => void;
   isAdmin?: boolean;
   isFirstTime?: boolean;
+  selectedDuration?: number;
 }
 
 const slotColors = {
@@ -54,7 +55,8 @@ const formatWorkingDays = (workingDays: number[]): string => {
 export default function AppointmentCalendar({ 
   onSelectSlot, 
   isAdmin = false,
-  isFirstTime = false 
+  isFirstTime = false,
+  selectedDuration = 60
 }: AppointmentCalendarProps) {
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
@@ -89,7 +91,7 @@ export default function AppointmentCalendar({
       
       setIsLoading(true);
       try {
-        const response = await fetch(`/api/appointments/available?date=${selectedDate}&isFirstTime=${isFirstTime}&isAdmin=${isAdmin}`);
+        const response = await fetch(`/api/appointments/available?date=${selectedDate}&isFirstTime=${isFirstTime}&isAdmin=${isAdmin}&duration=${selectedDuration}`);
         if (!response.ok) throw new Error('Failed to fetch slots');
         const data = await response.json();
         console.log('Received slots:', data);
@@ -140,7 +142,7 @@ export default function AppointmentCalendar({
     if (selectedDate) {
       fetchSlots();
     }
-  }, [selectedDate, isFirstTime, isAdmin, settings]);
+  }, [selectedDate, isFirstTime, isAdmin, settings, selectedDuration]);
 
   const handleDateChange = (date: string) => {
     // Check if the selected date is a working day, but only for non-admin users

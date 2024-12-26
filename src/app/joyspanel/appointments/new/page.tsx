@@ -1,64 +1,33 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ClockIcon, UserIcon, CalendarIcon } from '@heroicons/react/24/outline';
-import type { AppointmentSettings } from '@/types/appointment';
 import AppointmentCalendar from '@/app/components/AppointmentCalendar';
+import { useRouter } from 'next/navigation';
 
-export default function NewAppointment() {
+const durations = [
+  { value: 30, label: '30 minutes' },
+  { value: 60, label: '1 heure' },
+  { value: 90, label: '1 heure 30' },
+  { value: 120, label: '2 heures' },
+  { value: 150, label: '2 heures 30' },
+  { value: 180, label: '3 heures' },
+  { value: 210, label: '3 heures 30' },
+  { value: 240, label: '4 heures' },
+];
+
+export default function NewAppointmentPage() {
   const router = useRouter();
-  const [settings, setSettings] = useState<AppointmentSettings | null>(null);
-  const [date, setDate] = useState<string>('');
-  const [startTime, setStartTime] = useState<string>('');
-  const [isFictitious, setIsFictitious] = useState(false);
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedTime, setSelectedTime] = useState('');
+  const [duration, setDuration] = useState(60); // Default 1 hour
   const [clientName, setClientName] = useState('');
   const [clientEmail, setClientEmail] = useState('');
   const [clientPhone, setClientPhone] = useState('');
   const [notes, setNotes] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-
-  useEffect(() => {
-    async function fetchSettings() {
-      try {
-        const response = await fetch('/api/appointments/settings');
-        if (!response.ok) throw new Error('Failed to fetch settings');
-        const data = await response.json();
-        setSettings(data);
-      } catch (error) {
-        setError('Failed to load settings');
-      }
-    }
-
-    fetchSettings();
-  }, []);
-
-  const generateTimeSlots = () => {
-    if (!settings) return [];
-    
-    const slots = [];
-    const [startHour, startMinute] = settings.workingHours.start.split(':').map(Number);
-    const [endHour, endMinute] = settings.workingHours.end.split(':').map(Number);
-    
-    let currentHour = startHour;
-    let currentMinute = startMinute;
-
-    while (currentHour < endHour || (currentHour === endHour && currentMinute < endMinute)) {
-      slots.push(
-        `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`
-      );
-
-      currentMinute += settings.slotDuration;
-      if (currentMinute >= 60) {
-        currentHour += Math.floor(currentMinute / 60);
-        currentMinute = currentMinute % 60;
-      }
-    }
-
-    return slots;
-  };
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,36 +35,38 @@ export default function NewAppointment() {
     setError('');
 
     try {
-      const appointmentDate = new Date(date);
-      const [hours, minutes] = startTime.split(':').map(Number);
-      appointmentDate.setHours(hours, minutes, 0, 0);
-
-      const endDate = new Date(appointmentDate);
-      endDate.setMinutes(endDate.getMinutes() + (settings?.slotDuration || 60));
-
-      const appointmentData = {
-        startTime: appointmentDate,
-        endTime: endDate,
-        isFictitious,
-        clientName: isFictitious ? `Client ${Math.floor(Math.random() * 1000)}` : clientName,
-        clientEmail: isFictitious ? `client${Math.floor(Math.random() * 1000)}@example.com` : clientEmail,
-        clientPhone: isFictitious ? '+41 XX XXX XX XX' : clientPhone,
-        notes,
-        status: isFictitious ? 'fictitious' : 'booked'
-      };
+      const startTime = new Date(`${selectedDate}T${selectedTime}`);
+      const endTime = new Date(startTime.getTime() + duration * 60000);
 
       const response = await fetch('/api/appointments', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(appointmentData),
+        body: JSON.stringify({
+          startTime: startTime.toISOString(),
+          endTime: endTime.toISOString(),
+          clientName,
+          clientEmail,
+          clientPhone,
+          notes,
+          status: 'booked',
+          isFictitious: false,
+          isFirstTime: false,
+        }),
       });
 
-      if (!response.ok) throw new Error('Failed to create appointment');
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to create appointment');
+      }
 
-      router.push('/joyspanel/appointments');
+      setSuccess(true);
+      setTimeout(() => {
+        router.push('/joyspanel/appointments');
+      }, 2000);
     } catch (error) {
+      console.error('Error creating appointment:', error);
       setError(error instanceof Error ? error.message : 'Failed to create appointment');
     } finally {
       setIsLoading(false);
@@ -103,8 +74,8 @@ export default function NewAppointment() {
   };
 
   const handleSlotSelect = (date: string, time: string) => {
-    setDate(date);
-    setStartTime(time);
+    setSelectedDate(date);
+    setSelectedTime(time);
   };
 
   return (
@@ -114,19 +85,11 @@ export default function NewAppointment() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Nouveau Rendez-vous</h1>
-            <p className="mt-1 text-sm text-gray-600">
-              Créez un nouveau rendez-vous réel ou fictif
-            </p>
-          </div>
-          <button
-            onClick={() => router.back()}
-            className="text-gray-600 hover:text-gray-900"
-          >
-            Retour
-          </button>
+        <div className="mb-8">
+          <h1 className="text-2xl font-semibold text-gray-900">Nouveau rendez-vous</h1>
+          <p className="mt-1 text-sm text-gray-600">
+            Créez un nouveau rendez-vous manuellement
+          </p>
         </div>
 
         {error && (
@@ -135,115 +98,88 @@ export default function NewAppointment() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg shadow">
+        {success && (
+          <div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-600 rounded-md">
+            Rendez-vous créé avec succès
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-8 bg-white p-6 rounded-lg shadow">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Durée de la séance
+              </label>
+              <select
+                value={duration}
+                onChange={(e) => setDuration(parseInt(e.target.value))}
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                required
+              >
+                {durations.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <AppointmentCalendar
+            onSelectSlot={handleSlotSelect}
+            isAdmin={true}
+            selectedDuration={duration}
+          />
+
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Date
+                Nom du client
               </label>
-              <div className="mt-1 relative">
-                <AppointmentCalendar 
-                  onSelectSlot={handleSlotSelect} 
-                  isAdmin={true} 
-                  isFirstTime={false} 
-                />
-              </div>
+              <input
+                type="text"
+                value={clientName}
+                onChange={(e) => setClientName(e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                required
+              />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Heure
+                Email du client
               </label>
-              <div className="mt-1 relative">
-                <select
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
-                  required
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                >
-                  <option value="">Sélectionnez une heure</option>
-                  {generateTimeSlots().map((slot) => (
-                    <option key={slot} value={slot}>
-                      {slot}
-                    </option>
-                  ))}
-                </select>
-                <ClockIcon className="absolute right-3 top-2 h-5 w-5 text-gray-400" />
-              </div>
+              <input
+                type="email"
+                value={clientEmail}
+                onChange={(e) => setClientEmail(e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                required
+              />
             </div>
-          </div>
 
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="isFictitious"
-              checked={isFictitious}
-              onChange={(e) => setIsFictitious(e.target.checked)}
-              className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-            />
-            <label htmlFor="isFictitious" className="ml-2 block text-sm text-gray-900">
-              Rendez-vous fictif
-            </label>
-          </div>
-
-          {!isFictitious && (
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Nom du client
-                </label>
-                <div className="mt-1">
-                  <input
-                    type="text"
-                    value={clientName}
-                    onChange={(e) => setClientName(e.target.value)}
-                    required={!isFictitious}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Email
-                </label>
-                <div className="mt-1">
-                  <input
-                    type="email"
-                    value={clientEmail}
-                    onChange={(e) => setClientEmail(e.target.value)}
-                    required={!isFictitious}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Téléphone
-                </label>
-                <div className="mt-1">
-                  <input
-                    type="tel"
-                    value={clientPhone}
-                    onChange={(e) => setClientPhone(e.target.value)}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                  />
-                </div>
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Téléphone du client
+              </label>
+              <input
+                type="tel"
+                value={clientPhone}
+                onChange={(e) => setClientPhone(e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                required
+              />
             </div>
-          )}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Notes
-            </label>
-            <div className="mt-1">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Notes (optionnel)
+              </label>
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
               />
             </div>
           </div>
@@ -252,14 +188,14 @@ export default function NewAppointment() {
             <button
               type="button"
               onClick={() => router.back()}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
             >
               Annuler
             </button>
             <button
               type="submit"
-              disabled={isLoading}
-              className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700"
+              disabled={isLoading || !selectedDate || !selectedTime}
+              className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50"
             >
               {isLoading ? 'Création...' : 'Créer le rendez-vous'}
             </button>
