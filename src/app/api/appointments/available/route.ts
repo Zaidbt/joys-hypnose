@@ -6,6 +6,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const date = searchParams.get('date');
     const isFirstTime = searchParams.get('isFirstTime') === 'true';
+    const isAdmin = searchParams.get('isAdmin') === 'true';
     
     if (!date) {
       return NextResponse.json(
@@ -50,22 +51,30 @@ export async function GET(request: Request) {
       .toArray();
     
     // Generate all possible slots
-    const [startHour, startMinute] = settings.workingHours.start.split(':').map(Number);
-    const [endHour, endMinute] = settings.workingHours.end.split(':').map(Number);
+    const [startHour, startMinute] = isAdmin ? [0, 0] : settings.workingHours.start.split(':').map(Number);
+    const [endHour, endMinute] = isAdmin ? [23, 59] : settings.workingHours.end.split(':').map(Number);
     
     const slots = [];
     let currentHour = startHour;
     let currentMinute = startMinute;
+
+    const formatter = new Intl.DateTimeFormat('fr-FR', {
+      timeZone: 'Africa/Casablanca',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
 
     while (currentHour < endHour || (currentHour === endHour && currentMinute < endMinute)) {
       const timeString = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
       const slotDate = new Date(date);
       slotDate.setHours(currentHour, currentMinute, 0, 0);
 
-      // Calculate end time - always 1 hour regardless of isFirstTime
+      // Format the time in Casablanca timezone
+      const formattedTime = formatter.format(slotDate);
       const endTime = new Date(slotDate);
       endTime.setMinutes(endTime.getMinutes() + 60);
-      const endTimeString = `${endTime.getHours().toString().padStart(2, '0')}:${endTime.getMinutes().toString().padStart(2, '0')}`;
+      const formattedEndTime = formatter.format(endTime);
 
       // Check if slot overlaps with any booking
       let isAvailable = true;
@@ -75,8 +84,8 @@ export async function GET(request: Request) {
       slotEnd.setMinutes(slotEnd.getMinutes() + 60);
       
       const overlappingBooking = bookedSlots.find(booking => {
-        const bookingStart = new Date(booking.startTime);
-        const bookingEnd = new Date(booking.endTime);
+        const bookingStart = new Date(formatter.format(new Date(booking.startTime)));
+        const bookingEnd = new Date(formatter.format(new Date(booking.endTime)));
         
         // A slot overlaps if it starts before the booking ends AND ends after the booking starts
         return (slotDate < bookingEnd && slotEnd > bookingStart);
@@ -88,8 +97,8 @@ export async function GET(request: Request) {
       }
 
       slots.push({
-        time: timeString,
-        endTime: endTimeString,
+        time: formattedTime,
+        endTime: formattedEndTime,
         available: isAvailable,
         status: isAvailable ? 'available' : slotStatus,
         duration: 1  // Always 1 hour

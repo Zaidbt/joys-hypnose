@@ -89,7 +89,7 @@ export default function AppointmentCalendar({
       
       setIsLoading(true);
       try {
-        const response = await fetch(`/api/appointments/available?date=${selectedDate}&isFirstTime=${isFirstTime}`);
+        const response = await fetch(`/api/appointments/available?date=${selectedDate}&isFirstTime=${isFirstTime}&isAdmin=${isAdmin}`);
         if (!response.ok) throw new Error('Failed to fetch slots');
         const data = await response.json();
         console.log('Received slots:', data);
@@ -105,11 +105,11 @@ export default function AppointmentCalendar({
     if (selectedDate) {
       fetchSlots();
     }
-  }, [selectedDate, isFirstTime]);
+  }, [selectedDate, isFirstTime, isAdmin]);
 
   const handleDateChange = (date: string) => {
-    // Check if the selected date is a working day
-    if (settings) {
+    // Check if the selected date is a working day, but only for non-admin users
+    if (settings && !isAdmin) {
       const selectedDay = new Date(date).getDay();
       if (!settings.workingDays.includes(selectedDay)) {
         const workingDaysStr = formatWorkingDays(settings.workingDays);
