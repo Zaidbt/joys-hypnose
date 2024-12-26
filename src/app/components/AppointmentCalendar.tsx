@@ -119,10 +119,10 @@ export default function AppointmentCalendar({
             setError(
               blockedRange?.reason
                 ? `Cette période n'est pas disponible pour les réservations : ${blockedRange.reason}`
-                : 'Cette période n'est pas disponible pour les réservations.'
+                : "Cette période n'est pas disponible pour les réservations."
             );
           } else {
-            setError('Cette date n\'est pas disponible pour les réservations.');
+            setError("Cette date n'est pas disponible pour les réservations.");
           }
           setSelectedTime('');
         } else {
