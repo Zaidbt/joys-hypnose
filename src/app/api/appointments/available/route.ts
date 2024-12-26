@@ -51,8 +51,8 @@ export async function GET(request: Request) {
       .toArray();
     
     // Generate all possible slots
-    const [startHour, startMinute] = isAdmin ? [0, 0] : settings.workingHours.start.split(':').map(Number);
-    const [endHour, endMinute] = isAdmin ? [23, 59] : settings.workingHours.end.split(':').map(Number);
+    const [startHour, startMinute] = isAdmin ? [9, 0] : settings.workingHours.start.split(':').map(Number);
+    const [endHour, endMinute] = isAdmin ? [22, 0] : settings.workingHours.end.split(':').map(Number);
     
     const slots = [];
     let currentHour = startHour;
@@ -84,8 +84,8 @@ export async function GET(request: Request) {
       slotEnd.setMinutes(slotEnd.getMinutes() + 60);
       
       const overlappingBooking = bookedSlots.find(booking => {
-        const bookingStart = new Date(formatter.format(new Date(booking.startTime)));
-        const bookingEnd = new Date(formatter.format(new Date(booking.endTime)));
+        const bookingStart = new Date(booking.startTime);
+        const bookingEnd = new Date(booking.endTime);
         
         // A slot overlaps if it starts before the booking ends AND ends after the booking starts
         return (slotDate < bookingEnd && slotEnd > bookingStart);
