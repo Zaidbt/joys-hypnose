@@ -9,6 +9,8 @@ export async function GET() {
     const settingsCollection = db.collection('appointment_settings');
 
     const settings = await settingsCollection.findOne({});
+    console.log('Retrieved settings:', settings);
+
     if (!settings) {
       const defaultSettings: AppointmentSettings = {
         workingHours: { start: '09:00', end: '18:00' },
@@ -37,6 +39,8 @@ export async function GET() {
 export async function PUT(request: Request) {
   try {
     const settings: AppointmentSettings = await request.json();
+    console.log('Received settings update:', settings);
+
     const client = await clientPromise;
     const db = client.db('joyshypnose');
     const settingsCollection = db.collection('appointment_settings');
@@ -53,14 +57,27 @@ export async function PUT(request: Request) {
       endDate: new Date(range.endDate).toISOString()
     }));
 
-    const result = await settingsCollection.updateOne(
-      {},
-      { $set: settings },
-      { upsert: true }
-    );
+    // Find the existing settings document
+    const existingSettings = await settingsCollection.findOne({});
+
+    let result;
+    if (existingSettings) {
+      // Update existing document
+      result = await settingsCollection.updateOne(
+        { _id: existingSettings._id },
+        { $set: settings }
+      );
+    } else {
+      // Insert new document
+      result = await settingsCollection.insertOne(settings);
+    }
+
+    console.log('Settings update result:', result);
 
     if (result.acknowledged) {
-      return NextResponse.json({ message: 'Settings updated successfully' });
+      // Fetch and return the updated settings
+      const updatedSettings = await settingsCollection.findOne({});
+      return NextResponse.json(updatedSettings);
     } else {
       throw new Error('Failed to update settings');
     }

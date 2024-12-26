@@ -72,6 +72,8 @@ export default function SettingsPage() {
 
       if (!response.ok) throw new Error('Failed to update settings');
 
+      const updatedSettings = await response.json();
+      setSettings(updatedSettings);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (error) {
