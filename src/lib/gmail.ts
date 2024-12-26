@@ -87,7 +87,7 @@ async function sendClientConfirmation(appointment: TimeSlot) {
           <div style="background-color: white; padding: 15px; border-radius: 6px; margin: 20px 0;">
             <p style="margin: 5px 0;"><strong>Date :</strong> ${formattedDate}</p>
             <p style="margin: 5px 0;"><strong>Heure :</strong> ${formattedTime}</p>
-            <p style="margin: 5px 0;"><strong>Lieu :</strong> Cabinet Joy's Hypnose, Casablanca</p>
+            <p style="margin: 5px 0;"><strong>Lieu :</strong> 17 Rue Bab El Mandab, Residence El Prado 2,<br>1er étage appart #2 Bourgogne,<br>Casablanca</p>
           </div>
 
           ${appointment.isFirstTime ? `

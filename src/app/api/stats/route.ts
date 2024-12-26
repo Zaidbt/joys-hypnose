@@ -27,13 +27,17 @@ export async function GET() {
     
     // Calculate today's appointments
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
+    const formatter = new Intl.DateTimeFormat('fr-FR', {
+      timeZone: 'Africa/Casablanca',
+    });
+    const todayStart = new Date(formatter.format(today));
+    todayStart.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(todayStart);
     tomorrow.setDate(tomorrow.getDate() + 1);
     
     const todayAppointments = appointments.filter(a => {
-      const appointmentDate = new Date(a.startTime);
-      return appointmentDate >= today && appointmentDate < tomorrow;
+      const appointmentDate = new Date(formatter.format(new Date(a.startTime)));
+      return appointmentDate >= todayStart && appointmentDate < tomorrow;
     });
 
     // Calculate stats
@@ -44,7 +48,7 @@ export async function GET() {
         pending: appointments.filter(a => a.status === 'pending').length,
         cancelled: appointments.filter(a => a.status === 'cancelled').length,
         today: todayAppointments.length,
-        upcoming: appointments.filter(a => new Date(a.startTime) >= today).length
+        upcoming: appointments.filter(a => new Date(formatter.format(new Date(a.startTime))) >= todayStart).length
       },
       clients: {
         total: new Set(appointments.map(a => a.clientEmail)).size,

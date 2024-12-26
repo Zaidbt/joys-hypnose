@@ -73,104 +73,114 @@ const StatCard = ({ title, value, icon: Icon, trend, color = "primary" }) => (
   </motion.div>
 );
 
-const AppointmentTimeline = ({ appointments }) => (
-  <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
-    <h3 className="text-lg font-medium text-gray-900 mb-4">Rendez-vous à venir</h3>
-    <div className="flow-root">
-      <ul className="-mb-8">
-        {appointments.map((appointment, idx) => (
-          <li key={appointment._id}>
-            <div className="relative pb-8">
-              {idx !== appointments.length - 1 && (
-                <span
-                  className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"
-                  aria-hidden="true"
-                />
-              )}
-              <div className="relative flex space-x-3">
-                <div>
-                  <span className={`h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white ${
-                    appointment.status === 'confirmed' ? 'bg-green-500' : 
-                    appointment.status === 'pending' ? 'bg-yellow-500' : 'bg-red-500'
-                  }`}>
-                    <ClockIcon className="h-5 w-5 text-white" />
-                  </span>
-                </div>
-                <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
-                  <div>
-                    <p className="text-sm text-gray-900">
-                      {appointment.clientName} 
-                      {appointment.isFirstTime && (
-                        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                          Première séance
-                        </span>
-                      )}
-                    </p>
-                  </div>
-                  <div className="whitespace-nowrap text-right text-sm text-gray-500">
-                    <time dateTime={appointment.startTime}>
-                      {new Date(appointment.startTime).toLocaleString('fr-FR', {
-                        day: 'numeric',
-                        month: 'short',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </time>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </li>
-        ))}
-      </ul>
-    </div>
-  </div>
-);
+const AppointmentTimeline = ({ appointments }) => {
+  const formatter = new Intl.DateTimeFormat('fr-FR', {
+    timeZone: 'Africa/Casablanca',
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
 
-const ClientActivity = ({ clients }) => (
-  <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
-    <h3 className="text-lg font-medium text-gray-900 mb-4">Activité récente</h3>
-    <div className="flow-root">
-      <ul className="-mb-8">
-        {clients.map((client, idx) => (
-          <li key={client._id}>
-            <div className="relative pb-8">
-              {idx !== clients.length - 1 && (
-                <span
-                  className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"
-                  aria-hidden="true"
-                />
-              )}
-              <div className="relative flex space-x-3">
-                <div>
-                  <span className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center ring-8 ring-white">
-                    <UsersIcon className="h-5 w-5 text-white" />
-                  </span>
-                </div>
-                <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+  return (
+    <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
+      <h3 className="text-lg font-medium text-gray-900 mb-4">Rendez-vous à venir</h3>
+      <div className="flow-root">
+        <ul className="-mb-8">
+          {appointments.map((appointment, idx) => (
+            <li key={appointment._id}>
+              <div className="relative pb-8">
+                {idx !== appointments.length - 1 && (
+                  <span
+                    className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"
+                    aria-hidden="true"
+                  />
+                )}
+                <div className="relative flex space-x-3">
                   <div>
-                    <p className="text-sm text-gray-900">{client.clientName}</p>
-                    <p className="text-sm text-gray-500">{client.action}</p>
+                    <span className={`h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white ${
+                      appointment.status === 'confirmed' ? 'bg-green-500' : 
+                      appointment.status === 'pending' ? 'bg-yellow-500' : 'bg-red-500'
+                    }`}>
+                      <ClockIcon className="h-5 w-5 text-white" />
+                    </span>
                   </div>
-                  <div className="whitespace-nowrap text-right text-sm text-gray-500">
-                    <time dateTime={client.date}>
-                      {new Date(client.date).toLocaleString('fr-FR', {
-                        day: 'numeric',
-                        month: 'short',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </time>
+                  <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+                    <div>
+                      <p className="text-sm text-gray-900">
+                        {appointment.clientName} 
+                        {appointment.isFirstTime && (
+                          <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                            Première séance
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                    <div className="whitespace-nowrap text-right text-sm text-gray-500">
+                      <time dateTime={appointment.startTime}>
+                        {formatter.format(new Date(appointment.startTime))}
+                      </time>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </li>
-        ))}
-      </ul>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
-  </div>
-);
+  );
+};
+
+const ClientActivity = ({ clients }) => {
+  const formatter = new Intl.DateTimeFormat('fr-FR', {
+    timeZone: 'Africa/Casablanca',
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+
+  return (
+    <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
+      <h3 className="text-lg font-medium text-gray-900 mb-4">Activité récente</h3>
+      <div className="flow-root">
+        <ul className="-mb-8">
+          {clients.map((client, idx) => (
+            <li key={client._id}>
+              <div className="relative pb-8">
+                {idx !== clients.length - 1 && (
+                  <span
+                    className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"
+                    aria-hidden="true"
+                  />
+                )}
+                <div className="relative flex space-x-3">
+                  <div>
+                    <span className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center ring-8 ring-white">
+                      <UsersIcon className="h-5 w-5 text-white" />
+                    </span>
+                  </div>
+                  <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+                    <div>
+                      <p className="text-sm text-gray-900">{client.clientName}</p>
+                      <p className="text-sm text-gray-500">{client.action}</p>
+                    </div>
+                    <div className="whitespace-nowrap text-right text-sm text-gray-500">
+                      <time dateTime={client.date}>
+                        {formatter.format(new Date(client.date))}
+                      </time>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+};
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();

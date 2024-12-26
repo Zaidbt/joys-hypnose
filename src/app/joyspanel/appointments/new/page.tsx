@@ -142,7 +142,11 @@ export default function NewAppointment() {
                 Date
               </label>
               <div className="mt-1 relative">
-                <AppointmentCalendar onSelectSlot={handleSlotSelect} isAdmin={true} />
+                <AppointmentCalendar 
+                  onSelectSlot={handleSlotSelect} 
+                  isAdmin={true} 
+                  isFirstTime={false} 
+                />
               </div>
             </div>
 

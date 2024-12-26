@@ -16,14 +16,16 @@ export interface TimeSlot {
 }
 
 export interface AppointmentSettings {
-  _id?: string;
+  workingDays: number[];
   workingHours: {
-    start: string; // Format: "HH:mm"
-    end: string;   // Format: "HH:mm"
+    start: string;
+    end: string;
   };
-  workingDays: number[]; // 0-6 (Sunday-Saturday)
-  slotDuration: number;  // in minutes
-  breakDuration: number; // in minutes
-  maxAdvanceBooking: number; // in days
-  fictionalBookingPercentage: number; // 0-100
+  slotDuration: number;
+  blockedDateRanges: Array<{
+    id: string;
+    startDate: string;
+    endDate: string;
+    reason?: string;
+  }>;
 } 
