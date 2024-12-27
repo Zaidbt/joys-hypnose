@@ -38,11 +38,8 @@ export default function NewAppointmentPage() {
     try {
       // Convert the selected date and time to UTC while considering Casablanca timezone
       const localDateTime = `${selectedDate}T${selectedTime}`;
-      const startTime = zonedTimeToUtc(new Date(localDateTime), 'Africa/Casablanca');
-      const endTime = zonedTimeToUtc(
-        new Date(new Date(localDateTime).getTime() + duration * 60000),
-        'Africa/Casablanca'
-      );
+      const startTime = new Date(localDateTime);
+      const endTime = new Date(new Date(localDateTime).getTime() + duration * 60000);
 
       const response = await fetch('/api/appointments', {
         method: 'POST',

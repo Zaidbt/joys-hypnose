@@ -112,15 +112,15 @@ export default function AppointmentCalendar({
           const dateObj = new Date(selectedDate);
           
           const isBlocked = settings?.blockedDateRanges?.some(range => {
-            const rangeStart = zonedTimeToUtc(new Date(range.startDate), 'Africa/Casablanca');
-            const rangeEnd = zonedTimeToUtc(new Date(range.endDate), 'Africa/Casablanca');
+            const rangeStart = new Date(range.startDate);
+            const rangeEnd = new Date(range.endDate);
             return dateObj >= rangeStart && dateObj <= rangeEnd;
           });
 
           if (isBlocked) {
             const blockedRange = settings?.blockedDateRanges?.find(range => {
-              const rangeStart = zonedTimeToUtc(new Date(range.startDate), 'Africa/Casablanca');
-              const rangeEnd = zonedTimeToUtc(new Date(range.endDate), 'Africa/Casablanca');
+              const rangeStart = new Date(range.startDate);
+              const rangeEnd = new Date(range.endDate);
               return dateObj >= rangeStart && dateObj <= rangeEnd;
             });
 

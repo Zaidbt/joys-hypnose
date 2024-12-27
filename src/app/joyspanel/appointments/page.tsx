@@ -69,14 +69,8 @@ export default function AppointmentsPage() {
   const fetchAppointments = useCallback(async () => {
     try {
       const now = new Date();
-      const startDate = zonedTimeToUtc(
-        new Date(now.getFullYear(), now.getMonth(), now.getDate()),
-        'Africa/Casablanca'
-      );
-      const endDate = zonedTimeToUtc(
-        new Date(now.getFullYear(), now.getMonth() + 6, now.getDate(), 23, 59, 59, 999),
-        'Africa/Casablanca'
-      );
+      const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const endDate = new Date(now.getFullYear(), now.getMonth() + 6, now.getDate(), 23, 59, 59, 999);
 
       const response = await fetch(
         `/api/appointments?start=${startDate.toISOString()}&end=${endDate.toISOString()}&t=${Date.now()}`,
