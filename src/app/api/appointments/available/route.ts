@@ -78,12 +78,12 @@ export async function GET(request: Request) {
       .toArray();
     
     // Generate all possible slots
-    const [startHour, startMinute] = settings.workingHours.start.split(':').map(Number);
-    const [endHour, endMinute] = settings.workingHours.end.split(':').map(Number);
+    const [startHour, startMinute] = isAdmin ? ["09", "00"] : settings.workingHours.start.split(':').map(Number);
+    const [endHour, endMinute] = isAdmin ? ["22", "00"] : settings.workingHours.end.split(':').map(Number);
     
     const slots = [];
-    let currentHour = startHour;
-    let currentMinute = startMinute;
+    let currentHour = parseInt(startHour);
+    let currentMinute = parseInt(startMinute);
 
     const formatter = new Intl.DateTimeFormat('fr-FR', {
       timeZone: 'Africa/Casablanca',
@@ -93,7 +93,7 @@ export async function GET(request: Request) {
     });
 
     // Calculate slot interval based on duration and break time
-    const slotInterval = settings.slotDuration + settings.breakDuration;
+    const slotInterval = isAdmin ? 30 : settings.slotDuration + settings.breakDuration;
 
     while (currentHour < endHour || (currentHour === endHour && currentMinute < endMinute)) {
       const slotDate = new Date(date);
@@ -102,23 +102,30 @@ export async function GET(request: Request) {
       // Format the time in Casablanca timezone
       const formattedTime = formatter.format(slotDate);
       const endTime = new Date(slotDate);
-      endTime.setMinutes(endTime.getMinutes() + settings.slotDuration);
+      endTime.setMinutes(endTime.getMinutes() + duration);
       const formattedEndTime = formatter.format(endTime);
 
       // Check if slot overlaps with any booking
       let isAvailable = true;
       let slotStatus = 'available';
       
-      // Don't allow bookings that would end after working hours
-      if (endTime.getHours() > endHour || (endTime.getHours() === endHour && endTime.getMinutes() > endMinute)) {
+      // Don't allow bookings that would end after working hours (only for non-admin)
+      if (!isAdmin && (endTime.getHours() > endHour || (endTime.getHours() === endHour && endTime.getMinutes() > endMinute))) {
         isAvailable = false;
       } else {
         const overlappingBooking = bookedSlots.find(booking => {
           const bookingStart = new Date(booking.startTime);
           const bookingEnd = new Date(booking.endTime);
           
-          // A slot overlaps if it starts before the booking ends AND ends after the booking starts
-          return (slotDate < bookingEnd && endTime > bookingStart);
+          // A slot overlaps if:
+          // 1. The slot starts during another booking (slot start is between booking start and end)
+          // 2. The slot ends during another booking (slot end is between booking start and end)
+          // 3. The slot completely contains another booking (slot start is before booking start AND slot end is after booking end)
+          return (
+            (slotDate >= bookingStart && slotDate < bookingEnd) || // Slot starts during booking
+            (endTime > bookingStart && endTime <= bookingEnd) || // Slot ends during booking
+            (slotDate <= bookingStart && endTime >= bookingEnd) // Slot contains booking
+          );
         });
 
         if (overlappingBooking) {
@@ -133,7 +140,7 @@ export async function GET(request: Request) {
           endTime: formattedEndTime,
           available: isAvailable,
           status: slotStatus,
-          duration: settings.slotDuration / 60  // Duration in hours
+          duration: duration / 60  // Duration in hours
         });
       }
 

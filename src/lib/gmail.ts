@@ -71,8 +71,7 @@ async function sendClientConfirmation(appointment: TimeSlot) {
   const eventDescription = encodeURIComponent(`Rendez-vous d'hypnothérapie avec Joy's Hypnose\n${appointment.isFirstTime ? 'Première séance' : 'Séance de suivi'}`);
   const startTime = appointmentDate.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/g, 'Z');
   const endTime = new Date(appointmentDate.getTime() + (appointment.isFirstTime ? 120 : 90) * 60000).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/g, 'Z');
-  
-  const calendarLink = `https://calendar.google.com/calendar/u/0/r/eventedit?text=${eventTitle}&dates=${startTime}/${endTime}&details=${eventDescription}&location=${eventLocation}&sf=true&output=xml`;
+  const calendarLink = `https://www.google.com/calendar/event?action=TEMPLATE&text=${eventTitle}&dates=${startTime}/${endTime}&details=${eventDescription}&location=${eventLocation}&sf=true`;
 
   const clientEmailContent = `
     <!DOCTYPE html>
@@ -269,7 +268,7 @@ export async function sendAppointmentNotification(appointment: TimeSlot) {
   const startTime = appointmentDate.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/g, 'Z');
   const endTime = new Date(appointmentDate.getTime() + (appointment.isFirstTime ? 120 : 90) * 60000).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/g, 'Z');
   
-  const calendarLink = `https://calendar.google.com/calendar/u/0/r/eventedit?text=${eventTitle}&dates=${startTime}/${endTime}&details=${eventDescription}&location=${eventLocation}&sf=true&output=xml`;
+  const calendarLink = `https://www.google.com/calendar/event?action=TEMPLATE&text=${eventTitle}&dates=${startTime}/${endTime}&details=${eventDescription}&location=${eventLocation}&sf=true`;
 
   const emailContent = `
     <!DOCTYPE html>
