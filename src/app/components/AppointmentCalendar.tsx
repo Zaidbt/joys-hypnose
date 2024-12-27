@@ -223,7 +223,10 @@ export default function AppointmentCalendar({
               >
                 <span className="text-sm font-medium">{slot.time}</span>
                 <span className="text-xs opacity-75">
-                  {slot.duration} {slot.duration > 1 ? 'heures' : 'heure'}
+                  {slot.duration === 1 ? '1 heure' : 
+                   slot.duration === 1.5 ? '1 heure 30' : 
+                   slot.duration === 2 ? '2 heures' : 
+                   `${slot.duration} heures`}
                 </span>
               </button>
             ))}

@@ -78,8 +78,8 @@ export async function GET(request: Request) {
       .toArray();
     
     // Generate all possible slots
-    const [startHour, startMinute] = isAdmin ? [9, 0] : settings.workingHours.start.split(':').map(Number);
-    const [endHour, endMinute] = isAdmin ? [22, 0] : settings.workingHours.end.split(':').map(Number);
+    const [startHour, startMinute] = settings.workingHours.start.split(':').map(Number);
+    const [endHour, endMinute] = settings.workingHours.end.split(':').map(Number);
     
     const slots = [];
     let currentHour = startHour;
@@ -93,7 +93,7 @@ export async function GET(request: Request) {
     });
 
     // Calculate slot interval based on duration and break time
-    const slotInterval = isAdmin ? 30 : settings.slotDuration;
+    const slotInterval = settings.slotDuration + settings.breakDuration;
 
     while (currentHour < endHour || (currentHour === endHour && currentMinute < endMinute)) {
       const slotDate = new Date(date);
@@ -102,15 +102,15 @@ export async function GET(request: Request) {
       // Format the time in Casablanca timezone
       const formattedTime = formatter.format(slotDate);
       const endTime = new Date(slotDate);
-      endTime.setMinutes(endTime.getMinutes() + duration);
+      endTime.setMinutes(endTime.getMinutes() + settings.slotDuration);
       const formattedEndTime = formatter.format(endTime);
 
       // Check if slot overlaps with any booking
       let isAvailable = true;
       let slotStatus = 'available';
       
-      // Don't allow bookings that would end after 22:00
-      if (endTime.getHours() > 22 || (endTime.getHours() === 22 && endTime.getMinutes() > 0)) {
+      // Don't allow bookings that would end after working hours
+      if (endTime.getHours() > endHour || (endTime.getHours() === endHour && endTime.getMinutes() > endMinute)) {
         isAvailable = false;
       } else {
         const overlappingBooking = bookedSlots.find(booking => {
@@ -133,7 +133,7 @@ export async function GET(request: Request) {
           endTime: formattedEndTime,
           available: isAvailable,
           status: slotStatus,
-          duration: duration / 60  // Duration in hours
+          duration: settings.slotDuration / 60  // Duration in hours
         });
       }
 
