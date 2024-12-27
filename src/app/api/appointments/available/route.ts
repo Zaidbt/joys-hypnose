@@ -44,7 +44,7 @@ export async function GET(request: Request) {
       const selectedDate = new Date(date);
       selectedDate.setHours(0, 0, 0, 0);
       
-      const isBlocked = settings.blockedDateRanges.some((range: BlockedDateRange) => {
+      const blockedRange = settings.blockedDateRanges.find((range: BlockedDateRange) => {
         const rangeStart = new Date(range.startDate);
         rangeStart.setHours(0, 0, 0, 0);
         const rangeEnd = new Date(range.endDate);
@@ -52,9 +52,9 @@ export async function GET(request: Request) {
         return selectedDate >= rangeStart && selectedDate <= rangeEnd;
       });
 
-      if (isBlocked) {
-        console.log('Date is blocked:', date);
-        return NextResponse.json([]);
+      if (blockedRange) {
+        console.log('Date is blocked:', date, 'Reason:', blockedRange.reason);
+        return NextResponse.json({ blocked: true, reason: blockedRange.reason });
       }
     }
 

@@ -11,6 +11,7 @@ interface TimeSlot {
   available: boolean;
   status: 'available' | 'booked' | 'pending' | 'fictitious';
   duration: number;
+  reason?: string;
 }
 
 interface AppointmentCalendarProps {
@@ -94,16 +95,21 @@ export default function AppointmentCalendar({
         const data = await response.json();
         console.log('Received slots:', data);
         
-        if (data.length === 0 && !isAdmin) {
+        if (data.blocked) {
+          setError(`Cette date n'est pas disponible pour les réservations. ${data.reason ? `Raison : ${data.reason}` : ''}`);
+          setSelectedTime('');
+          setAvailableSlots([]);
+        } else if (Array.isArray(data) && data.length === 0 && !isAdmin) {
           setError('Cette date n\'est pas disponible pour les réservations.');
           setSelectedTime('');
+          setAvailableSlots([]);
         } else {
           setError('');
+          setAvailableSlots(Array.isArray(data) ? data : []);
         }
-        
-        setAvailableSlots(data);
       } catch (error) {
         setError('Failed to load available slots');
+        setAvailableSlots([]);
       } finally {
         setIsLoading(false);
       }
