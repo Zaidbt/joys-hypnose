@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { CalendarIcon, ClockIcon } from '@heroicons/react/24/outline';
 import type { AppointmentSettings } from '@/types/appointment';
-import { formatInTimeZone, utcToZonedTime } from 'date-fns-tz';
+import { formatInTimeZone } from 'date-fns-tz';
 
 interface TimeSlot {
   time: string;
@@ -105,7 +105,6 @@ export default function AppointmentCalendar({
         
         if (!response.ok) throw new Error('Failed to fetch slots');
         const data = await response.json();
-        console.log('Received slots:', data);
         
         if (data.length === 0 && !isAdmin) {
           // Check if date is in blocked range
@@ -135,10 +134,10 @@ export default function AppointmentCalendar({
           setSelectedTime('');
         } else {
           setError('');
+          setAvailableSlots(data);
         }
-        
-        setAvailableSlots(data);
       } catch (error) {
+        console.error('Error fetching slots:', error);
         setError('Failed to load available slots');
       } finally {
         setIsLoading(false);
@@ -198,51 +197,39 @@ export default function AppointmentCalendar({
         </div>
       </div>
 
-      {selectedDate && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-4">
-            Créneaux disponibles {isFirstTime && "(2 heures pour première séance)"}
-          </label>
-          {isLoading ? (
-            <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-600"></div>
-            </div>
-          ) : availableSlots.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {availableSlots.map((slot) => (
-                <button
-                  key={slot.time}
-                  type="button"
-                  onClick={() => handleTimeSelect(slot)}
-                  className={`flex flex-col items-center justify-center px-4 py-3 border-2 rounded-md text-sm font-medium ${getSlotColor(slot)}`}
-                  disabled={slot.status !== 'available'}
-                  title={slotLabels[slot.status]}
-                >
-                  <div className="flex items-center">
-                    <ClockIcon className="h-4 w-4 mr-2" />
-                    <span className="font-semibold">{slot.time}</span>
-                  </div>
-                  {slot.duration > 1 && (
-                    <span className="text-xs mt-1 opacity-75">
-                      jusqu'à {slot.endTime}
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-          ) : (
-            <p className="text-center text-gray-500 py-4 bg-gray-50 rounded-md">
-              Aucun créneau disponible pour cette date
-            </p>
-          )}
+      {error && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-md">
+          <p className="text-sm text-red-600">{error}</p>
         </div>
       )}
 
-      {error && (
-        <div className="p-4 bg-red-50 border border-red-200 text-red-600 rounded-md">
-          {error}
+      {isLoading ? (
+        <div className="flex justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-600"></div>
         </div>
-      )}
+      ) : selectedDate && availableSlots.length > 0 ? (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-4">
+            Sélectionnez une heure
+          </label>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            {availableSlots.map((slot, index) => (
+              <button
+                key={index}
+                onClick={() => handleTimeSelect(slot)}
+                disabled={slot.status !== 'available'}
+                className={`relative flex flex-col items-center justify-center p-3 rounded-lg border ${getSlotColor(slot)}`}
+                title={slotLabels[slot.status]}
+              >
+                <span className="text-sm font-medium">{slot.time}</span>
+                <span className="text-xs opacity-75">
+                  {slot.duration} {slot.duration > 1 ? 'heures' : 'heure'}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 } 

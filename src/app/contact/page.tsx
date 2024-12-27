@@ -14,6 +14,7 @@ import {
 import type { AppointmentSettings } from '@/types/appointment';
 import AppointmentCalendar from '@/app/components/AppointmentCalendar';
 import BookingConfirmationModal from '@/app/components/BookingConfirmationModal';
+import { formatInTimeZone } from 'date-fns-tz';
 
 export default function ContactPage() {
   const [settings, setSettings] = useState<AppointmentSettings | null>(null);
