@@ -323,19 +323,19 @@ export default function DashboardPage() {
         </div>
 
         {/* Quick Links */}
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 mb-8">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 mb-6">
           {quickLinks.map((link) => (
             <Link
               key={link.name}
               href={link.href}
-              className="relative group bg-white p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+              className="relative group bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
             >
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <link.icon className="h-6 w-6 text-primary-600" />
+                  <link.icon className="h-5 w-5 sm:h-6 sm:w-6 text-primary-600" />
                 </div>
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-gray-900">{link.name}</h3>
+                <div className="ml-2 sm:ml-3">
+                  <h3 className="text-xs sm:text-sm font-medium text-gray-900">{link.name}</h3>
                 </div>
               </div>
             </Link>
@@ -343,7 +343,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <StatCard
             title="Rendez-vous aujourd'hui"
             value={stats.appointments.todayCount}
@@ -366,7 +366,7 @@ export default function DashboardPage() {
           />
           <StatCard
             title="Taux de confirmation"
-            value={`${Math.round((stats.appointments.confirmed / stats.appointments.total) * 100)}%`}
+            value={Math.round((stats.appointments.confirmed / stats.appointments.total) * 100)}
             icon={CheckCircleIcon}
             trend={3}
             color="indigo"
@@ -374,9 +374,13 @@ export default function DashboardPage() {
         </div>
 
         {/* Two-column layout for timeline and activity */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <AppointmentTimeline appointments={recentAppointments} />
-          <ClientActivity clients={recentActivity} />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-6">
+            <AppointmentTimeline appointments={recentAppointments} />
+          </div>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-6">
+            <ClientActivity clients={recentActivity} />
+          </div>
         </div>
       </div>
     </div>

@@ -81,83 +81,83 @@ export default function StatsPage() {
 
         <div className="grid grid-cols-1 gap-8">
           {/* Appointments Stats */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
             <div className="flex items-center mb-4">
-              <CalendarIcon className="h-6 w-6 text-primary-600 mr-2" />
-              <h2 className="text-lg font-medium">Rendez-vous</h2>
+              <CalendarIcon className="h-5 w-5 sm:h-6 sm:w-6 text-primary-600 mr-2" />
+              <h2 className="text-base sm:text-lg font-medium">Rendez-vous</h2>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="p-3 bg-gray-50 rounded-lg">
                 <p className="text-sm text-gray-500">Total</p>
-                <p className="text-2xl font-semibold">{stats.appointments.total}</p>
+                <p className="text-xl sm:text-2xl font-semibold">{stats.appointments.total}</p>
               </div>
-              <div>
+              <div className="p-3 bg-gray-50 rounded-lg">
                 <p className="text-sm text-gray-500">Confirmés</p>
-                <p className="text-2xl font-semibold text-green-600">{stats.appointments.confirmed}</p>
+                <p className="text-xl sm:text-2xl font-semibold text-green-600">{stats.appointments.confirmed}</p>
               </div>
-              <div>
+              <div className="p-3 bg-gray-50 rounded-lg">
                 <p className="text-sm text-gray-500">En attente</p>
-                <p className="text-2xl font-semibold text-yellow-600">{stats.appointments.pending}</p>
+                <p className="text-xl sm:text-2xl font-semibold text-yellow-600">{stats.appointments.pending}</p>
               </div>
-              <div>
+              <div className="p-3 bg-gray-50 rounded-lg">
                 <p className="text-sm text-gray-500">Annulés</p>
-                <p className="text-2xl font-semibold text-red-600">{stats.appointments.cancelled}</p>
+                <p className="text-xl sm:text-2xl font-semibold text-red-600">{stats.appointments.cancelled}</p>
               </div>
-              <div>
+              <div className="p-3 bg-gray-50 rounded-lg">
                 <p className="text-sm text-gray-500">Aujourd'hui</p>
-                <p className="text-2xl font-semibold">{stats.appointments.today}</p>
+                <p className="text-xl sm:text-2xl font-semibold">{stats.appointments.today}</p>
               </div>
-              <div>
+              <div className="p-3 bg-gray-50 rounded-lg">
                 <p className="text-sm text-gray-500">À venir</p>
-                <p className="text-2xl font-semibold">{stats.appointments.upcoming}</p>
+                <p className="text-xl sm:text-2xl font-semibold">{stats.appointments.upcoming}</p>
               </div>
-              <div>
+              <div className="p-3 bg-gray-50 rounded-lg">
                 <p className="text-sm text-gray-500">Taux de confirmation</p>
-                <p className="text-2xl font-semibold">{stats.appointments.confirmationRate}%</p>
+                <p className="text-xl sm:text-2xl font-semibold">{stats.appointments.confirmationRate}%</p>
               </div>
             </div>
           </div>
 
           {/* Clients Stats */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
             <div className="flex items-center mb-4">
-              <UsersIcon className="h-6 w-6 text-blue-600 mr-2" />
-              <h2 className="text-lg font-medium">Clients</h2>
+              <UsersIcon className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600 mr-2" />
+              <h2 className="text-base sm:text-lg font-medium">Clients</h2>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              <div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="p-3 bg-gray-50 rounded-lg">
                 <p className="text-sm text-gray-500">Total</p>
-                <p className="text-2xl font-semibold">{stats.clients.total}</p>
+                <p className="text-xl sm:text-2xl font-semibold">{stats.clients.total}</p>
               </div>
-              <div>
+              <div className="p-3 bg-gray-50 rounded-lg">
                 <p className="text-sm text-gray-500">Première séance</p>
-                <p className="text-2xl font-semibold">{stats.clients.firstTime}</p>
+                <p className="text-xl sm:text-2xl font-semibold">{stats.clients.firstTime}</p>
               </div>
-              <div>
+              <div className="p-3 bg-gray-50 rounded-lg">
                 <p className="text-sm text-gray-500">Clients fidèles</p>
-                <p className="text-2xl font-semibold">{stats.clients.returning}</p>
+                <p className="text-xl sm:text-2xl font-semibold">{stats.clients.returning}</p>
               </div>
             </div>
           </div>
 
           {/* Newsletter Stats */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
             <div className="flex items-center mb-4">
-              <EnvelopeIcon className="h-6 w-6 text-green-600 mr-2" />
-              <h2 className="text-lg font-medium">Newsletter</h2>
+              <EnvelopeIcon className="h-5 w-5 sm:h-6 sm:w-6 text-green-600 mr-2" />
+              <h2 className="text-base sm:text-lg font-medium">Newsletter</h2>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              <div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="p-3 bg-gray-50 rounded-lg">
                 <p className="text-sm text-gray-500">Total abonnés</p>
-                <p className="text-2xl font-semibold">{stats.newsletter.total}</p>
+                <p className="text-xl sm:text-2xl font-semibold">{stats.newsletter.total}</p>
               </div>
-              <div>
+              <div className="p-3 bg-gray-50 rounded-lg">
                 <p className="text-sm text-gray-500">Actifs</p>
-                <p className="text-2xl font-semibold text-green-600">{stats.newsletter.active}</p>
+                <p className="text-xl sm:text-2xl font-semibold text-green-600">{stats.newsletter.active}</p>
               </div>
-              <div>
+              <div className="p-3 bg-gray-50 rounded-lg">
                 <p className="text-sm text-gray-500">Désabonnés</p>
-                <p className="text-2xl font-semibold text-gray-600">{stats.newsletter.unsubscribed}</p>
+                <p className="text-xl sm:text-2xl font-semibold text-gray-600">{stats.newsletter.unsubscribed}</p>
               </div>
             </div>
           </div>
