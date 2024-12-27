@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { CalendarIcon, ClockIcon } from '@heroicons/react/24/outline';
 import type { AppointmentSettings } from '@/types/appointment';
-import { formatInTimeZone, zonedTimeToUtc } from 'date-fns-tz';
+import { formatInTimeZone, utcToZonedTime } from 'date-fns-tz';
 
 interface TimeSlot {
   time: string;
@@ -97,7 +97,7 @@ export default function AppointmentCalendar({
       setIsLoading(true);
       try {
         // Convert selected date to UTC while considering Casablanca timezone
-        const localDate = zonedTimeToUtc(new Date(selectedDate), 'Africa/Casablanca');
+        const localDate = new Date(selectedDate);
         
         const response = await fetch(
           `/api/appointments/available?date=${localDate.toISOString()}&isFirstTime=${isFirstTime}&isAdmin=${isAdmin}&duration=${selectedDuration}`
@@ -109,7 +109,7 @@ export default function AppointmentCalendar({
         
         if (data.length === 0 && !isAdmin) {
           // Check if date is in blocked range
-          const dateObj = zonedTimeToUtc(new Date(selectedDate), 'Africa/Casablanca');
+          const dateObj = new Date(selectedDate);
           
           const isBlocked = settings?.blockedDateRanges?.some(range => {
             const rangeStart = zonedTimeToUtc(new Date(range.startDate), 'Africa/Casablanca');

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import AppointmentCalendar from '@/app/components/AppointmentCalendar';
 import { useRouter } from 'next/navigation';
-import { formatInTimeZone, zonedTimeToUtc } from 'date-fns-tz';
+import { formatInTimeZone, utcToZonedTime } from 'date-fns-tz';
 
 const durations = [
   { value: 30, label: '30 minutes' },

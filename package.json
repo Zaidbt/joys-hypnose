@@ -21,6 +21,7 @@
     "@types/nodemailer": "^6.4.17",
     "bcryptjs": "^2.4.3",
     "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
     "dotenv": "^16.4.5",
     "framer-motion": "^10.18.0",
     "googleapis": "^144.0.0",
