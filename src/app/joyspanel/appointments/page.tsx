@@ -15,10 +15,11 @@ import {
   MagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
 import type { TimeSlot } from '@/types/appointment';
-import { formatInTimeZone, utcToZonedTime } from 'date-fns-tz';
+import { formatInTimeZone } from 'date-fns-tz';
+import { fr } from 'date-fns/locale';
 
 const formatDate = (date: Date) => {
-  return formatInTimeZone(date, 'Africa/Casablanca', 'EEEE d MMMM yyyy', { locale: require('date-fns/locale/fr') });
+  return formatInTimeZone(date, 'Africa/Casablanca', 'EEEE d MMMM yyyy', { locale: fr });
 };
 
 const formatTime = (date: Date) => {
