@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { CalendarIcon, ClockIcon } from '@heroicons/react/24/outline';
 import type { AppointmentSettings } from '@/types/appointment';
-import { formatInTimeZone } from 'date-fns-tz';
 
 interface TimeSlot {
   time: string;
@@ -18,7 +17,6 @@ interface AppointmentCalendarProps {
   onSelectSlot: (date: string, time: string) => void;
   isAdmin?: boolean;
   isFirstTime?: boolean;
-  selectedDuration?: number;
 }
 
 const slotColors = {
@@ -56,8 +54,7 @@ const formatWorkingDays = (workingDays: number[]): string => {
 export default function AppointmentCalendar({ 
   onSelectSlot, 
   isAdmin = false,
-  isFirstTime = false,
-  selectedDuration = 60
+  isFirstTime = false 
 }: AppointmentCalendarProps) {
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
@@ -66,14 +63,10 @@ export default function AppointmentCalendar({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Get min and max dates in Casablanca timezone
-  const now = new Date();
-  const minDate = formatInTimeZone(now, 'Africa/Casablanca', 'yyyy-MM-dd');
-  const maxDate = formatInTimeZone(
-    new Date(now.setMonth(now.getMonth() + 3)),
-    'Africa/Casablanca',
-    'yyyy-MM-dd'
-  );
+  // Get min and max dates
+  const today = new Date();
+  const minDate = today.toISOString().split('T')[0];
+  const maxDate = new Date(today.setMonth(today.getMonth() + 3)).toISOString().split('T')[0];
 
   useEffect(() => {
     async function fetchSettings() {
@@ -96,48 +89,20 @@ export default function AppointmentCalendar({
       
       setIsLoading(true);
       try {
-        // Convert selected date to UTC while considering Casablanca timezone
-        const localDate = new Date(selectedDate);
-        
-        const response = await fetch(
-          `/api/appointments/available?date=${localDate.toISOString()}&isFirstTime=${isFirstTime}&isAdmin=${isAdmin}&duration=${selectedDuration}`
-        );
-        
+        const response = await fetch(`/api/appointments/available?date=${selectedDate}&isFirstTime=${isFirstTime}&isAdmin=${isAdmin}`);
         if (!response.ok) throw new Error('Failed to fetch slots');
         const data = await response.json();
+        console.log('Received slots:', data);
         
         if (data.length === 0 && !isAdmin) {
-          // Check if date is in blocked range
-          const dateObj = new Date(selectedDate);
-          
-          const isBlocked = settings?.blockedDateRanges?.some(range => {
-            const rangeStart = new Date(range.startDate);
-            const rangeEnd = new Date(range.endDate);
-            return dateObj >= rangeStart && dateObj <= rangeEnd;
-          });
-
-          if (isBlocked) {
-            const blockedRange = settings?.blockedDateRanges?.find(range => {
-              const rangeStart = new Date(range.startDate);
-              const rangeEnd = new Date(range.endDate);
-              return dateObj >= rangeStart && dateObj <= rangeEnd;
-            });
-
-            setError(
-              blockedRange?.reason
-                ? `Cette période n'est pas disponible : ${blockedRange.reason}`
-                : "Cette période n'est pas disponible pour les réservations."
-            );
-          } else {
-            setError("Cette date n'est pas disponible pour les réservations.");
-          }
+          setError('Cette date n\'est pas disponible pour les réservations.');
           setSelectedTime('');
         } else {
           setError('');
-          setAvailableSlots(data);
         }
+        
+        setAvailableSlots(data);
       } catch (error) {
-        console.error('Error fetching slots:', error);
         setError('Failed to load available slots');
       } finally {
         setIsLoading(false);
@@ -147,7 +112,7 @@ export default function AppointmentCalendar({
     if (selectedDate) {
       fetchSlots();
     }
-  }, [selectedDate, isFirstTime, isAdmin, settings, selectedDuration]);
+  }, [selectedDate, isFirstTime, isAdmin]);
 
   const handleDateChange = (date: string) => {
     // Check if the selected date is a working day, but only for non-admin users
@@ -197,42 +162,51 @@ export default function AppointmentCalendar({
         </div>
       </div>
 
-      {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-md">
-          <p className="text-sm text-red-600">{error}</p>
+      {selectedDate && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-4">
+            Créneaux disponibles {isFirstTime && "(2 heures pour première séance)"}
+          </label>
+          {isLoading ? (
+            <div className="flex justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-600"></div>
+            </div>
+          ) : availableSlots.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {availableSlots.map((slot) => (
+                <button
+                  key={slot.time}
+                  type="button"
+                  onClick={() => handleTimeSelect(slot)}
+                  className={`flex flex-col items-center justify-center px-4 py-3 border-2 rounded-md text-sm font-medium ${getSlotColor(slot)}`}
+                  disabled={slot.status !== 'available'}
+                  title={slotLabels[slot.status]}
+                >
+                  <div className="flex items-center">
+                    <ClockIcon className="h-4 w-4 mr-2" />
+                    <span className="font-semibold">{slot.time}</span>
+                  </div>
+                  {slot.duration > 1 && (
+                    <span className="text-xs mt-1 opacity-75">
+                      jusqu'à {slot.endTime}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-gray-500 py-4 bg-gray-50 rounded-md">
+              Aucun créneau disponible pour cette date
+            </p>
+          )}
         </div>
       )}
 
-      {isLoading ? (
-        <div className="flex justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-600"></div>
+      {error && (
+        <div className="p-4 bg-red-50 border border-red-200 text-red-600 rounded-md">
+          {error}
         </div>
-      ) : selectedDate && availableSlots.length > 0 ? (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-4">
-            Sélectionnez une heure
-          </label>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {availableSlots.map((slot, index) => (
-              <button
-                key={index}
-                onClick={() => handleTimeSelect(slot)}
-                disabled={slot.status !== 'available'}
-                className={`relative flex flex-col items-center justify-center p-3 rounded-lg border ${getSlotColor(slot)}`}
-                title={slotLabels[slot.status]}
-              >
-                <span className="text-sm font-medium">{slot.time}</span>
-                <span className="text-xs opacity-75">
-                  {slot.duration === 1 ? '1 heure' : 
-                   slot.duration === 1.5 ? '1 heure 30' : 
-                   slot.duration === 2 ? '2 heures' : 
-                   `${slot.duration} heures`}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-      ) : null}
+      )}
     </div>
   );
 } 
