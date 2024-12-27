@@ -72,7 +72,7 @@ async function sendClientConfirmation(appointment: TimeSlot) {
   const startTime = appointmentDate.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/g, 'Z');
   const endTime = new Date(appointmentDate.getTime() + (appointment.isFirstTime ? 120 : 90) * 60000).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/g, 'Z');
   
-  const calendarLink = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${eventTitle}&dates=${startTime}/${endTime}&details=${eventDescription}&location=${eventLocation}`;
+  const calendarLink = `https://calendar.google.com/calendar/event?action=TEMPLATE&text=${eventTitle}&dates=${startTime}/${endTime}&details=${eventDescription}&location=${eventLocation}&colorId=2&add=true`;
 
   const clientEmailContent = `
     <!DOCTYPE html>
@@ -269,7 +269,7 @@ export async function sendAppointmentNotification(appointment: TimeSlot) {
   const startTime = appointmentDate.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/g, 'Z');
   const endTime = new Date(appointmentDate.getTime() + (appointment.isFirstTime ? 120 : 90) * 60000).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/g, 'Z');
   
-  const calendarLink = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${eventTitle}&dates=${startTime}/${endTime}&details=${eventDescription}&location=${eventLocation}`;
+  const calendarLink = `https://calendar.google.com/calendar/event?action=TEMPLATE&text=${eventTitle}&dates=${startTime}/${endTime}&details=${eventDescription}&location=${eventLocation}&colorId=2&add=true`;
 
   const emailContent = `
     <!DOCTYPE html>
