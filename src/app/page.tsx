@@ -10,34 +10,28 @@ import NewsletterBanner from './components/NewsletterBanner';
 
 const services = [
   {
-    key: "hypnotherapy",
+    title: "Hypnose-Thérapies",
     Icon: Sparkle,
-    title: "Hypnothérapie"
   },
   {
-    key: "familyConstellation",
+    title: "Constellation familiale Individuelle",
     Icon: Flower,
-    title: "Constellations Familiales"
   },
   {
-    key: "soundTherapy",
+    title: "Thérapie Sonore/Sound Bath",
     Icon: SpeakerHigh,
-    title: "Thérapie par le Son"
   },
   {
-    key: "numerology",
+    title: "Numérologie",
     Icon: NumberCircleEight,
-    title: "Numérologie"
   },
   {
-    key: "shamanicHypnosis",
+    title: "Le chamanisme Sous Hypnose",
     Icon: Leaf,
-    title: "Hypnose Chamanique"
   },
   {
-    key: "quantumProgramming",
+    title: "La Neuro-programmation Quantique",
     Icon: Brain,
-    title: "Programmation Quantique"
   }
 ];
 
@@ -111,10 +105,13 @@ export default function HomePage() {
               className="text-center lg:text-left lg:order-1"
             >
               <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-black leading-tight mb-4 sm:mb-6">
-                Hypnothérapie à Casablanca
+                Retrouvez votre{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-rose-500">
+                  harmonie intérieure
+                </span>
               </h1>
               <p className="text-base sm:text-lg text-black mb-6 sm:mb-8 leading-relaxed text-justify">
-                Découvrez le pouvoir transformateur de l'hypnothérapie. Je vous accompagne dans votre voyage vers le bien-être et la guérison émotionnelle.
+                Bienvenue dans mon espace d'hypnothérapie, où je vous accompagne vers un mieux-être profond et durable. À travers une approche holistique et bienveillante, nous explorerons ensemble les chemins de votre transformation intérieure. Mon rôle est de vous guider avec douceur vers la reconnexion avec votre essence profonde, en libérant les blocages qui vous empêchent d'avancer.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
                 <Link
@@ -141,17 +138,17 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div className="text-center mb-12 sm:mb-16">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-4 section-title">
-              Mes Services
+              Mes <span className="text-rose-500">Services</span>
             </h2>
             <p className="text-base sm:text-lg text-black text-justify sm:text-center max-w-2xl mx-auto">
-              Je propose une gamme complète de services thérapeutiques pour vous aider à atteindre vos objectifs de bien-être et de développement personnel.
+              Une approche holistique pour votre bien-être
             </p>
           </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {services.map((service, index) => (
               <motion.div
-                key={service.key}
+                key={service.title}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -180,10 +177,149 @@ export default function HomePage() {
               href="/services"
               className="inline-flex items-center justify-center px-6 sm:px-8 py-3 text-base font-medium text-white bg-rose-400 hover:bg-rose-500 rounded-full transition-colors duration-300 shadow-sm hover:shadow-md group"
             >
-              Voir tous les services
+              Découvrir tous nos services
               <ArrowRightIcon className="ml-2 h-5 w-5 transform group-hover:translate-x-1 transition-transform duration-300" />
             </Link>
           </motion.div>
+        </div>
+      </section>
+
+      {/* Thématiques Section */}
+      <section className="relative py-20 sm:py-32 bg-white/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-12 sm:mb-16"
+          >
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-4">
+              Thématiques
+            </h2>
+          </motion.div>
+
+          {/* Image - First on mobile */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8 }}
+            className="relative mb-8 sm:mb-12 max-w-2xl mx-auto group"
+          >
+            <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <Image
+                src="/images/meditation-space.webp"
+                alt="Espace de méditation"
+                fill
+                className="object-cover transform transition-transform duration-700 group-hover:scale-105"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 60vw"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-rose-100/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </div>
+          </motion.div>
+
+          <p className="text-base sm:text-lg text-black text-justify sm:text-center max-w-2xl mx-auto mb-12">
+            Découvrez les différentes thématiques que nous pouvons aborder ensemble
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {[
+              "Les blessures de l'enfant intérieur",
+              "Gestion Émotionnelle",
+              "Hypersensibilité/ Empaths",
+              "Transgénérationnel/ Lignes Ancestrales",
+              "Stress / Anxiété/ Dépression",
+              "Harmonisation Féminin/Masculin"
+            ].map((theme, index) => (
+              <motion.div
+                key={theme}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="relative group"
+              >
+                <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 border border-rose-100/20">
+                  <div className="flex items-center gap-3">
+                    <div className="flex-shrink-0">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-rose-100 flex items-center justify-center">
+                        <span className="text-rose-500 font-semibold text-sm sm:text-base">
+                          {index + 1}
+                        </span>
+                      </div>
+                    </div>
+                    <h3 className="text-base sm:text-lg font-medium text-gray-900">
+                      {theme}
+                    </h3>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="relative py-20 sm:py-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-12 sm:mb-16"
+          >
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Avis Vérifiés
+            </h2>
+            <div className="mt-4 flex flex-col items-center">
+              <div className="inline-flex items-center gap-2 bg-[#00b67a] px-4 py-2 rounded">
+                <div className="flex items-center">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} weight="fill" className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                  ))}
+                </div>
+                <span className="text-sm sm:text-base text-white font-semibold border-l border-white/30 pl-2 ml-1">
+                  Excellent
+                </span>
+              </div>
+            </div>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {testimonials.map((testimonial, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="flex-1"
+              >
+                <div className="h-full bg-white p-4 sm:p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100">
+                  <div className="flex items-center justify-between mb-4">
+                    <StarRating rating={testimonial.rating} />
+                    <span className="text-xs sm:text-sm text-gray-500">{testimonial.date}</span>
+                  </div>
+                  <blockquote className="text-sm sm:text-base leading-relaxed text-gray-700 mb-4 text-justify">
+                    "{testimonial.content}"
+                  </blockquote>
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                    <cite className="text-sm font-semibold text-gray-900 not-italic">
+                      {testimonial.author}
+                    </cite>
+                    <div className="flex items-center">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 text-[#00b67a]" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                      </svg>
+                      <span className="ml-1 text-xs text-[#00b67a]">Vérifié</span>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
     </main>
