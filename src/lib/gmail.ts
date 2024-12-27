@@ -65,12 +65,33 @@ async function sendClientConfirmation(appointment: TimeSlot) {
   const formattedDate = formatter.format(appointmentDate);
   const formattedTime = timeFormatter.format(appointmentDate);
 
+  // Create Google Calendar event link
+  const eventTitle = encodeURIComponent(`Séance d'hypnothérapie - Joy's Hypnose`);
+  const eventLocation = encodeURIComponent("17 Rue Bab El Mandab, Residence El Prado 2, 1er étage appart #2 Bourgogne, Casablanca");
+  const eventDescription = encodeURIComponent(`Rendez-vous d'hypnothérapie avec Joy's Hypnose\n${appointment.isFirstTime ? 'Première séance' : 'Séance de suivi'}`);
+  const startTime = appointmentDate.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/g, 'Z');
+  const endTime = new Date(appointmentDate.getTime() + (appointment.isFirstTime ? 120 : 90) * 60000).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/g, 'Z');
+  
+  const calendarLink = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${eventTitle}&dates=${startTime}/${endTime}&details=${eventDescription}&location=${eventLocation}`;
+
   const clientEmailContent = `
     <!DOCTYPE html>
     <html>
     <head>
       <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+        .calendar-button {
+          display: inline-block;
+          background-color: #4285f4;
+          color: white !important;
+          padding: 12px 24px;
+          text-decoration: none;
+          border-radius: 4px;
+          margin: 20px 0;
+        }
+        .calendar-button:hover {
+          background-color: #3367d6;
+        }
       </style>
     </head>
     <body>
@@ -88,6 +109,12 @@ async function sendClientConfirmation(appointment: TimeSlot) {
             <p style="margin: 5px 0;"><strong>Date :</strong> ${formattedDate}</p>
             <p style="margin: 5px 0;"><strong>Heure :</strong> ${formattedTime}</p>
             <p style="margin: 5px 0;"><strong>Lieu :</strong> 17 Rue Bab El Mandab, Residence El Prado 2,<br>1er étage appart #2 Bourgogne,<br>Casablanca</p>
+          </div>
+
+          <div style="text-align: center;">
+            <a href="${calendarLink}" class="calendar-button" target="_blank">
+              Ajouter à mon calendrier Google
+            </a>
           </div>
 
           ${appointment.isFirstTime ? `
@@ -235,6 +262,15 @@ export async function sendAppointmentNotification(appointment: TimeSlot) {
 
   console.log('Formatted date and time:', { formattedDate, formattedTime });
 
+  // Create Google Calendar event link for admin
+  const eventTitle = encodeURIComponent(`RDV - ${appointment.clientName}`);
+  const eventLocation = encodeURIComponent("17 Rue Bab El Mandab, Residence El Prado 2, 1er étage appart #2 Bourgogne, Casablanca");
+  const eventDescription = encodeURIComponent(`Rendez-vous avec ${appointment.clientName}\nTéléphone: ${appointment.clientPhone || 'Non renseigné'}\nEmail: ${appointment.clientEmail}\nNotes: ${appointment.notes || 'Aucune'}`);
+  const startTime = appointmentDate.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/g, 'Z');
+  const endTime = new Date(appointmentDate.getTime() + (appointment.isFirstTime ? 120 : 90) * 60000).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/g, 'Z');
+  
+  const calendarLink = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${eventTitle}&dates=${startTime}/${endTime}&details=${eventDescription}&location=${eventLocation}`;
+
   const emailContent = `
     <!DOCTYPE html>
     <html>
@@ -262,6 +298,18 @@ export async function sendAppointmentNotification(appointment: TimeSlot) {
           background-color: #f8f9fa;
           border-left: 4px solid #6c757d;
           border-radius: 4px;
+        }
+        .calendar-button {
+          display: inline-block;
+          background-color: #4285f4;
+          color: white !important;
+          padding: 12px 24px;
+          text-decoration: none;
+          border-radius: 4px;
+          margin: 20px 0;
+        }
+        .calendar-button:hover {
+          background-color: #3367d6;
         }
         .admin-link {
           display: inline-block;
@@ -313,7 +361,13 @@ export async function sendAppointmentNotification(appointment: TimeSlot) {
           
           <div class="detail-row">
             <span class="label">Durée:</span>
-            <span class="value">${appointment.isFirstTime ? '2 heures' : '1 heure'}</span>
+            <span class="value">${appointment.isFirstTime ? '2 heures' : '1 heure 30'}</span>
+          </div>
+
+          <div style="text-align: center;">
+            <a href="${calendarLink}" class="calendar-button" target="_blank">
+              Ajouter à mon calendrier Google
+            </a>
           </div>
           
           ${appointment.notes ? `
