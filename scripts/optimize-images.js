@@ -25,6 +25,23 @@ async function optimizeImages() {
         console.log('File replaced successfully');
       });
 
+    // Optimize histoire.png
+    console.log('Optimizing histoire.png...');
+    await sharp('public/images/histoire.png')
+      .resize(1200, 800, {
+        fit: 'cover',
+        position: 'center'
+      })
+      .webp({
+        quality: 85,
+        effort: 6,
+        lossless: false
+      })
+      .toFile('public/images/histoire.webp')
+      .then(info => {
+        console.log('Histoire optimization complete:', info);
+      });
+
   } catch (error) {
     console.error('Error during optimization:', error);
   }
