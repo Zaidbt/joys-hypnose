@@ -1,54 +1,40 @@
 import { NextResponse } from 'next/server';
-import { sendTestEmail } from '@/lib/gmail';
+import { sendEmail, testEmailConfig } from '@/lib/gmail';
 
-export async function POST(request: Request) {
-  // Check environment variables
-  const config = {
-    clientId: process.env.GMAIL_CLIENT_ID ? 'Set' : 'Not set',
-    clientSecret: process.env.GMAIL_CLIENT_SECRET ? 'Set' : 'Not set',
-    redirectUri: process.env.GMAIL_REDIRECT_URI,
-    refreshToken: process.env.GMAIL_REFRESH_TOKEN ? 'Set' : 'Not set',
-    adminEmail: process.env.ADMIN_EMAIL
-  };
-
-  console.log('Test endpoint - Gmail API Configuration:', config);
-
-  // Check if any required config is missing
-  const missingConfig = [];
-  if (!process.env.GMAIL_CLIENT_ID) missingConfig.push('GMAIL_CLIENT_ID');
-  if (!process.env.GMAIL_CLIENT_SECRET) missingConfig.push('GMAIL_CLIENT_SECRET');
-  if (!process.env.GMAIL_REFRESH_TOKEN) missingConfig.push('GMAIL_REFRESH_TOKEN');
-  if (!process.env.ADMIN_EMAIL) missingConfig.push('ADMIN_EMAIL');
-
-  if (missingConfig.length > 0) {
-    return NextResponse.json({
-      error: 'Missing required configuration',
-      missingConfig,
-      config
-    }, { status: 400 });
-  }
-
+export async function GET() {
   try {
-    await sendTestEmail();
-    return NextResponse.json({ 
-      success: true, 
+    // First test the configuration
+    const configTest = await testEmailConfig();
+    if (!configTest.success) {
+      return NextResponse.json({
+        success: false,
+        error: 'Configuration test failed',
+        details: configTest.error
+      });
+    }
+
+    // Try to send a test email
+    await sendEmail(
+      process.env.ADMIN_EMAIL!,
+      'Test Email - Gmail Service Account',
+      `
+        <h1>Test Email</h1>
+        <p>This is a test email sent using the Gmail service account at ${new Date().toLocaleString()}</p>
+        <p>If you received this email, your Gmail configuration is working correctly!</p>
+      `
+    );
+
+    return NextResponse.json({
+      success: true,
       message: 'Test email sent successfully',
-      config
+      emailAddress: configTest.emailAddress
     });
   } catch (error) {
-    console.error('Error in test email route:', error);
-    return NextResponse.json(
-      { 
-        error: 'Failed to send test email', 
-        details: error instanceof Error ? error.message : 'Unknown error',
-        config,
-        errorObject: error instanceof Error ? {
-          name: error.name,
-          message: error.message,
-          stack: error.stack
-        } : error
-      },
-      { status: 500 }
-    );
+    console.error('Error in test endpoint:', error);
+    return NextResponse.json({
+      success: false,
+      error: 'Failed to send test email',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    });
   }
 } 
