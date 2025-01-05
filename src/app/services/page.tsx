@@ -40,8 +40,7 @@ export default function Services() {
                   src="/images/joys.webp"
                   alt="Joy's Hypnose"
                   fill
-                  className="object-cover"
-                  style={{ objectPosition: 'center 10%' }}
+                  className="object-contain"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 60vw"
                   priority
                 />

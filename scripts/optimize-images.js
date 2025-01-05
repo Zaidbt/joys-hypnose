@@ -48,9 +48,9 @@ async function optimizeImages() {
     // Optimize joys.jpg
     console.log('Optimizing joys.jpg...');
     await sharp('public/images/joys.jpg')
-      .resize(1200, 900, {
-        fit: 'cover',
-        position: 'top'
+      .resize(1200, 1200, {
+        fit: 'contain',
+        background: { r: 255, g: 255, b: 255, alpha: 0 }
       })
       .webp({
         quality: 85,
