@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import AppointmentCalendar from '@/app/components/AppointmentCalendar';
+import ClientAutocomplete from '@/app/components/ClientAutocomplete';
 import { useRouter } from 'next/navigation';
 import { formatInTimeZone, utcToZonedTime } from 'date-fns-tz';
 
@@ -32,6 +33,12 @@ export default function NewAppointmentPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+
+  const handleClientSelect = (client: { name: string; email: string; phone: string }) => {
+    setClientName(client.name);
+    setClientEmail(client.email);
+    setClientPhone(client.phone);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -145,6 +152,13 @@ export default function NewAppointmentPage() {
           />
 
           <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Client
+              </label>
+              <ClientAutocomplete onClientSelect={handleClientSelect} />
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Nom du client
