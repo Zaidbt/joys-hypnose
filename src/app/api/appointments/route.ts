@@ -147,6 +147,7 @@ export async function POST(request: Request) {
       clientPhone: body.clientPhone,
       notes: body.notes,
       isFirstTime: body.isFirstTime || false,
+      isOnline: body.isOnline || false,
       isFictitious: false,
       createdAt: new Date(),
       updatedAt: new Date()
