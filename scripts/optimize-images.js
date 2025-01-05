@@ -28,9 +28,9 @@ async function optimizeImages() {
     // Optimize notrehistoire.png
     console.log('Optimizing notrehistoire.png...');
     await sharp('public/images/notrehistoire.png')
-      .resize(1200, 800, {
+      .resize(1200, 900, {
         fit: 'cover',
-        position: 'center'
+        position: 'top'
       })
       .webp({
         quality: 85,
