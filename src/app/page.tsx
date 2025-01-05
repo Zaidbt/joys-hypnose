@@ -4,9 +4,10 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRightIcon } from '@heroicons/react/24/outline';
+import { ArrowRightIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 import { Star, Sparkle, Flower, SpeakerHigh, NumberCircleEight, Leaf, Brain } from "@phosphor-icons/react";
 import NewsletterBanner from './components/NewsletterBanner';
+import { useState } from 'react';
 
 const services = [
   {
@@ -71,6 +72,8 @@ const StarRating = ({ rating }: { rating: number }) => {
 };
 
 export default function HomePage() {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   return (
     <main className="relative min-h-screen bg-[#fff5f5]">
       <NewsletterBanner />
@@ -159,7 +162,7 @@ export default function HomePage() {
 
               {/* Right side - Content */}
               <div className="relative p-8 sm:p-12 lg:p-16">
-                <div className="absolute top-4 right-4 flex gap-2">
+                <div className="absolute top-8 sm:top-12 right-4 flex gap-2">
                   <div className="flex items-center bg-[#00b67a] text-white px-3 py-1 rounded-full text-sm font-medium">
                     <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
@@ -174,38 +177,60 @@ export default function HomePage() {
                   </div>
                 </div>
                 
-                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mt-8 mb-4">
                   L'Hypnose Transformative : Un Chemin vers la Guérison
                 </h2>
+
+                <div className="flex items-center justify-between mb-6">
+                  <a
+                    href="/downloads/hypnose-transformative-guide.pdf"
+                    download
+                    className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full text-white bg-rose-500 hover:bg-rose-600 transition-colors duration-200 shadow-md hover:shadow-lg"
+                  >
+                    Télécharger le guide gratuit
+                    <ArrowRightIcon className="ml-2 -mr-1 h-5 w-5" />
+                  </a>
+                  
+                  <button
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-rose-50 text-rose-500 hover:bg-rose-100 transition-colors duration-200"
+                    aria-expanded={isExpanded}
+                    aria-label="Voir plus de détails"
+                  >
+                    <ChevronDownIcon 
+                      className={`w-6 h-6 transform transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                    />
+                  </button>
+                </div>
                 
-                <p className="text-lg text-gray-600 mb-6">
-                  Découvrez comment l'hypnose transformative peut vous aider à libérer votre potentiel et à atteindre un équilibre émotionnel profond.
-                </p>
+                {isExpanded && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <p className="text-lg text-gray-600 mb-6">
+                      Découvrez comment l'hypnose transformative peut vous aider à libérer votre potentiel et à atteindre un équilibre émotionnel profond.
+                    </p>
 
-                <ul className="space-y-3 mb-8">
-                  {[
-                    "Les fondements de l'hypnose transformative",
-                    "Exercices pratiques guidés",
-                    "Études de cas et témoignages inspirants",
-                    "Techniques de visualisation et de guérison",
-                    "Applications thérapeutiques concrètes",
-                    "Approche intégrative unique"
-                  ].map((item, index) => (
-                    <li key={index} className="flex items-center text-gray-700">
-                      <Sparkle weight="fill" className="w-5 h-5 text-rose-500 mr-2 flex-shrink-0" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-
-                <a
-                  href="/downloads/hypnose-transformative-guide.pdf"
-                  download
-                  className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full text-white bg-rose-500 hover:bg-rose-600 transition-colors duration-200 shadow-md hover:shadow-lg"
-                >
-                  Télécharger le guide gratuit
-                  <ArrowRightIcon className="ml-2 -mr-1 h-5 w-5" />
-                </a>
+                    <ul className="space-y-3 mb-8">
+                      {[
+                        "Les fondements de l'hypnose transformative",
+                        "Exercices pratiques guidés",
+                        "Études de cas et témoignages inspirants",
+                        "Techniques de visualisation et de guérison",
+                        "Applications thérapeutiques concrètes",
+                        "Approche intégrative unique"
+                      ].map((item, index) => (
+                        <li key={index} className="flex items-center text-gray-700">
+                          <Sparkle weight="fill" className="w-5 h-5 text-rose-500 mr-2 flex-shrink-0" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </motion.div>
+                )}
               </div>
             </div>
           </motion.div>
