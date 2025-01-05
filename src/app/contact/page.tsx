@@ -81,7 +81,7 @@ export default function ContactPage() {
 
       // Create end time based on appointment type
       const endDate = new Date(appointmentDate);
-      endDate.setMinutes(endDate.getMinutes() + (isFirstTime ? 120 : 60)); // 2 hours for first time, 1 hour for regular
+      endDate.setMinutes(endDate.getMinutes() + (isFirstTime ? 120 : 90)); // 2 hours for first time, 1.5 hours for regular
 
       // Ensure we're working with valid date objects
       if (isNaN(appointmentDate.getTime()) || isNaN(endDate.getTime())) {

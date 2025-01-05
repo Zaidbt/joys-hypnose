@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import AppointmentCalendar from '@/app/components/AppointmentCalendar';
 import ClientAutocomplete from '@/app/components/ClientAutocomplete';
 import { useRouter } from 'next/navigation';
-import { formatInTimeZone, utcToZonedTime } from 'date-fns-tz';
+import { formatInTimeZone, zonedTimeToZonedTime, utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz';
 
 const durations = [
   { value: 30, label: '30 minutes' },
