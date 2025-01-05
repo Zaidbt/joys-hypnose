@@ -45,6 +45,26 @@ async function optimizeImages() {
         console.log('Notre Histoire file replaced successfully');
       });
 
+    // Optimize joys.jpg
+    console.log('Optimizing joys.jpg...');
+    await sharp('public/images/joys.jpg')
+      .resize(1200, 900, {
+        fit: 'cover',
+        position: 'top'
+      })
+      .webp({
+        quality: 85,
+        effort: 6,
+        lossless: false
+      })
+      .toFile('public/images/joys.optimized.webp')
+      .then(info => {
+        console.log('Joys optimization complete:', info);
+        // Replace original file with optimized version
+        require('fs').renameSync('public/images/joys.optimized.webp', 'public/images/joys.webp');
+        console.log('Joys file replaced successfully');
+      });
+
   } catch (error) {
     console.error('Error during optimization:', error);
   }

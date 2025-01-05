@@ -37,11 +37,11 @@ export default function Services() {
             >
               <div className="relative w-full aspect-square rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <Image
-                  src="/images/joys.jpg"
+                  src="/images/joys.webp"
                   alt="Joy's Hypnose"
                   fill
                   className="object-cover"
-                  style={{ objectPosition: 'center 55%' }}
+                  style={{ objectPosition: 'center 10%' }}
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 60vw"
                   priority
                 />
