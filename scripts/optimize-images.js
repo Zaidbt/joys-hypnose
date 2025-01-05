@@ -25,9 +25,9 @@ async function optimizeImages() {
         console.log('File replaced successfully');
       });
 
-    // Optimize histoire.png
-    console.log('Optimizing histoire.png...');
-    await sharp('public/images/histoire.png')
+    // Optimize notrehistoire.png
+    console.log('Optimizing notrehistoire.png...');
+    await sharp('public/images/notrehistoire.png')
       .resize(1200, 800, {
         fit: 'cover',
         position: 'center'
@@ -37,12 +37,12 @@ async function optimizeImages() {
         effort: 6,
         lossless: false
       })
-      .toFile('public/images/histoire.optimized.webp')
+      .toFile('public/images/notrehistoire.optimized.webp')
       .then(info => {
-        console.log('Histoire optimization complete:', info);
+        console.log('Notre Histoire optimization complete:', info);
         // Replace original file with optimized version
-        require('fs').renameSync('public/images/histoire.optimized.webp', 'public/images/histoire.webp');
-        console.log('Histoire file replaced successfully');
+        require('fs').renameSync('public/images/notrehistoire.optimized.webp', 'public/images/notrehistoire.webp');
+        console.log('Notre Histoire file replaced successfully');
       });
 
   } catch (error) {

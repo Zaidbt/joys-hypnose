@@ -188,10 +188,12 @@ export default function MonApproche() {
               <div className="max-w-3xl mx-auto">
                 <div className="relative aspect-[4/3] overflow-hidden rounded-2xl mb-12">
                   <Image
-                    src="/images/histoire.png"
+                    src="/images/notrehistoire.webp"
                     alt="Notre Histoire"
                     fill
-                    className="object-cover rounded-2xl transition-transform duration-300 group-hover:scale-105"
+                    className="object-cover"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 60vw"
+                    priority
                   />
                   <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-gray-900/10" />
                 </div>
