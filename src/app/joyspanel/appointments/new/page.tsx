@@ -5,8 +5,7 @@ import { motion } from 'framer-motion';
 import AppointmentCalendar from '@/app/components/AppointmentCalendar';
 import ClientAutocomplete from '@/app/components/ClientAutocomplete';
 import { useRouter } from 'next/navigation';
-import { parseISO, format } from 'date-fns';
-import { utcToZonedTime } from 'date-fns-tz';
+import { formatInTimeZone } from 'date-fns-tz';
 
 const durations = [
   { value: 30, label: '30 minutes' },
@@ -56,12 +55,19 @@ export default function NewAppointmentPage() {
     try {
       setIsLoading(true);
 
-      // Create start time by combining date and time
-      const startTime = parseISO(`${selectedDate}T${selectedTime}`);
-      
-      // Create end time based on duration
-      const endTime = new Date(startTime);
-      endTime.setMinutes(endTime.getMinutes() + (isFirstTime ? 120 : 90));
+      // Create the appointment date
+      const [hours, minutes] = selectedTime.split(':').map(Number);
+      const appointmentDate = new Date(selectedDate);
+      appointmentDate.setHours(hours, minutes, 0, 0);
+
+      // Create end time based on appointment type
+      const endDate = new Date(appointmentDate);
+      endDate.setMinutes(endDate.getMinutes() + (isFirstTime ? 120 : 90));
+
+      // Ensure we're working with valid date objects
+      if (isNaN(appointmentDate.getTime()) || isNaN(endDate.getTime())) {
+        throw new Error('Date invalide');
+      }
 
       const response = await fetch('/api/appointments', {
         method: 'POST',
@@ -69,8 +75,8 @@ export default function NewAppointmentPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          startTime: startTime.toISOString(),
-          endTime: endTime.toISOString(),
+          startTime: appointmentDate.toISOString(),
+          endTime: endDate.toISOString(),
           clientName,
           clientEmail,
           clientPhone,
