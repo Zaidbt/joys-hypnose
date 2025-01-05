@@ -5,7 +5,8 @@ import { motion } from 'framer-motion';
 import AppointmentCalendar from '@/app/components/AppointmentCalendar';
 import ClientAutocomplete from '@/app/components/ClientAutocomplete';
 import { useRouter } from 'next/navigation';
-import { formatInTimeZone, zonedTimeToZonedTime, utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz';
+import { parseISO, format } from 'date-fns';
+import { utcToZonedTime } from 'date-fns-tz';
 
 const durations = [
   { value: 30, label: '30 minutes' },
@@ -55,12 +56,10 @@ export default function NewAppointmentPage() {
     try {
       setIsLoading(true);
 
-      // Create start and end times in Casablanca timezone
-      const startTime = zonedTimeToUtc(
-        `${selectedDate}T${selectedTime}`,
-        'Africa/Casablanca'
-      );
-
+      // Create start time by combining date and time
+      const startTime = parseISO(`${selectedDate}T${selectedTime}`);
+      
+      // Create end time based on duration
       const endTime = new Date(startTime);
       endTime.setMinutes(endTime.getMinutes() + (isFirstTime ? 120 : 90));
 
@@ -70,8 +69,8 @@ export default function NewAppointmentPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          startTime,
-          endTime,
+          startTime: startTime.toISOString(),
+          endTime: endTime.toISOString(),
           clientName,
           clientEmail,
           clientPhone,
