@@ -133,6 +133,73 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* E-pub Download Section */}
+      <section className="py-16 sm:py-20 bg-gradient-to-b from-[#fff5f5] to-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="relative bg-white rounded-3xl shadow-xl overflow-hidden"
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-2">
+              {/* Left side - Image */}
+              <div className="relative h-64 lg:h-auto">
+                <Image
+                  src="/images/epub-cover.jpg"
+                  alt="L'Hypnose Transformative : Un Chemin vers la Guérison"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-rose-500/20 to-transparent" />
+              </div>
+
+              {/* Right side - Content */}
+              <div className="relative p-8 sm:p-12 lg:p-16">
+                <div className="absolute top-4 right-4 bg-rose-100 text-rose-800 px-4 py-1 rounded-full text-sm font-medium">
+                  Gratuit
+                </div>
+                
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                  L'Hypnose Transformative : Un Chemin vers la Guérison
+                </h2>
+                
+                <p className="text-lg text-gray-600 mb-6">
+                  Découvrez comment l'hypnose transformative peut vous aider à libérer votre potentiel et à atteindre un équilibre émotionnel profond.
+                </p>
+
+                <ul className="space-y-3 mb-8">
+                  {[
+                    "Les fondements de l'hypnose transformative",
+                    "Exercices pratiques guidés",
+                    "Études de cas et témoignages inspirants",
+                    "Techniques de visualisation et de guérison",
+                    "Applications thérapeutiques concrètes",
+                    "Approche intégrative unique"
+                  ].map((item, index) => (
+                    <li key={index} className="flex items-center text-gray-700">
+                      <Sparkle weight="fill" className="w-5 h-5 text-rose-500 mr-2 flex-shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+
+                <a
+                  href="/downloads/hypnose-transformative-guide.pdf"
+                  download
+                  className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full text-white bg-rose-500 hover:bg-rose-600 transition-colors duration-200 shadow-md hover:shadow-lg"
+                >
+                  Télécharger le guide gratuit
+                  <ArrowRightIcon className="ml-2 -mr-1 h-5 w-5" />
+                </a>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Services Section */}
       <section className="relative py-20 sm:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
