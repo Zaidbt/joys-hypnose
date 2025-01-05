@@ -33,19 +33,19 @@ export default function Services() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8 }}
-              className="relative mb-12 max-w-2xl mx-auto"
+              className="relative mb-8 sm:mb-12 max-w-4xl mx-auto group"
             >
-              <div className="relative w-full h-[400px] sm:h-[600px] rounded-3xl overflow-hidden shadow-2xl bg-[#e8f1f5]">
+              <div className="relative w-full aspect-square rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <Image
                   src="/images/joys.jpg"
                   alt="Joy's Hypnose"
                   fill
                   className="object-cover"
-                  priority
+                  style={{ objectPosition: 'center 55%' }}
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 60vw"
-                  style={{ objectPosition: 'center center' }}
+                  priority
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-rose-100/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-rose-100/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
             </motion.div>
           </motion.div>
