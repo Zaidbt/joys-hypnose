@@ -153,11 +153,10 @@ export default function HomePage() {
                   src="/images/epub.webp"
                   alt="L'Hypnose Transformative : Un Chemin vers la Guérison"
                   fill
-                  className="object-contain bg-white"
+                  className="object-contain"
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   priority
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-rose-500/20 to-transparent" />
               </div>
 
               {/* Right side - Content */}
@@ -350,11 +349,10 @@ export default function HomePage() {
                 src="/images/meditation-space.webp"
                 alt="Espace de méditation"
                 fill
-                className="object-contain bg-white"
+                className="object-contain"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 60vw"
                 priority
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-rose-100/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
           </motion.div>
 
