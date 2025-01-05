@@ -70,26 +70,26 @@ export default function BlogPage() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.5, delay: index * 0.1 }}
-                      className="group bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden h-full"
+                      className="group relative bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden h-full border border-gray-100 hover:border-primary-100 transform hover:-translate-y-1"
                     >
                       {post.featuredImage && (
-                        <div className="relative h-56 w-full overflow-hidden">
+                        <div className="relative h-64 w-full overflow-hidden">
                           <Image
                             src={post.featuredImage}
                             alt={post.title}
                             fill
-                            className="object-cover transform group-hover:scale-105 transition-transform duration-300"
+                            className="object-cover transform group-hover:scale-105 transition-transform duration-500"
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                             priority={index < 6}
                             unoptimized
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/10 to-transparent" />
                         </div>
                       )}
-                      
-                      <div className="p-6">
-                        <div className="flex items-center space-x-4 mb-4">
-                          <div className="relative h-12 w-12 rounded-full overflow-hidden">
+
+                      <div className="p-8">
+                        <div className="flex items-center space-x-4 mb-6">
+                          <div className="relative h-14 w-14 rounded-full overflow-hidden ring-2 ring-primary-100">
                             <Image
                               src="/images/Joyspfp/profile.jpg"
                               alt="Joy's profile"
@@ -98,7 +98,7 @@ export default function BlogPage() {
                             />
                           </div>
                           <div>
-                            <p className="text-sm font-medium text-gray-900">Joy</p>
+                            <p className="text-base font-semibold text-gray-900">Joy</p>
                             <div className="flex items-center text-sm text-gray-500 space-x-2">
                               <CalendarIcon className="h-4 w-4" />
                               <span>
@@ -112,20 +112,20 @@ export default function BlogPage() {
                           </div>
                         </div>
 
-                        <h2 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-primary-600 transition-colors">
+                        <h2 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-primary-600 transition-colors line-clamp-2">
                           {post.title}
                         </h2>
-                        
-                        <p className="text-gray-600 mb-4 line-clamp-3">
+
+                        <p className="text-gray-600 mb-6 line-clamp-3 text-base leading-relaxed">
                           {post.excerpt}
                         </p>
 
                         {post.tags && post.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-2 mt-4">
+                          <div className="flex flex-wrap gap-2 mb-6">
                             {post.tags.map((tag) => (
                               <span
                                 key={tag}
-                                className="px-3 py-1 bg-primary-50 text-primary-600 rounded-full text-sm font-medium"
+                                className="px-3 py-1 bg-primary-50 text-primary-600 rounded-full text-sm font-medium hover:bg-primary-100 transition-colors"
                               >
                                 {tag}
                               </span>
@@ -133,9 +133,14 @@ export default function BlogPage() {
                           </div>
                         )}
 
-                        <div className="mt-4 flex items-center text-primary-600 font-medium">
-                          <span>Lire l'article</span>
-                          <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div className="flex items-center text-primary-600 font-medium group/link">
+                          <span className="text-base">Lire l'article</span>
+                          <svg 
+                            className="w-5 h-5 ml-2 transform group-hover/link:translate-x-1 transition-transform" 
+                            fill="none" 
+                            viewBox="0 0 24 24" 
+                            stroke="currentColor"
+                          >
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                           </svg>
                         </div>
