@@ -150,7 +150,7 @@ export default function HomePage() {
                   src="/images/epub-cover.jpg"
                   alt="L'Hypnose Transformative : Un Chemin vers la Guérison"
                   fill
-                  className="object-contain lg:object-cover"
+                  className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   priority
                 />
@@ -283,14 +283,14 @@ export default function HomePage() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8 }}
-            className="relative mb-8 sm:mb-12 max-w-2xl mx-auto group"
+            className="relative mb-8 sm:mb-12 max-w-4xl mx-auto group"
           >
-            <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <div className="relative w-full aspect-[16/9] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
               <Image
                 src="/images/meditation-space.webp"
                 alt="Espace de méditation"
                 fill
-                className="object-cover transform transition-transform duration-700 group-hover:scale-105"
+                className="object-cover"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 60vw"
                 priority
               />
