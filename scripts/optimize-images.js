@@ -65,6 +65,26 @@ async function optimizeImages() {
         console.log('Joys file replaced successfully');
       });
 
+    // Optimize Groupe.jpg
+    console.log('Optimizing Groupe.jpg...');
+    await sharp('public/images/Groupe.jpg')
+      .resize(1920, null, {  // Set width to 1920px, maintain aspect ratio
+        fit: 'inside',
+        withoutEnlargement: true
+      })
+      .webp({
+        quality: 80,  // Slightly lower quality to keep file size under 1MB
+        effort: 6,
+        lossless: false
+      })
+      .toFile('public/images/groupe.optimized.webp')
+      .then(info => {
+        console.log('Groupe optimization complete:', info);
+        // Replace original file with optimized version
+        require('fs').renameSync('public/images/groupe.optimized.webp', 'public/images/groupe.webp');
+        console.log('Groupe file replaced successfully');
+      });
+
   } catch (error) {
     console.error('Error during optimization:', error);
   }

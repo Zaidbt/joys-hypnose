@@ -66,7 +66,31 @@ export default function MonApproche() {
         </div>
       </section>
 
-      {/* Diplômes & Formation Section - Moved up */}
+      {/* Groupe Image Section */}
+      <section className="py-16 bg-white">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="relative w-full overflow-hidden rounded-2xl shadow-lg"
+          >
+            <div className="relative aspect-[16/9]">
+              <Image
+                src="/images/groupe.webp"
+                alt="Groupe Joy's Hypnose"
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 80vw"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Diplômes & Formation Section */}
       <section className="relative py-24 bg-white">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <motion.div
