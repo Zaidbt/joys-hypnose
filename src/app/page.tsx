@@ -145,13 +145,14 @@ export default function HomePage() {
           >
             <div className="grid grid-cols-1 lg:grid-cols-2">
               {/* Left side - Image */}
-              <div className="relative h-64 lg:h-auto">
+              <div className="relative h-[400px] lg:h-[600px]">
                 <Image
                   src="/images/epub-cover.jpg"
                   alt="L'Hypnose Transformative : Un Chemin vers la Guérison"
                   fill
-                  className="object-cover"
+                  className="object-contain lg:object-cover"
                   sizes="(max-width: 1024px) 100vw, 50vw"
+                  priority
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-rose-500/20 to-transparent" />
               </div>
