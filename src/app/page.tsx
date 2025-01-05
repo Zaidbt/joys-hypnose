@@ -344,13 +344,13 @@ export default function HomePage() {
             transition={{ duration: 0.8 }}
             className="relative mb-8 sm:mb-12 max-w-4xl mx-auto group"
           >
-            <div className="relative w-full aspect-[16/12] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <div className="relative w-full aspect-square rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
               <Image
                 src="/images/meditation-space.webp"
                 alt="Espace de méditation"
                 fill
                 className="object-cover"
-                style={{ objectPosition: 'center 30%' }}
+                style={{ objectPosition: 'center 55%' }}
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 60vw"
                 priority
               />
