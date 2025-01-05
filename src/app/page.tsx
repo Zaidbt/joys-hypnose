@@ -159,8 +159,19 @@ export default function HomePage() {
 
               {/* Right side - Content */}
               <div className="relative p-8 sm:p-12 lg:p-16">
-                <div className="absolute top-4 right-4 bg-rose-100 text-rose-800 px-4 py-1 rounded-full text-sm font-medium">
-                  Gratuit
+                <div className="absolute top-4 right-4 flex gap-2">
+                  <div className="flex items-center bg-[#00b67a] text-white px-3 py-1 rounded-full text-sm font-medium">
+                    <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    Gratuit
+                  </div>
+                  <div className="flex items-center bg-rose-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                    <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    Exclusif
+                  </div>
                 </div>
                 
                 <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
