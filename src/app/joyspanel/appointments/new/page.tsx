@@ -30,6 +30,8 @@ export default function NewAppointmentPage() {
   const [clientEmail, setClientEmail] = useState('');
   const [clientPhone, setClientPhone] = useState('');
   const [notes, setNotes] = useState('');
+  const [isFirstTime, setIsFirstTime] = useState(false);
+  const [isOnline, setIsOnline] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -42,14 +44,25 @@ export default function NewAppointmentPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     setError('');
+    setSuccess(false);
+
+    if (!selectedDate || !selectedTime || !clientName || !clientEmail) {
+      setError('Veuillez remplir tous les champs obligatoires');
+      return;
+    }
 
     try {
-      // Convert the selected date and time to UTC while considering Casablanca timezone
-      const localDateTime = `${selectedDate}T${selectedTime}`;
-      const startTime = new Date(localDateTime);
-      const endTime = new Date(new Date(localDateTime).getTime() + duration * 60000);
+      setIsLoading(true);
+
+      // Create start and end times in Casablanca timezone
+      const startTime = zonedTimeToUtc(
+        `${selectedDate}T${selectedTime}`,
+        'Africa/Casablanca'
+      );
+
+      const endTime = new Date(startTime);
+      endTime.setMinutes(endTime.getMinutes() + (isFirstTime ? 120 : 90));
 
       const response = await fetch('/api/appointments', {
         method: 'POST',
@@ -57,15 +70,15 @@ export default function NewAppointmentPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          startTime: startTime.toISOString(),
-          endTime: endTime.toISOString(),
+          startTime,
+          endTime,
           clientName,
           clientEmail,
           clientPhone,
           notes,
+          isFirstTime,
+          isOnline,
           status: 'booked',
-          isFictitious: false,
-          isFirstTime: false,
         }),
       });
 
@@ -208,6 +221,40 @@ export default function NewAppointmentPage() {
                 rows={3}
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
               />
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Options
+                </label>
+                <div className="mt-2 space-y-2">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="isFirstTime"
+                      checked={isFirstTime}
+                      onChange={(e) => setIsFirstTime(e.target.checked)}
+                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                    />
+                    <label htmlFor="isFirstTime" className="ml-2 block text-sm text-gray-900">
+                      Première séance (2 heures)
+                    </label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="isOnline"
+                      checked={isOnline}
+                      onChange={(e) => setIsOnline(e.target.checked)}
+                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                    />
+                    <label htmlFor="isOnline" className="ml-2 block text-sm text-gray-900">
+                      Session en ligne via Zoom
+                    </label>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 

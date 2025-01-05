@@ -11,6 +11,7 @@ export interface TimeSlot {
   notes?: string;
   isFictitious: boolean;
   isFirstTime: boolean;
+  isOnline?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

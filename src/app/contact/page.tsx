@@ -25,6 +25,7 @@ export default function ContactPage() {
   const [phone, setPhone] = useState('');
   const [message, setMessage] = useState('');
   const [isFirstTime, setIsFirstTime] = useState(false);
+  const [isOnline, setIsOnline] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -103,6 +104,7 @@ export default function ContactPage() {
         clientPhone: phone,
         notes: message,
         isFirstTime,
+        isOnline,
         status: 'pending'
       };
 
@@ -227,6 +229,19 @@ export default function ContactPage() {
                   />
                   <label htmlFor="isFirstTime" className="text-sm text-gray-700">
                     C'est ma première séance (durée 2 heures)
+                  </label>
+                </div>
+
+                <div className="flex items-center space-x-2 mb-4">
+                  <input
+                    type="checkbox"
+                    id="isOnline"
+                    checked={isOnline}
+                    onChange={(e) => setIsOnline(e.target.checked)}
+                    className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                  />
+                  <label htmlFor="isOnline" className="text-sm text-gray-700">
+                    Je souhaite une séance en ligne via Zoom
                   </label>
                 </div>
 

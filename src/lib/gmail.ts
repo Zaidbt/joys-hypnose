@@ -90,7 +90,17 @@ async function sendClientConfirmation(appointment: TimeSlot) {
           <div style="background-color: white; padding: 15px; border-radius: 6px; margin: 20px 0;">
             <p style="margin: 5px 0;"><strong>Date :</strong> ${formattedDate}</p>
             <p style="margin: 5px 0;"><strong>Heure :</strong> ${formattedTime}</p>
+            ${appointment.isOnline ? `
+            <div style="background-color: #ebf8ff; padding: 15px; border-radius: 6px; margin: 10px 0;">
+              <p style="margin: 5px 0;"><strong>Session en ligne via Zoom</strong></p>
+              <p style="margin: 5px 0;"><strong>Lien Zoom :</strong> <a href="https://us06web.zoom.us/j/3796260037?pwd=REJzUHl5YWVTOENLWUU2bCs0RVVMQT09" style="color: #4299e1; text-decoration: none;">Cliquez ici pour rejoindre</a></p>
+              <p style="margin: 5px 0;"><strong>ID de réunion :</strong> 379 626 0037</p>
+              <p style="margin: 5px 0;"><strong>Code secret :</strong> D99WQ6</p>
+              <p style="margin: 10px 0; font-style: italic; color: #4a5568;">Veuillez tester votre connexion et votre équipement quelques minutes avant la séance.</p>
+            </div>
+            ` : `
             <p style="margin: 5px 0;"><strong>Lieu :</strong> 17 Rue Bab El Mandab, Residence El Prado 2,<br>1er étage appart #2 Bourgogne,<br>Casablanca</p>
+            `}
           </div>
 
           <div style="text-align: center;">
@@ -305,6 +315,26 @@ export async function sendAppointmentNotification(appointment: TimeSlot) {
             <span class="label">Durée:</span>
             <span class="value">${appointment.isFirstTime ? '2 heures' : '1 heure 30'}</span>
           </div>
+
+          ${appointment.isOnline ? `
+          <div class="detail-row" style="background-color: #ebf8ff; padding: 15px; border-radius: 6px; margin: 10px 0;">
+            <div style="margin-bottom: 10px;">
+              <span class="label">Session en ligne via Zoom</span>
+            </div>
+            <div style="margin: 5px 0;">
+              <span class="label">Lien :</span>
+              <span class="value"><a href="https://us06web.zoom.us/j/3796260037?pwd=REJzUHl5YWVTOENLWUU2bCs0RVVMQT09" style="color: #4299e1; text-decoration: none;">https://us06web.zoom.us/j/3796260037</a></span>
+            </div>
+            <div style="margin: 5px 0;">
+              <span class="label">ID de réunion :</span>
+              <span class="value">379 626 0037</span>
+            </div>
+            <div style="margin: 5px 0;">
+              <span class="label">Code secret :</span>
+              <span class="value">D99WQ6</span>
+            </div>
+          </div>
+          ` : ''}
 
           <div style="text-align: center;">
             <a href="${calendarLink}" class="calendar-button" target="_blank">
