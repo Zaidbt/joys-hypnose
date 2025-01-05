@@ -1,17 +1,20 @@
 import { google } from 'googleapis';
-import { JWT } from 'google-auth-library';
+import { OAuth2Client } from 'google-auth-library';
 
-// Initialize the Gmail API client with service account
+// Initialize the Gmail API client
 const createGmailClient = () => {
   try {
-    const auth = new JWT({
-      email: process.env.GMAIL_SERVICE_ACCOUNT_EMAIL,
-      key: process.env.GMAIL_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-      scopes: ['https://www.googleapis.com/auth/gmail.send'],
-      subject: process.env.GMAIL_SENDER_EMAIL // The email address you want to send from
+    const oauth2Client = new OAuth2Client(
+      process.env.GMAIL_CLIENT_ID,
+      process.env.GMAIL_CLIENT_SECRET,
+      'https://joyshypnose-therapies.com/api/gmail/auth'
+    );
+
+    oauth2Client.setCredentials({
+      refresh_token: process.env.GMAIL_REFRESH_TOKEN
     });
 
-    return google.gmail({ version: 'v1', auth });
+    return google.gmail({ version: 'v1', auth: oauth2Client });
   } catch (error) {
     console.error('Error creating Gmail client:', error);
     throw error;
@@ -25,7 +28,7 @@ export async function sendEmail(to: string, subject: string, htmlContent: string
     
     const utf8Subject = `=?utf-8?B?${Buffer.from(subject).toString('base64')}?=`;
     const messageParts = [
-      `From: ${process.env.GMAIL_SENDER_EMAIL}`,
+      `From: Joy's Hypnose <${process.env.ADMIN_EMAIL}>`,
       `To: ${to}`,
       'Content-Type: text/html; charset=utf-8',
       'MIME-Version: 1.0',
