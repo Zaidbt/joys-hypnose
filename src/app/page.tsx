@@ -350,7 +350,7 @@ export default function HomePage() {
                 alt="Espace de méditation"
                 fill
                 className="object-cover"
-                style={{ objectPosition: 'center 55%' }}
+                style={{ objectPosition: 'center 35%' }}
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 60vw"
                 priority
               />
