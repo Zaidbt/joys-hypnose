@@ -37,9 +37,12 @@ async function optimizeImages() {
         effort: 6,
         lossless: false
       })
-      .toFile('public/images/histoire.webp')
+      .toFile('public/images/histoire.optimized.webp')
       .then(info => {
         console.log('Histoire optimization complete:', info);
+        // Replace original file with optimized version
+        require('fs').renameSync('public/images/histoire.optimized.webp', 'public/images/histoire.webp');
+        console.log('Histoire file replaced successfully');
       });
 
   } catch (error) {
