@@ -181,13 +181,14 @@ export default function HomePage() {
                   L'Hypnose Transformative : Un Chemin vers la Guérison
                 </h2>
 
-                <div className="flex items-center justify-between mb-6">
+                {/* Mobile version */}
+                <div className="flex sm:hidden items-center justify-between mb-6">
                   <a
                     href="/downloads/hypnose-transformative-guide.pdf"
                     download
                     className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full text-white bg-rose-500 hover:bg-rose-600 transition-colors duration-200 shadow-md hover:shadow-lg"
                   >
-                    Télécharger le guide gratuit
+                    Télécharger
                     <ArrowRightIcon className="ml-2 -mr-1 h-5 w-5" />
                   </a>
                   
@@ -202,9 +203,43 @@ export default function HomePage() {
                     />
                   </button>
                 </div>
+
+                {/* Desktop version */}
+                <div className="hidden sm:block">
+                  <p className="text-lg text-gray-600 mb-6">
+                    Découvrez comment l'hypnose transformative peut vous aider à libérer votre potentiel et à atteindre un équilibre émotionnel profond.
+                  </p>
+
+                  <ul className="space-y-3 mb-8">
+                    {[
+                      "Les fondements de l'hypnose transformative",
+                      "Exercices pratiques guidés",
+                      "Études de cas et témoignages inspirants",
+                      "Techniques de visualisation et de guérison",
+                      "Applications thérapeutiques concrètes",
+                      "Approche intégrative unique"
+                    ].map((item, index) => (
+                      <li key={index} className="flex items-center text-gray-700">
+                        <Sparkle weight="fill" className="w-5 h-5 text-rose-500 mr-2 flex-shrink-0" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <a
+                    href="/downloads/hypnose-transformative-guide.pdf"
+                    download
+                    className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full text-white bg-rose-500 hover:bg-rose-600 transition-colors duration-200 shadow-md hover:shadow-lg"
+                  >
+                    Télécharger le guide gratuit
+                    <ArrowRightIcon className="ml-2 -mr-1 h-5 w-5" />
+                  </a>
+                </div>
                 
+                {/* Mobile expanded content */}
                 {isExpanded && (
                   <motion.div
+                    className="sm:hidden"
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
