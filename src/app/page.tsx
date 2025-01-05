@@ -147,7 +147,7 @@ export default function HomePage() {
               {/* Left side - Image */}
               <div className="relative h-[400px] lg:h-[600px]">
                 <Image
-                  src="/images/epub-cover.jpg"
+                  src="/images/epub.webp"
                   alt="L'Hypnose Transformative : Un Chemin vers la Guérison"
                   fill
                   className="object-cover"
