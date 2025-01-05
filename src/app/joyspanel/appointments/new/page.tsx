@@ -237,7 +237,7 @@ export default function NewAppointmentPage() {
                       onChange={(e) => setIsFirstTime(e.target.checked)}
                       className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                     />
-                    <label htmlFor="isFirstTime" className="ml-2 block text-sm text-gray-900">
+                    <label htmlFor="isFirstTime" className="ml-2 text-sm text-gray-700">
                       Première séance (2 heures)
                     </label>
                   </div>
@@ -249,8 +249,8 @@ export default function NewAppointmentPage() {
                       onChange={(e) => setIsOnline(e.target.checked)}
                       className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                     />
-                    <label htmlFor="isOnline" className="ml-2 block text-sm text-gray-900">
-                      Session en ligne via Zoom
+                    <label htmlFor="isOnline" className="ml-2 text-sm text-gray-700">
+                      Séance en ligne via Zoom
                     </label>
                   </div>
                 </div>

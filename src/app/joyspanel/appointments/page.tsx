@@ -347,6 +347,11 @@ export default function AppointmentsPage() {
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900 hidden sm:table-cell">
                           {appointment.isFirstTime ? 'Première séance' : 'Séance normale'}
+                          {appointment.isOnline && (
+                            <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                              En ligne
+                            </span>
+                          )}
                         </td>
                         <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                           <div className="flex justify-end space-x-2">
