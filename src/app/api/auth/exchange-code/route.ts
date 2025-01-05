@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     const oauth2Client = new google.auth.OAuth2(
       process.env.GMAIL_CLIENT_ID,
       process.env.GMAIL_CLIENT_SECRET,
-      'http://localhost:3000/api/auth/callback'
+      'https://joyshypnose-therapies.com/api/auth/callback/google'
     );
 
     console.log('Attempting to exchange code for tokens...');
