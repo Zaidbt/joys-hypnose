@@ -1,9 +1,10 @@
 import { google } from 'googleapis';
 import { NextResponse } from 'next/server';
 
-export async function POST(request: Request) {
+export async function GET(request: Request) {
   try {
-    const { code } = await request.json();
+    const { searchParams } = new URL(request.url);
+    const code = searchParams.get('code');
 
     if (!code) {
       return NextResponse.json({ error: 'Authorization code is required' }, { status: 400 });
@@ -33,8 +34,11 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Error exchanging code for tokens:', error);
     return NextResponse.json(
-      { error: 'Failed to exchange authorization code for tokens' },
+      { error: 'Failed to exchange authorization code for tokens', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
-} 
+}
+
+// Keep the POST endpoint for backward compatibility
+export { GET as POST }; 
