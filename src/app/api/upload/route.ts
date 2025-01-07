@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/utils/authOptions';
-import { writeFile, mkdir, stat } from 'fs/promises';
+import { writeFile, mkdir, stat, chmod } from 'fs/promises';
 import { createWriteStream } from 'fs';
 import path from 'path';
 import { uploadConfig } from '@/lib/upload-config';
@@ -80,6 +80,8 @@ export async function POST(request: Request) {
     } catch (error) {
       console.log('Creating upload directory...');
       await mkdir(uploadConfig.uploadDir, { recursive: true });
+      // Set directory permissions to 755
+      await chmod(uploadConfig.uploadDir, 0o755);
     }
 
     // Create unique filename with sanitized original name and preserved extension
@@ -96,6 +98,9 @@ export async function POST(request: Request) {
       const fileStream = Readable.from(Buffer.from(await file.arrayBuffer()));
       await streamToFile(fileStream, filepath);
       console.log('Successfully wrote file');
+      
+      // Set file permissions to 644
+      await chmod(filepath, 0o644);
       
       // Verify file was written
       const fileStats = await stat(filepath);
