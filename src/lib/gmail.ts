@@ -203,18 +203,32 @@ async function sendConfirmationEmail(appointment: TimeSlot) {
         .details { background-color: white; padding: 15px; border-radius: 6px; margin: 20px 0; }
         .price-info { background-color: #ebf4ff; padding: 15px; border-radius: 6px; margin: 20px 0; }
         .footer { text-align: center; margin-top: 30px; color: #718096; }
+        .confirmation-badge {
+          background-color: #c6f6d5;
+          color: #22543d;
+          padding: 10px 20px;
+          border-radius: 6px;
+          text-align: center;
+          margin: 20px auto;
+          font-weight: bold;
+          border: 2px solid #9ae6b4;
+        }
       </style>
     </head>
     <body>
       <div class="container">
         <div class="header">
           <h1 style="color: #6b46c1; margin-bottom: 10px;">Joy's Hypnose</h1>
-          <p style="font-size: 18px; color: #4a5568;">Confirmation de votre rendez-vous</p>
+          <p style="font-size: 18px; color: #4a5568;">✨ Votre rendez-vous est confirmé ! ✨</p>
         </div>
 
         <div class="content">
+          <div class="confirmation-badge">
+            Bonne nouvelle ! Votre demande de rendez-vous a été validée.
+          </div>
+
           <p>Cher(e) ${appointment.clientName},</p>
-          <p>Je vous confirme que votre rendez-vous a été validé :</p>
+          <p>J'ai le plaisir de vous confirmer que votre demande de rendez-vous a été <strong>acceptée</strong>. Voici les détails de notre rencontre :</p>
           
           <div class="details">
             <p><strong>Date :</strong> ${formattedDate}</p>
@@ -272,7 +286,7 @@ async function sendConfirmationEmail(appointment: TimeSlot) {
     'MIME-Version: 1.0',
     `To: ${appointment.clientEmail}`,
     'From: Joy\'s Hypnose <noreply@joyshypnose-therapies.com>',
-    'Subject: Confirmation de votre rendez-vous - Joy\'s Hypnose',
+    'Subject: ✨ Votre rendez-vous est confirmé ! - Joy\'s Hypnose',
     '',
     confirmationEmailContent
   ].join('\n');
