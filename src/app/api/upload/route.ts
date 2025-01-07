@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/utils/authOptions';
-import { writeFile, mkdir, stat, chmod, readFile } from 'fs/promises';
+import { writeFile, mkdir, stat } from 'fs/promises';
 import { createWriteStream } from 'fs';
 import path from 'path';
 import { uploadConfig } from '@/lib/upload-config';
@@ -29,10 +29,6 @@ async function streamToFile(stream: Readable, filepath: string): Promise<void> {
 
 export async function POST(request: Request) {
   console.log('Starting file upload process...');
-  console.log('Current working directory:', process.cwd());
-  console.log('Upload directory config:', uploadConfig.uploadDir);
-  console.log('NODE_ENV:', process.env.NODE_ENV);
-  
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
@@ -80,19 +76,10 @@ export async function POST(request: Request) {
 
     // Ensure upload directory exists
     try {
-      const uploadDirStats = await stat(uploadConfig.uploadDir);
-      console.log('Upload directory exists:', {
-        isDirectory: uploadDirStats.isDirectory(),
-        permissions: uploadDirStats.mode,
-        owner: uploadDirStats.uid,
-        group: uploadDirStats.gid
-      });
+      await stat(uploadConfig.uploadDir);
     } catch (error) {
       console.log('Creating upload directory...');
       await mkdir(uploadConfig.uploadDir, { recursive: true });
-      // Set directory permissions to 755
-      await chmod(uploadConfig.uploadDir, 0o755);
-      console.log('Created upload directory with permissions 755');
     }
 
     // Create unique filename with sanitized original name and preserved extension
@@ -110,27 +97,12 @@ export async function POST(request: Request) {
       await streamToFile(fileStream, filepath);
       console.log('Successfully wrote file');
       
-      // Set file permissions to 644
-      await chmod(filepath, 0o644);
-      console.log('Set file permissions to 644');
-      
       // Verify file was written
       const fileStats = await stat(filepath);
       console.log('Written file stats:', {
         size: fileStats.size,
-        permissions: fileStats.mode,
-        owner: fileStats.uid,
-        group: fileStats.gid,
-        exists: true
+        permissions: fileStats.mode
       });
-
-      // Try to read the file back to verify it's readable
-      try {
-        const testRead = await readFile(filepath);
-        console.log('Successfully verified file is readable, size:', testRead.length);
-      } catch (readError) {
-        console.error('Warning: File written but not readable:', readError);
-      }
     } catch (error) {
       console.error('Error writing file:', error);
       return NextResponse.json(

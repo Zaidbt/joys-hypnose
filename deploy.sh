@@ -20,20 +20,12 @@ ssh $SERVER << 'ENDSSH'
 # Configuration
 REMOTE_DIR="/var/www/joyshypnose"
 REPO_URL="https://github.com/Zaidbt/joys-hypnose.git"
-UPLOADS_BACKUP="/var/www/uploads_backup"
 
 # Create deployment directory if it doesn't exist
 mkdir -p $REMOTE_DIR
-mkdir -p $UPLOADS_BACKUP
 
 # Navigate to the directory
 cd $REMOTE_DIR
-
-# Backup existing uploads if they exist
-if [ -d "public/uploads" ]; then
-    echo "📦 Backing up existing uploads..."
-    cp -r public/uploads/* $UPLOADS_BACKUP/
-fi
 
 # Check if the repository exists
 if [ ! -d ".git" ]; then
@@ -52,19 +44,6 @@ npm install
 # Build the application
 echo "🔨 Building the application..."
 npm run build
-
-# Create uploads directory and restore uploads
-echo "📦 Restoring uploads..."
-mkdir -p public/uploads
-mkdir -p .next/standalone/public/uploads
-if [ -d "$UPLOADS_BACKUP" ]; then
-    cp -r $UPLOADS_BACKUP/* public/uploads/
-    cp -r $UPLOADS_BACKUP/* .next/standalone/public/uploads/
-fi
-
-# Copy public directory to standalone output
-echo "📦 Copying public directory to standalone output..."
-cp -r public/* .next/standalone/public/
 
 # Install PM2 if not already installed
 if ! command -v pm2 &> /dev/null; then

@@ -63,7 +63,7 @@ const nextConfig = {
     return [
       {
         source: '/uploads/:path*',
-        destination: '/api/serve-upload/:path*',
+        destination: '/public/uploads/:path*',
       },
     ];
   },
