@@ -93,8 +93,13 @@ export default function FinancialTracking({ appointments }: FinancialTrackingPro
         new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
       );
 
-      // Calculate total revenue (700 DH per session)
-      client.totalRevenue = client.appointments.length * 700;
+      // Calculate total revenue using prices from settings
+      client.totalRevenue = client.appointments.reduce((total, appointment) => {
+        const price = appointment.isFirstTime ? 
+          settings.prices.firstSession : 
+          settings.prices.followUpSession;
+        return total + price;
+      }, 0);
     });
 
     // Convert map to array and sort by total revenue
@@ -167,7 +172,9 @@ export default function FinancialTracking({ appointments }: FinancialTrackingPro
                       )}
                     </span>
                   </div>
-                  <span className="font-medium text-gray-900">700 DH</span>
+                  <span className="font-medium text-gray-900">
+                    {appointment.isFirstTime ? settings.prices.firstSession : settings.prices.followUpSession} DH
+                  </span>
                 </div>
               ))}
             </div>
