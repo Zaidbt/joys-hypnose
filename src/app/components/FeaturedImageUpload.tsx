@@ -52,18 +52,17 @@ export default function FeaturedImageUpload({
         </div>
       )}
       {currentImage ? (
-        <div className="relative">
+        <div className="relative h-64 w-full mb-4 rounded-lg overflow-hidden">
           <Image
             src={currentImage}
-            alt="Featured"
-            width={400}
-            height={300}
-            className="rounded-lg"
+            alt="Featured image"
+            fill
+            className="object-cover"
+            unoptimized
           />
           <button
-            type="button"
             onClick={onImageRemove}
-            className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-sm hover:bg-gray-100"
+            className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-lg hover:bg-gray-100"
           >
             <XMarkIcon className="h-5 w-5 text-gray-600" />
           </button>
