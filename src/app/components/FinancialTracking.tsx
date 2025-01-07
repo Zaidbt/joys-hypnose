@@ -50,6 +50,7 @@ export default function FinancialTracking({ appointments }: FinancialTrackingPro
         const response = await fetch('/api/appointments/settings');
         if (!response.ok) throw new Error('Failed to fetch settings');
         const data = await response.json();
+        console.log('Fetched settings:', data);
         setSettings(data);
       } catch (error) {
         console.error('Error fetching settings:', error);
@@ -60,21 +61,24 @@ export default function FinancialTracking({ appointments }: FinancialTrackingPro
   }, []);
 
   useEffect(() => {
-    if (!settings) return;
+    if (!settings || !appointments) return;
 
-    // Filter only confirmed appointments (status is 'confirmed' or 'booked')
-    const confirmedAppointments = appointments.filter(app => 
-      app.status === 'confirmed' || app.status === 'booked'
-    );
+    console.log('Processing appointments:', appointments.length, 'appointments');
+    console.log('Settings:', settings);
 
-    console.log('Confirmed appointments:', confirmedAppointments);
+    // Filter only confirmed appointments (status is 'booked')
+    const confirmedAppointments = appointments.filter(app => app.status === 'booked');
+    console.log('Found', confirmedAppointments.length, 'confirmed appointments');
 
     // Group appointments by client
     const clientMap = new Map<string, Client>();
 
     confirmedAppointments.forEach(appointment => {
       const clientEmail = appointment.clientEmail;
-      if (!clientEmail) return; // Skip if no email
+      if (!clientEmail) {
+        console.log('Skipping appointment - no email:', appointment);
+        return;
+      }
 
       if (!clientMap.has(clientEmail)) {
         clientMap.set(clientEmail, {
@@ -96,20 +100,15 @@ export default function FinancialTracking({ appointments }: FinancialTrackingPro
         new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
       );
 
-      client.totalRevenue = client.appointments.reduce((total, app, index) => {
-        // First appointment for this client
-        if (index === 0) {
-          return total + settings.prices.firstSession;
-        }
-        return total + settings.prices.followUpSession;
-      }, 0);
+      client.totalRevenue = client.appointments.length * settings.prices.firstSession; // All sessions are 700 DH
+      console.log(`Client ${client.clientName}: ${client.appointments.length} appointments, total revenue: ${client.totalRevenue} DH`);
     });
 
     // Convert map to array and sort by total revenue
     const sortedClients = Array.from(clientMap.values())
       .sort((a, b) => b.totalRevenue - a.totalRevenue);
 
-    console.log('Sorted clients:', sortedClients);
+    console.log('Final sorted clients:', sortedClients);
     setClients(sortedClients);
     setIsLoading(false);
   }, [appointments, settings]);

@@ -202,11 +202,9 @@ export default function DashboardPage() {
       try {
         setIsLoading(true);
         
-        // Fetch appointments and stats
-        const [appointmentsResponse, statsResponse] = await Promise.all([
-          fetch('/api/appointments'),
-          fetch('/api/stats')
-        ]);
+        // Fetch all appointments without date filtering
+        const appointmentsResponse = await fetch('/api/appointments');
+        const statsResponse = await fetch('/api/stats');
 
         if (!appointmentsResponse.ok || !statsResponse.ok) {
           console.error('API Error:', {
@@ -225,7 +223,10 @@ export default function DashboardPage() {
         console.log('Raw appointments data:', appointmentsData);
         console.log('Raw stats data:', statsData);
 
-        // Calculate dates for filtering
+        // Store all appointments for financial tracking
+        setAllAppointments(appointmentsData);
+
+        // Calculate dates for filtering recent appointments
         const now = new Date();
         const todayStart = new Date(now.getTime());
         todayStart.setHours(0, 0, 0, 0);
@@ -235,9 +236,6 @@ export default function DashboardPage() {
         
         const monthStart = new Date(todayStart.getTime());
         monthStart.setMonth(monthStart.getMonth() - 1);
-
-        // Store all appointments for financial tracking
-        setAllAppointments(appointmentsData);
 
         const stats: DashboardStats = {
           appointments: {
@@ -295,31 +293,15 @@ export default function DashboardPage() {
     };
 
     fetchDashboardData();
-  }, [status, router]);
+  }, [router, status]);
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
-      </div>
-    );
+  if (status === 'loading' || isLoading || !stats) {
+    return <LoadingSpinner />;
   }
-
-  if (!stats) {
-    return null;
-  }
-
-  const quickLinks = [
-    { name: 'Rendez-vous', href: '/joyspanel/appointments', icon: CalendarIcon },
-    { name: 'Clients', href: '/joyspanel/clients', icon: UsersIcon },
-    { name: 'Newsletter', href: '/joyspanel/newsletter', icon: EnvelopeIcon },
-    { name: 'Statistiques', href: '/joyspanel/stats', icon: ChartBarIcon },
-  ];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
+    <div className="min-h-screen bg-gray-50/90">
+      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-2xl font-semibold text-gray-900">Tableau de bord</h1>
           <p className="mt-1 text-sm text-gray-500">
@@ -327,27 +309,6 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        {/* Quick Links */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 mb-6">
-          {quickLinks.map((link) => (
-            <Link
-              key={link.name}
-              href={link.href}
-              className="relative group bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
-            >
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <link.icon className="h-5 w-5 sm:h-6 sm:w-6 text-primary-600" />
-                </div>
-                <div className="ml-2 sm:ml-3">
-                  <h3 className="text-xs sm:text-sm font-medium text-gray-900">{link.name}</h3>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <StatCard
             title="Rendez-vous aujourd'hui"
