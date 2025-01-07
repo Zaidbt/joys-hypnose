@@ -14,7 +14,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
-      url: 'https://joyshypnose-therapies.com/about',
+      url: 'https://joyshypnose-therapies.com/mon-approche',
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.8,
