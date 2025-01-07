@@ -286,7 +286,7 @@ async function sendConfirmationEmail(appointment: TimeSlot) {
     'MIME-Version: 1.0',
     `To: ${appointment.clientEmail}`,
     'From: Joy\'s Hypnose <noreply@joyshypnose-therapies.com>',
-    'Subject: ✨ Votre rendez-vous est confirmé ! - Joy\'s Hypnose',
+    'Subject: Votre rendez-vous est confirmé ! - Joy\'s Hypnose',
     '',
     confirmationEmailContent
   ].join('\n');
