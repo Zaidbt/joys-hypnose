@@ -11,7 +11,7 @@ const playfair = Playfair_Display({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-playfair',
-  preload: true,
+  preload: false,
   fallback: ['serif'],
   adjustFontFallback: true,
 });
@@ -20,7 +20,7 @@ const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-cormorant',
-  preload: true,
+  preload: false,
   weight: ['300', '400', '500', '600', '700'],
   fallback: ['serif'],
   adjustFontFallback: true,
