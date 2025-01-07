@@ -202,8 +202,14 @@ export default function DashboardPage() {
       try {
         setIsLoading(true);
         
-        // Fetch all appointments without date filtering
-        const appointmentsResponse = await fetch('/api/appointments');
+        // Fetch all appointments (no date filtering)
+        const now = new Date();
+        const startDate = new Date(2024, 0, 1); // Start from January 1, 2024
+        const endDate = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
+
+        const appointmentsResponse = await fetch(
+          `/api/appointments?start=${startDate.toISOString()}&end=${endDate.toISOString()}`
+        );
         const statsResponse = await fetch('/api/stats');
 
         if (!appointmentsResponse.ok || !statsResponse.ok) {
@@ -219,15 +225,10 @@ export default function DashboardPage() {
           statsResponse.json()
         ]);
 
-        // Debug logging
-        console.log('Raw appointments data:', appointmentsData);
-        console.log('Raw stats data:', statsData);
-
         // Store all appointments for financial tracking
         setAllAppointments(appointmentsData);
 
         // Calculate dates for filtering recent appointments
-        const now = new Date();
         const todayStart = new Date(now.getTime());
         todayStart.setHours(0, 0, 0, 0);
         
@@ -261,7 +262,6 @@ export default function DashboardPage() {
           },
         };
 
-        console.log('Processed stats:', stats);
         setStats(stats);
 
         // Get upcoming appointments (filter out past appointments)
@@ -270,7 +270,6 @@ export default function DashboardPage() {
           .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
           .slice(0, 5);
         
-        console.log('Upcoming appointments:', upcomingAppointments);
         setRecentAppointments(upcomingAppointments);
 
         // Generate recent activity
@@ -279,7 +278,7 @@ export default function DashboardPage() {
             _id: a._id,
             clientName: a.clientName,
             date: a.createdAt || a.startTime,
-            action: `${a.status === 'confirmed' ? 'a confirmé' : 'a pris'} rendez-vous`
+            action: `${a.status === 'booked' ? 'a confirmé' : 'a pris'} rendez-vous`
           }))
           .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
           .slice(0, 5);

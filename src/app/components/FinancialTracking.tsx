@@ -50,7 +50,6 @@ export default function FinancialTracking({ appointments }: FinancialTrackingPro
         const response = await fetch('/api/appointments/settings');
         if (!response.ok) throw new Error('Failed to fetch settings');
         const data = await response.json();
-        console.log('Fetched settings:', data);
         setSettings(data);
       } catch (error) {
         console.error('Error fetching settings:', error);
@@ -63,22 +62,15 @@ export default function FinancialTracking({ appointments }: FinancialTrackingPro
   useEffect(() => {
     if (!settings || !appointments) return;
 
-    console.log('Processing appointments:', appointments.length, 'appointments');
-    console.log('Settings:', settings);
+    // Filter only booked appointments
+    const bookedAppointments = appointments.filter(app => app.status === 'booked');
 
-    // Filter only confirmed appointments (status is 'booked')
-    const confirmedAppointments = appointments.filter(app => app.status === 'booked');
-    console.log('Found', confirmedAppointments.length, 'confirmed appointments');
-
-    // Group appointments by client
+    // Group appointments by client email
     const clientMap = new Map<string, Client>();
 
-    confirmedAppointments.forEach(appointment => {
+    bookedAppointments.forEach(appointment => {
       const clientEmail = appointment.clientEmail;
-      if (!clientEmail) {
-        console.log('Skipping appointment - no email:', appointment);
-        return;
-      }
+      if (!clientEmail) return;
 
       if (!clientMap.has(clientEmail)) {
         clientMap.set(clientEmail, {
@@ -96,19 +88,19 @@ export default function FinancialTracking({ appointments }: FinancialTrackingPro
 
     // Calculate revenue for each client
     clientMap.forEach(client => {
+      // Sort appointments by date
       client.appointments.sort((a, b) => 
         new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
       );
 
-      client.totalRevenue = client.appointments.length * settings.prices.firstSession; // All sessions are 700 DH
-      console.log(`Client ${client.clientName}: ${client.appointments.length} appointments, total revenue: ${client.totalRevenue} DH`);
+      // Calculate total revenue (700 DH per session)
+      client.totalRevenue = client.appointments.length * 700;
     });
 
     // Convert map to array and sort by total revenue
     const sortedClients = Array.from(clientMap.values())
       .sort((a, b) => b.totalRevenue - a.totalRevenue);
 
-    console.log('Final sorted clients:', sortedClients);
     setClients(sortedClients);
     setIsLoading(false);
   }, [appointments, settings]);
@@ -159,7 +151,7 @@ export default function FinancialTracking({ appointments }: FinancialTrackingPro
             </div>
 
             <div className="space-y-3">
-              {client.appointments.map((appointment, index) => (
+              {client.appointments.map((appointment) => (
                 <div
                   key={appointment._id}
                   className="flex items-center justify-between text-sm"
@@ -168,16 +160,14 @@ export default function FinancialTracking({ appointments }: FinancialTrackingPro
                     <CalendarIcon className="h-4 w-4 text-gray-400 mr-2" />
                     <span className="text-gray-600">
                       {formatDate(new Date(appointment.startTime))}
-                      {index === 0 && (
+                      {appointment.isFirstTime && (
                         <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
                           Première séance
                         </span>
                       )}
                     </span>
                   </div>
-                  <span className="font-medium text-gray-900">
-                    {index === 0 ? settings.prices.firstSession : settings.prices.followUpSession} DH
-                  </span>
+                  <span className="font-medium text-gray-900">700 DH</span>
                 </div>
               ))}
             </div>
