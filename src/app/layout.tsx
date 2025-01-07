@@ -49,6 +49,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr" className={`${playfair.variable} ${cormorant.variable}`}>
+      <head>
+        <meta name="google-site-verification" content="4jTYDU4kW_qD5ZkChniG6z1N7Ckjx7EBLMnVITkJKuo" />
+      </head>
       <body className={cormorant.className}>
         <ClientLayout>{children}</ClientLayout>
       </body>
