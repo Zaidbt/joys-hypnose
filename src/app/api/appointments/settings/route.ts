@@ -4,6 +4,11 @@ import { authOptions } from '@/app/utils/authOptions';
 import clientPromise from '@/lib/mongodb';
 import type { AppointmentSettings } from '@/types/appointment';
 
+const DEFAULT_PRICES = {
+  firstSession: 700,
+  followUpSession: 700
+};
+
 export async function GET() {
   try {
     const client = await clientPromise;
@@ -21,11 +26,25 @@ export async function GET() {
         breakDuration: 15,
         maxAdvanceBooking: 30,
         fictionalBookingPercentage: 30,
-        blockedDateRanges: []
+        blockedDateRanges: [],
+        prices: DEFAULT_PRICES
       };
       
       await settingsCollection.insertOne(defaultSettings);
       return NextResponse.json(defaultSettings);
+    }
+
+    // Ensure prices exist in settings
+    if (!settings.prices) {
+      const updatedSettings = {
+        ...settings,
+        prices: DEFAULT_PRICES
+      };
+      await settingsCollection.updateOne(
+        { _id: settings._id },
+        { $set: { prices: DEFAULT_PRICES } }
+      );
+      return NextResponse.json(updatedSettings);
     }
 
     return NextResponse.json(settings);
