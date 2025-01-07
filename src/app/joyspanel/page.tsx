@@ -188,6 +188,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [recentAppointments, setRecentAppointments] = useState([]);
+  const [allAppointments, setAllAppointments] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -235,6 +236,9 @@ export default function DashboardPage() {
         const monthStart = new Date(todayStart.getTime());
         monthStart.setMonth(monthStart.getMonth() - 1);
 
+        // Store all appointments for financial tracking
+        setAllAppointments(appointmentsData);
+
         const stats: DashboardStats = {
           appointments: {
             total: statsData.appointments.total || 0,
@@ -271,7 +275,7 @@ export default function DashboardPage() {
         console.log('Upcoming appointments:', upcomingAppointments);
         setRecentAppointments(upcomingAppointments);
 
-        // Generate recent activity (include both appointments and newsletter subscriptions)
+        // Generate recent activity
         const recentActivity = appointmentsData
           .map(a => ({
             _id: a._id,
@@ -380,7 +384,7 @@ export default function DashboardPage() {
             <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-6">
               <AppointmentTimeline appointments={recentAppointments} />
             </div>
-            <FinancialTracking appointments={recentAppointments} />
+            <FinancialTracking appointments={allAppointments} />
           </div>
           <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-6">
             <ClientActivity clients={recentActivity} />

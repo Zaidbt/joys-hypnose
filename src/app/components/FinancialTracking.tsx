@@ -62,19 +62,25 @@ export default function FinancialTracking({ appointments }: FinancialTrackingPro
   useEffect(() => {
     if (!settings) return;
 
-    // Filter only confirmed appointments
-    const confirmedAppointments = appointments.filter(app => app.status === 'booked');
+    // Filter only confirmed appointments (status is 'confirmed' or 'booked')
+    const confirmedAppointments = appointments.filter(app => 
+      app.status === 'confirmed' || app.status === 'booked'
+    );
+
+    console.log('Confirmed appointments:', confirmedAppointments);
 
     // Group appointments by client
     const clientMap = new Map<string, Client>();
 
     confirmedAppointments.forEach(appointment => {
       const clientEmail = appointment.clientEmail;
+      if (!clientEmail) return; // Skip if no email
+
       if (!clientMap.has(clientEmail)) {
         clientMap.set(clientEmail, {
           _id: appointment._id,
-          clientName: appointment.clientName,
-          clientEmail: appointment.clientEmail,
+          clientName: appointment.clientName || 'Client sans nom',
+          clientEmail: clientEmail,
           appointments: [],
           totalRevenue: 0
         });
@@ -82,18 +88,28 @@ export default function FinancialTracking({ appointments }: FinancialTrackingPro
 
       const client = clientMap.get(clientEmail)!;
       client.appointments.push(appointment);
+    });
 
-      // Calculate revenue for this appointment
-      const isFirstAppointment = client.appointments.length === 1;
-      client.totalRevenue += isFirstAppointment ? 
-        settings.prices.firstSession : 
-        settings.prices.followUpSession;
+    // Calculate revenue for each client
+    clientMap.forEach(client => {
+      client.appointments.sort((a, b) => 
+        new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+      );
+
+      client.totalRevenue = client.appointments.reduce((total, app, index) => {
+        // First appointment for this client
+        if (index === 0) {
+          return total + settings.prices.firstSession;
+        }
+        return total + settings.prices.followUpSession;
+      }, 0);
     });
 
     // Convert map to array and sort by total revenue
     const sortedClients = Array.from(clientMap.values())
       .sort((a, b) => b.totalRevenue - a.totalRevenue);
 
+    console.log('Sorted clients:', sortedClients);
     setClients(sortedClients);
     setIsLoading(false);
   }, [appointments, settings]);
