@@ -165,6 +165,137 @@ async function sendClientConfirmation(appointment: TimeSlot) {
   }
 }
 
+async function sendConfirmationEmail(appointment: TimeSlot) {
+  const gmail = createGmailClient();
+  if (!gmail) {
+    console.warn('Gmail client not initialized - skipping confirmation email');
+    return;
+  }
+
+  const appointmentDate = new Date(appointment.startTime);
+  const formatter = new Intl.DateTimeFormat('fr-FR', {
+    timeZone: 'Africa/Casablanca',
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+  
+  const timeFormatter = new Intl.DateTimeFormat('fr-FR', {
+    timeZone: 'Africa/Casablanca',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  });
+  
+  const formattedDate = formatter.format(appointmentDate);
+  const formattedTime = timeFormatter.format(appointmentDate);
+
+  const confirmationEmailContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .content { background-color: #f7fafc; padding: 20px; border-radius: 8px; }
+        .details { background-color: white; padding: 15px; border-radius: 6px; margin: 20px 0; }
+        .price-info { background-color: #ebf4ff; padding: 15px; border-radius: 6px; margin: 20px 0; }
+        .footer { text-align: center; margin-top: 30px; color: #718096; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1 style="color: #6b46c1; margin-bottom: 10px;">Joy's Hypnose</h1>
+          <p style="font-size: 18px; color: #4a5568;">Confirmation de votre rendez-vous</p>
+        </div>
+
+        <div class="content">
+          <p>Cher(e) ${appointment.clientName},</p>
+          <p>Je vous confirme que votre rendez-vous a été validé :</p>
+          
+          <div class="details">
+            <p><strong>Date :</strong> ${formattedDate}</p>
+            <p><strong>Heure :</strong> ${formattedTime}</p>
+            ${appointment.isOnline ? `
+            <div style="background-color: #ebf8ff; padding: 15px; border-radius: 6px; margin: 10px 0;">
+              <p><strong>Session en ligne via Zoom</strong></p>
+              <p><strong>Lien Zoom :</strong> <a href="https://us06web.zoom.us/j/3796260037?pwd=REJzUHl5YWVTOENLWUU2bCs0RVVMQT09">Cliquez ici pour rejoindre</a></p>
+              <p><strong>ID de réunion :</strong> 379 626 0037</p>
+              <p><strong>Code secret :</strong> D99WQ6</p>
+            </div>
+            ` : `
+            <p><strong>Lieu :</strong> 17 Rue Bab El Mandab, Residence El Prado 2,<br>1er étage appart #2 Bourgogne,<br>Casablanca</p>
+            `}
+          </div>
+
+          <div class="price-info">
+            <p><strong>Tarif de la séance :</strong> 700 DH</p>
+            <p>Le règlement peut être effectué en espèces ou par virement bancaire.</p>
+          </div>
+
+          ${appointment.isFirstTime ? `
+          <div style="background-color: #ebf4ff; padding: 15px; border-radius: 6px; margin: 20px 0;">
+            <p style="color: #4c51bf;"><strong>Information importante :</strong></p>
+            <p>Pour votre première séance, prévoyez d'arriver 5-10 minutes en avance pour vous installer confortablement.</p>
+            <p>La séance dure environ 2 heures.</p>
+          </div>
+          ` : `
+          <div style="background-color: #ebf4ff; padding: 15px; border-radius: 6px; margin: 20px 0;">
+            <p>La séance dure environ 1 heure 30.</p>
+          </div>
+          `}
+
+          <p>Pour toute question ou besoin de modification, n'hésitez pas à me contacter :</p>
+          <ul style="list-style: none; padding: 0;">
+            <li>📞 Téléphone : +212 660-826028</li>
+            <li>✉️ Email : joyshypnose@gmail.com</li>
+          </ul>
+        </div>
+
+        <div class="footer">
+          <p>À très bientôt,</p>
+          <p style="font-weight: bold;">Joy's Hypnose</p>
+          <p style="margin-top: 15px;">
+            <a href="https://www.joyshypnose-therapies.com" style="color: #6b46c1; text-decoration: none;">www.joyshypnose-therapies.com</a>
+          </p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  const confirmationMessage = [
+    'Content-Type: text/html; charset=utf-8',
+    'MIME-Version: 1.0',
+    `To: ${appointment.clientEmail}`,
+    'From: Joy\'s Hypnose <noreply@joyshypnose-therapies.com>',
+    'Subject: Confirmation de votre rendez-vous - Joy\'s Hypnose',
+    '',
+    confirmationEmailContent
+  ].join('\n');
+
+  const encodedConfirmationMessage = Buffer.from(confirmationMessage)
+    .toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+
+  try {
+    await gmail.users.messages.send({
+      userId: 'me',
+      requestBody: {
+        raw: encodedConfirmationMessage,
+      },
+    });
+    console.log('Confirmation email sent successfully');
+  } catch (error) {
+    console.error('Error sending confirmation email:', error);
+  }
+}
+
 export async function sendAppointmentNotification(appointment: TimeSlot) {
   console.log('Starting sendAppointmentNotification with appointment:', {
     clientName: appointment.clientName,
@@ -412,3 +543,5 @@ export async function testEmailConfig() {
     };
   }
 }
+
+export { sendAppointmentNotification, testEmailConfig, sendConfirmationEmail };

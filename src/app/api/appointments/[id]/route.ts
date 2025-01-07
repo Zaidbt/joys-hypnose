@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/utils/authOptions';
 import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
+import { sendConfirmationEmail } from '@/lib/gmail';
 
 export async function PATCH(
   request: Request,
@@ -37,6 +38,17 @@ export async function PATCH(
         { error: 'Appointment not found' },
         { status: 404 }
       );
+    }
+
+    // Send confirmation email when appointment is confirmed (status changed to 'booked')
+    if (status === 'booked') {
+      try {
+        await sendConfirmationEmail(result);
+        console.log('Confirmation email sent for appointment:', params.id);
+      } catch (error) {
+        console.error('Error sending confirmation email:', error);
+        // Don't fail the request if email fails
+      }
     }
 
     return NextResponse.json({
