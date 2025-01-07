@@ -16,6 +16,7 @@ import {
   ArrowTrendingDownIcon,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import FinancialTracking from '@/app/components/FinancialTracking';
 
 interface DashboardStats {
   appointments: {
@@ -375,8 +376,11 @@ export default function DashboardPage() {
 
         {/* Two-column layout for timeline and activity */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-6">
-            <AppointmentTimeline appointments={recentAppointments} />
+          <div className="space-y-4">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-6">
+              <AppointmentTimeline appointments={recentAppointments} />
+            </div>
+            <FinancialTracking appointments={recentAppointments} />
           </div>
           <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-6">
             <ClientActivity clients={recentActivity} />
