@@ -17,11 +17,11 @@ export interface TimeSlot {
 }
 
 export interface AppointmentSettings {
-  workingDays: number[];
   workingHours: {
     start: string;
     end: string;
   };
+  workingDays: number[];
   slotDuration: number;
   breakDuration: number;
   maxAdvanceBooking: number;
@@ -32,4 +32,8 @@ export interface AppointmentSettings {
     endDate: string;
     reason?: string;
   }>;
+  prices: {
+    firstSession: number;
+    followUpSession: number;
+  };
 } 

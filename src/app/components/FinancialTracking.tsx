@@ -1,18 +1,34 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { formatInTimeZone } from 'date-fns-tz';
 import { fr } from 'date-fns/locale';
-import { BanknotesIcon, CalendarIcon } from '@heroicons/react/24/outline';
+import { BanknotesIcon, CalendarIcon, UserIcon } from '@heroicons/react/24/outline';
 
 interface TimeSlot {
   _id: string;
   startTime: string;
   endTime: string;
   clientName: string;
+  clientEmail: string;
   status: string;
   isFirstTime: boolean;
+}
+
+interface Client {
+  _id: string;
+  clientName: string;
+  clientEmail: string;
+  appointments: TimeSlot[];
+  totalRevenue: number;
+}
+
+interface AppointmentSettings {
+  prices: {
+    firstSession: number;
+    followUpSession: number;
+  };
 }
 
 interface FinancialTrackingProps {
@@ -24,27 +40,86 @@ const formatDate = (date: Date) => {
 };
 
 export default function FinancialTracking({ appointments }: FinancialTrackingProps) {
-  // Filter only confirmed appointments
-  const confirmedAppointments = appointments.filter(app => app.status === 'booked');
+  const [settings, setSettings] = useState<AppointmentSettings | null>(null);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchSettings() {
+      try {
+        const response = await fetch('/api/appointments/settings');
+        if (!response.ok) throw new Error('Failed to fetch settings');
+        const data = await response.json();
+        setSettings(data);
+      } catch (error) {
+        console.error('Error fetching settings:', error);
+      }
+    }
+
+    fetchSettings();
+  }, []);
+
+  useEffect(() => {
+    if (!settings) return;
+
+    // Filter only confirmed appointments
+    const confirmedAppointments = appointments.filter(app => app.status === 'booked');
+
+    // Group appointments by client
+    const clientMap = new Map<string, Client>();
+
+    confirmedAppointments.forEach(appointment => {
+      const clientEmail = appointment.clientEmail;
+      if (!clientMap.has(clientEmail)) {
+        clientMap.set(clientEmail, {
+          _id: appointment._id,
+          clientName: appointment.clientName,
+          clientEmail: appointment.clientEmail,
+          appointments: [],
+          totalRevenue: 0
+        });
+      }
+
+      const client = clientMap.get(clientEmail)!;
+      client.appointments.push(appointment);
+
+      // Calculate revenue for this appointment
+      const isFirstAppointment = client.appointments.length === 1;
+      client.totalRevenue += isFirstAppointment ? 
+        settings.prices.firstSession : 
+        settings.prices.followUpSession;
+    });
+
+    // Convert map to array and sort by total revenue
+    const sortedClients = Array.from(clientMap.values())
+      .sort((a, b) => b.totalRevenue - a.totalRevenue);
+
+    setClients(sortedClients);
+    setIsLoading(false);
+  }, [appointments, settings]);
+
+  if (isLoading || !settings) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-6">
+        <div className="animate-pulse space-y-4">
+          <div className="h-6 bg-gray-200 rounded w-1/4"></div>
+          <div className="h-10 bg-gray-200 rounded"></div>
+          <div className="space-y-3">
+            <div className="h-4 bg-gray-200 rounded"></div>
+            <div className="h-4 bg-gray-200 rounded"></div>
+            <div className="h-4 bg-gray-200 rounded"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Calculate total revenue
-  const totalRevenue = confirmedAppointments.reduce((total, app) => {
-    return total + (app.isFirstTime ? 700 : 500);
-  }, 0);
-
-  // Group appointments by month
-  const appointmentsByMonth = confirmedAppointments.reduce((acc: { [key: string]: TimeSlot[] }, appointment) => {
-    const monthKey = formatInTimeZone(new Date(appointment.startTime), 'Africa/Casablanca', 'yyyy-MM');
-    if (!acc[monthKey]) {
-      acc[monthKey] = [];
-    }
-    acc[monthKey].push(appointment);
-    return acc;
-  }, {});
+  const totalRevenue = clients.reduce((total, client) => total + client.totalRevenue, 0);
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-6">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-medium text-gray-900">Suivi Financier</h3>
         <div className="flex items-center bg-green-50 text-green-700 px-3 py-1 rounded-full">
           <BanknotesIcon className="h-5 w-5 mr-2" />
@@ -53,50 +128,48 @@ export default function FinancialTracking({ appointments }: FinancialTrackingPro
       </div>
 
       <div className="space-y-6">
-        {Object.entries(appointmentsByMonth).map(([month, monthAppointments]) => {
-          const monthRevenue = monthAppointments.reduce((total, app) => {
-            return total + (app.isFirstTime ? 700 : 500);
-          }, 0);
-
-          const [year, monthNum] = month.split('-');
-          const monthDate = new Date(parseInt(year), parseInt(monthNum) - 1);
-          const monthName = formatInTimeZone(monthDate, 'Africa/Casablanca', 'MMMM yyyy', { locale: fr });
-
-          return (
-            <motion.div
-              key={month}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="border-b border-gray-200 pb-4"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <h4 className="text-sm font-medium text-gray-900 capitalize">{monthName}</h4>
-                <span className="text-sm font-medium text-green-600">{monthRevenue} DH</span>
+        {clients.map((client) => (
+          <motion.div
+            key={client.clientEmail}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="border-b border-gray-200 pb-4"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center">
+                <UserIcon className="h-5 w-5 text-gray-400 mr-2" />
+                <h4 className="text-sm font-medium text-gray-900">{client.clientName}</h4>
               </div>
+              <span className="text-sm font-medium text-green-600">{client.totalRevenue} DH</span>
+            </div>
 
-              <div className="space-y-3">
-                {monthAppointments.map((appointment) => (
-                  <div
-                    key={appointment._id}
-                    className="flex items-center justify-between text-sm"
-                  >
-                    <div className="flex items-center">
-                      <CalendarIcon className="h-4 w-4 text-gray-400 mr-2" />
-                      <span className="text-gray-600">
-                        {formatDate(new Date(appointment.startTime))} - {appointment.clientName}
-                      </span>
-                    </div>
-                    <span className="font-medium text-gray-900">
-                      {appointment.isFirstTime ? '700' : '500'} DH
+            <div className="space-y-3">
+              {client.appointments.map((appointment, index) => (
+                <div
+                  key={appointment._id}
+                  className="flex items-center justify-between text-sm"
+                >
+                  <div className="flex items-center">
+                    <CalendarIcon className="h-4 w-4 text-gray-400 mr-2" />
+                    <span className="text-gray-600">
+                      {formatDate(new Date(appointment.startTime))}
+                      {index === 0 && (
+                        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                          Première séance
+                        </span>
+                      )}
                     </span>
                   </div>
-                ))}
-              </div>
-            </motion.div>
-          );
-        })}
+                  <span className="font-medium text-gray-900">
+                    {index === 0 ? settings.prices.firstSession : settings.prices.followUpSession} DH
+                  </span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        ))}
 
-        {confirmedAppointments.length === 0 && (
+        {clients.length === 0 && (
           <div className="text-center py-4">
             <p className="text-gray-500">Aucun rendez-vous confirmé</p>
           </div>

@@ -22,7 +22,11 @@ const DEFAULT_SETTINGS: AppointmentSettings = {
   breakDuration: 15,
   maxAdvanceBooking: 30,
   fictionalBookingPercentage: 30,
-  blockedDateRanges: []
+  blockedDateRanges: [],
+  prices: {
+    firstSession: 700,
+    followUpSession: 500
+  }
 };
 
 export default function SettingsPage() {
@@ -356,7 +360,52 @@ export default function SettingsPage() {
               </div>
             </div>
           </div>
-          
+
+          {/* Price Settings */}
+          <div>
+            <h3 className="text-lg font-medium text-gray-900">Tarifs des séances</h3>
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Première séance (DH)
+                </label>
+                <input
+                  type="number"
+                  value={settings.prices?.firstSession || 700}
+                  onChange={(e) => setSettings(prev => ({
+                    ...prev!,
+                    prices: {
+                      ...prev!.prices,
+                      firstSession: parseInt(e.target.value)
+                    }
+                  }))}
+                  min="0"
+                  step="50"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Séance de suivi (DH)
+                </label>
+                <input
+                  type="number"
+                  value={settings.prices?.followUpSession || 500}
+                  onChange={(e) => setSettings(prev => ({
+                    ...prev!,
+                    prices: {
+                      ...prev!.prices,
+                      followUpSession: parseInt(e.target.value)
+                    }
+                  }))}
+                  min="0"
+                  step="50"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                />
+              </div>
+            </div>
+          </div>
+
           {/* Blocked Date Ranges */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-gray-900">Périodes bloquées</h3>
