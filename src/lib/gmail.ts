@@ -544,4 +544,4 @@ export async function testEmailConfig() {
   }
 }
 
-export { sendAppointmentNotification, testEmailConfig, sendConfirmationEmail };
+export { sendConfirmationEmail };
