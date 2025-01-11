@@ -14,26 +14,39 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { status } = await request.json();
-    if (!status) {
-      return NextResponse.json(
-        { error: 'Status is required' },
-        { status: 400 }
-      );
+    const body = await request.json();
+    const updateData: { status?: string; isRedFlagged?: boolean; updatedAt: Date } = {
+      updatedAt: new Date()
+    };
+
+    // Handle status update
+    if (body.status) {
+      updateData.status = body.status;
+    }
+
+    // Handle red flag update
+    if (typeof body.isRedFlagged === 'boolean') {
+      updateData.isRedFlagged = body.isRedFlagged;
     }
 
     const client = await clientPromise;
     const db = client.db('joyshypnose');
     const clientsCollection = db.collection('appointments');
 
+    // If updating red flag status, update all appointments with the same phone number
+    if (typeof body.isRedFlagged === 'boolean') {
+      const targetClient = await clientsCollection.findOne({ _id: new ObjectId(params.id) });
+      if (targetClient && targetClient.clientPhone) {
+        await clientsCollection.updateMany(
+          { clientPhone: targetClient.clientPhone },
+          { $set: { isRedFlagged: body.isRedFlagged } }
+        );
+      }
+    }
+
     const result = await clientsCollection.findOneAndUpdate(
       { _id: new ObjectId(params.id) },
-      {
-        $set: {
-          status,
-          updatedAt: new Date()
-        }
-      },
+      { $set: updateData },
       { returnDocument: 'after' }
     );
 

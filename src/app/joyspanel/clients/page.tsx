@@ -12,6 +12,7 @@ import {
   TrashIcon,
   CheckCircleIcon,
   XCircleIcon,
+  FlagIcon,
 } from '@heroicons/react/24/outline';
 import type { TimeSlot } from '@/types/appointment';
 
@@ -109,6 +110,37 @@ export default function ClientsPage() {
     }
   };
 
+  const handleRedFlag = async (clientId: string, clientPhone: string, currentFlagStatus: boolean) => {
+    if (!window.confirm(`Êtes-vous sûr de vouloir ${currentFlagStatus ? 'retirer' : 'ajouter'} le drapeau rouge pour ce client ?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/clients/${clientId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ isRedFlagged: !currentFlagStatus }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update client flag status');
+      }
+
+      // Update all clients with the same phone number
+      setClients(prevClients =>
+        prevClients.map(client =>
+          client.clientPhone === clientPhone
+            ? { ...client, isRedFlagged: !currentFlagStatus }
+            : client
+        )
+      );
+    } catch (error) {
+      setError('Failed to update client flag status');
+    }
+  };
+
   if (isLoading) {
     return <div className="flex justify-center items-center min-h-[400px]">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
@@ -159,14 +191,14 @@ export default function ClientsPage() {
               key={client._id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+              className={`bg-white rounded-lg border ${client.isRedFlagged ? 'border-red-300' : 'border-gray-200'} overflow-hidden hover:shadow-md transition-shadow`}
             >
               <div className="p-4">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center space-x-3">
                     <div className="flex-shrink-0">
-                      <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
-                        <UserIcon className="h-6 w-6 text-primary-600" />
+                      <div className={`h-10 w-10 rounded-full ${client.isRedFlagged ? 'bg-red-100' : 'bg-primary-100'} flex items-center justify-center`}>
+                        <UserIcon className={`h-6 w-6 ${client.isRedFlagged ? 'text-red-600' : 'text-primary-600'}`} />
                       </div>
                     </div>
                     <div>
@@ -185,6 +217,13 @@ export default function ClientsPage() {
                        client.status === 'pending' ? 'En attente' : 'Annulé'}
                     </span>
                     <div className="flex items-center space-x-1">
+                      <button
+                        onClick={() => handleRedFlag(client._id!, client.clientPhone!, client.isRedFlagged || false)}
+                        className={`p-1 ${client.isRedFlagged ? 'text-red-600' : 'text-gray-400'} hover:text-red-900 transition-colors`}
+                        title={client.isRedFlagged ? "Retirer le drapeau rouge" : "Marquer comme client à risque"}
+                      >
+                        <FlagIcon className="h-5 w-5" />
+                      </button>
                       {client.status !== 'booked' && (
                         <button
                           onClick={() => handleStatusChange(client._id!, 'booked')}

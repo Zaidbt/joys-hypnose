@@ -12,7 +12,8 @@ import {
   SparklesIcon,
   NoSymbolIcon,
   FunnelIcon,
-  MagnifyingGlassIcon
+  MagnifyingGlassIcon,
+  FlagIcon,
 } from '@heroicons/react/24/outline';
 import type { TimeSlot } from '@/types/appointment';
 import { formatInTimeZone } from 'date-fns-tz';
@@ -325,7 +326,12 @@ export default function AppointmentsPage() {
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900 hidden sm:table-cell">
                           {appointment.clientName && (
                             <>
-                              <div className="font-medium">{appointment.clientName}</div>
+                              <div className="flex items-center space-x-2">
+                                <span className="font-medium">{appointment.clientName}</span>
+                                {appointment.isRedFlagged && (
+                                  <FlagIcon className="h-4 w-4 text-red-600" title="Client à risque" />
+                                )}
+                              </div>
                               <div className="text-gray-500">{appointment.clientEmail}</div>
                               <div className="text-gray-500">{appointment.clientPhone}</div>
                             </>
@@ -339,8 +345,13 @@ export default function AppointmentsPage() {
                           <div className="sm:hidden mt-1">
                             {appointment.clientName && (
                               <div className="text-gray-500 text-xs">
-                                {appointment.clientName}<br />
-                                {appointment.clientPhone}
+                                <div className="flex items-center space-x-1">
+                                  <span>{appointment.clientName}</span>
+                                  {appointment.isRedFlagged && (
+                                    <FlagIcon className="h-3 w-3 text-red-600" title="Client à risque" />
+                                  )}
+                                </div>
+                                <div>{appointment.clientPhone}</div>
                               </div>
                             )}
                           </div>

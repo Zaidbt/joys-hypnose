@@ -12,6 +12,7 @@ export interface TimeSlot {
   isFictitious: boolean;
   isFirstTime: boolean;
   isOnline?: boolean;
+  isRedFlagged?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
