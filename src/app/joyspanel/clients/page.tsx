@@ -10,6 +10,8 @@ import {
   ClockIcon,
   ChatBubbleLeftIcon,
   TrashIcon,
+  CheckCircleIcon,
+  XCircleIcon,
 } from '@heroicons/react/24/outline';
 import type { TimeSlot } from '@/types/appointment';
 
@@ -73,6 +75,37 @@ export default function ClientsPage() {
       );
     } catch (error) {
       setError('Failed to delete client');
+    }
+  };
+
+  const handleStatusChange = async (clientId: string, newStatus: string) => {
+    if (!window.confirm(`Êtes-vous sûr de vouloir ${newStatus === 'cancelled' ? 'annuler' : 'confirmer'} ce rendez-vous ?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/clients/${clientId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update client status');
+      }
+
+      // Update the client in the state
+      setClients(prevClients =>
+        prevClients.map(client =>
+          client._id === clientId
+            ? { ...client, status: newStatus }
+            : client
+        )
+      );
+    } catch (error) {
+      setError('Failed to update client status');
     }
   };
 
@@ -151,13 +184,33 @@ export default function ClientsPage() {
                       {client.status === 'booked' ? 'Confirmé' : 
                        client.status === 'pending' ? 'En attente' : 'Annulé'}
                     </span>
-                    <button
-                      onClick={() => handleDeleteClient(client._id!)}
-                      className="p-1 text-red-600 hover:text-red-900 transition-colors"
-                      title="Supprimer le client"
-                    >
-                      <TrashIcon className="h-5 w-5" />
-                    </button>
+                    <div className="flex items-center space-x-1">
+                      {client.status !== 'booked' && (
+                        <button
+                          onClick={() => handleStatusChange(client._id!, 'booked')}
+                          className="p-1 text-green-600 hover:text-green-900 transition-colors"
+                          title="Confirmer le rendez-vous"
+                        >
+                          <CheckCircleIcon className="h-5 w-5" />
+                        </button>
+                      )}
+                      {client.status !== 'cancelled' && (
+                        <button
+                          onClick={() => handleStatusChange(client._id!, 'cancelled')}
+                          className="p-1 text-red-600 hover:text-red-900 transition-colors"
+                          title="Annuler le rendez-vous"
+                        >
+                          <XCircleIcon className="h-5 w-5" />
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleDeleteClient(client._id!)}
+                        className="p-1 text-red-600 hover:text-red-900 transition-colors"
+                        title="Supprimer le client"
+                      >
+                        <TrashIcon className="h-5 w-5" />
+                      </button>
+                    </div>
                   </div>
                 </div>
 
