@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/utils/authOptions';
 import clientPromise from '@/lib/mongodb';
-import { sendAppointmentNotification } from '@/lib/gmail';
+import { sendAppointmentNotification, sendConfirmationEmail } from '@/lib/gmail';
 import type { TimeSlot, AppointmentSettings } from '@/types/appointment';
 
 // Cache for appointments
@@ -141,7 +141,7 @@ export async function POST(request: Request) {
     const appointment = {
       startTime: new Date(body.startTime),
       endTime: new Date(body.endTime),
-      status: isAdmin ? (body.status || 'available') : 'pending',
+      status: isAdmin ? 'booked' : 'pending',
       clientName: body.clientName,
       clientEmail: body.clientEmail,
       clientPhone: body.clientPhone,
@@ -155,28 +155,34 @@ export async function POST(request: Request) {
 
     const result = await appointmentsCollection.insertOne(appointment);
     
-    // Send notification email only for client bookings, not admin bookings
-    if (!isAdmin) {
-      try {
-        console.log('Attempting to send email notification for appointment:', {
-          clientName: appointment.clientName,
-          clientEmail: appointment.clientEmail,
-          startTime: appointment.startTime,
-          isFirstTime: appointment.isFirstTime,
-          status: appointment.status,
-          isAdmin
+    try {
+      console.log('Attempting to send email for appointment:', {
+        clientName: appointment.clientName,
+        clientEmail: appointment.clientEmail,
+        startTime: appointment.startTime,
+        isFirstTime: appointment.isFirstTime,
+        status: appointment.status,
+        isAdmin
+      });
+      
+      if (isAdmin) {
+        // Send confirmation email for admin-created appointments
+        await sendConfirmationEmail({
+          ...appointment,
+          _id: result.insertedId.toString()
         });
-        
+        console.log('Confirmation email sent successfully for admin booking');
+      } else {
+        // Send notification email for client bookings
         await sendAppointmentNotification({
           ...appointment,
           _id: result.insertedId.toString()
         });
-        
-        console.log('Email notification sent successfully');
-      } catch (error) {
-        console.error('Failed to send notification email:', error);
-        // Don't fail the request if email fails
+        console.log('Notification email sent successfully for client booking');
       }
+    } catch (error) {
+      console.error('Failed to send email:', error);
+      // Don't fail the request if email fails
     }
 
     // Invalidate cache

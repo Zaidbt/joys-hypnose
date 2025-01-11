@@ -40,8 +40,8 @@ export async function PATCH(
       );
     }
 
-    // Send confirmation email when appointment is confirmed (status changed to 'booked')
-    if (status === 'booked') {
+    // Only send confirmation email when changing from pending to booked
+    if (status === 'booked' && result.status === 'pending') {
       try {
         console.log('Attempting to send confirmation email for appointment:', {
           id: params.id,
