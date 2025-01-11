@@ -155,26 +155,28 @@ export async function POST(request: Request) {
 
     const result = await appointmentsCollection.insertOne(appointment);
     
-    // Send notification email for both client bookings and admin-created appointments
-    try {
-      console.log('Attempting to send email notification for appointment:', {
-        clientName: appointment.clientName,
-        clientEmail: appointment.clientEmail,
-        startTime: appointment.startTime,
-        isFirstTime: appointment.isFirstTime,
-        status: appointment.status,
-        isAdmin
-      });
-      
-      await sendAppointmentNotification({
-        ...appointment,
-        _id: result.insertedId.toString()
-      });
-      
-      console.log('Email notification sent successfully');
-    } catch (error) {
-      console.error('Failed to send notification email:', error);
-      // Don't fail the request if email fails
+    // Send notification email only for client bookings, not admin bookings
+    if (!isAdmin) {
+      try {
+        console.log('Attempting to send email notification for appointment:', {
+          clientName: appointment.clientName,
+          clientEmail: appointment.clientEmail,
+          startTime: appointment.startTime,
+          isFirstTime: appointment.isFirstTime,
+          status: appointment.status,
+          isAdmin
+        });
+        
+        await sendAppointmentNotification({
+          ...appointment,
+          _id: result.insertedId.toString()
+        });
+        
+        console.log('Email notification sent successfully');
+      } catch (error) {
+        console.error('Failed to send notification email:', error);
+        // Don't fail the request if email fails
+      }
     }
 
     // Invalidate cache

@@ -201,17 +201,29 @@ async function sendConfirmationEmail(appointment: TimeSlot) {
         .header { text-align: center; margin-bottom: 30px; }
         .content { background-color: #f7fafc; padding: 20px; border-radius: 8px; }
         .details { background-color: white; padding: 15px; border-radius: 6px; margin: 20px 0; }
-        .price-info { background-color: #ebf4ff; padding: 15px; border-radius: 6px; margin: 20px 0; }
-        .footer { text-align: center; margin-top: 30px; color: #718096; }
-        .confirmation-badge {
-          background-color: #c6f6d5;
-          color: #22543d;
-          padding: 10px 20px;
+        .warning { 
+          background-color: #fff5f5; 
+          border-left: 4px solid #f56565;
+          padding: 15px;
+          margin: 20px 0;
           border-radius: 6px;
+        }
+        .social-links {
+          margin: 20px 0;
           text-align: center;
-          margin: 20px auto;
-          font-weight: bold;
-          border: 2px solid #9ae6b4;
+        }
+        .social-links a {
+          color: #6b46c1;
+          text-decoration: none;
+          margin: 0 10px;
+        }
+        .footer {
+          text-align: center;
+          margin-top: 30px;
+          padding-top: 20px;
+          border-top: 1px solid #eee;
+          font-style: italic;
+          color: #666;
         }
       </style>
     </head>
@@ -219,16 +231,13 @@ async function sendConfirmationEmail(appointment: TimeSlot) {
       <div class="container">
         <div class="header">
           <h1 style="color: #6b46c1; margin-bottom: 10px;">Joy's Hypnose</h1>
-          <p style="font-size: 18px; color: #4a5568;">✨ Votre rendez-vous est confirmé ! ✨</p>
+          <p style="font-size: 18px; color: #4a5568;">Confirmation de votre rendez-vous</p>
         </div>
 
         <div class="content">
-          <div class="confirmation-badge">
-            Bonne nouvelle ! Votre demande de rendez-vous a été validée.
-          </div>
-
-          <p>Cher(e) ${appointment.clientName},</p>
-          <p>J'ai le plaisir de vous confirmer que votre demande de rendez-vous a été <strong>acceptée</strong>. Voici les détails de notre rencontre :</p>
+          <p>Bonjour ${appointment.clientName},</p>
+          
+          <p>Nous vous confirmons votre rendez-vous pour une séance d'hypnose transformative. Voici les détails :</p>
           
           <div class="details">
             <p><strong>Date :</strong> ${formattedDate}</p>
@@ -241,13 +250,13 @@ async function sendConfirmationEmail(appointment: TimeSlot) {
               <p><strong>Code secret :</strong> D99WQ6</p>
             </div>
             ` : `
-            <p><strong>Lieu :</strong> 17 Rue Bab El Mandab, Residence El Prado 2,<br>1er étage appart #2 Bourgogne,<br>Casablanca</p>
+            <p><strong>Adresse :</strong> 17 Rue Bab El Mandab, Residence El Prado 2,<br>1er étage appart #2 Bourgogne,<br>Casablanca</p>
             `}
           </div>
 
-          <div class="price-info">
-            <p><strong>Tarif de la séance :</strong> 700 DH</p>
-            <p>Le règlement peut être effectué en espèces ou par virement bancaire.</p>
+          <div class="warning">
+            <p style="margin: 0;"><strong>Important :</strong></p>
+            <p style="margin-top: 10px;">Nous apprécions le temps de chacun et vous remercions de prendre cette confirmation au sérieux. Si vous devez annuler, nous vous prions de le faire au moins 24 heures avant la séance. Dans le cas contraire, un montant de 200 DH sera requis pour un futur rendez-vous.</p>
           </div>
 
           ${appointment.isFirstTime ? `
@@ -262,19 +271,18 @@ async function sendConfirmationEmail(appointment: TimeSlot) {
           </div>
           `}
 
-          <p>Pour toute question ou besoin de modification, n'hésitez pas à me contacter :</p>
-          <ul style="list-style: none; padding: 0;">
-            <li>📞 Téléphone : +212 660-826028</li>
-            <li>✉️ Email : joyshypnose@gmail.com</li>
-          </ul>
+          <p>N'hésitez pas à visiter notre site pour découvrir plus d'informations, et suivez-nous sur Instagram pour rester à l'affût des retraites et ateliers à venir prochainement.</p>
+
+          <div class="social-links">
+            <a href="https://www.joyshypnose-therapies.com">Notre site web</a> |
+            <a href="https://www.instagram.com/joys.hypnose">Instagram</a>
+          </div>
+
+          <p>Nous vous remercions pour votre compréhension et avons hâte de vous retrouver bientôt !</p>
         </div>
 
         <div class="footer">
-          <p>À très bientôt,</p>
-          <p style="font-weight: bold;">Joy's Hypnose</p>
-          <p style="margin-top: 15px;">
-            <a href="https://www.joyshypnose-therapies.com" style="color: #6b46c1; text-decoration: none;">www.joyshypnose-therapies.com</a>
-          </p>
+          <p>"Ouvrez la porte à la transformation, un souffle à la fois !"</p>
         </div>
       </div>
     </body>
@@ -286,7 +294,7 @@ async function sendConfirmationEmail(appointment: TimeSlot) {
     'MIME-Version: 1.0',
     `To: ${appointment.clientEmail}`,
     'From: Joy\'s Hypnose <noreply@joyshypnose-therapies.com>',
-    'Subject: Votre rendez-vous est confirmé ! - Joy\'s Hypnose',
+    'Subject: Confirmation de votre rendez-vous - Joy\'s Hypnose',
     '',
     confirmationEmailContent
   ].join('\n');
