@@ -27,8 +27,34 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: "Joy's Hypnose | Hypnothérapie à Casablanca",
-  description: "Découvrez l'hypnothérapie à Casablanca avec Joy's Hypnose. Séances personnalisées pour stress, anxiété, confiance en soi et plus encore.",
+  metadataBase: new URL('https://joys-hypnose.com'),
+  title: {
+    default: "Joy's Hypnose | Hypnothérapie à Casablanca",
+    template: "%s | Joy's Hypnose"
+  },
+  description: "Découvrez l'hypnothérapie à Casablanca avec Joy's Hypnose. Séances personnalisées pour stress, anxiété, confiance en soi et développement personnel.",
+  keywords: ["hypnothérapie", "casablanca", "hypnose", "thérapie", "bien-être", "développement personnel", "stress", "anxiété"],
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  alternates: {
+    canonical: 'https://joys-hypnose.com',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'fr_FR',
+    url: 'https://joys-hypnose.com',
+    title: "Joy's Hypnose | Hypnothérapie à Casablanca",
+    description: "Découvrez l'hypnothérapie à Casablanca avec Joy's Hypnose. Séances personnalisées pour stress, anxiété, confiance en soi et développement personnel.",
+    siteName: "Joy's Hypnose",
+  },
   icons: {
     icon: '/favicon.ico',
     shortcut: '/favicon-16x16.png',
