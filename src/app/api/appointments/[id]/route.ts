@@ -43,8 +43,16 @@ export async function PATCH(
     // Send confirmation email when appointment is confirmed (status changed to 'booked')
     if (status === 'booked') {
       try {
+        console.log('Attempting to send confirmation email for appointment:', {
+          id: params.id,
+          clientName: result.clientName,
+          clientEmail: result.clientEmail,
+          startTime: result.startTime,
+          status: result.status
+        });
+        
         await sendConfirmationEmail(result);
-        console.log('Confirmation email sent for appointment:', params.id);
+        console.log('Confirmation email sent successfully for appointment:', params.id);
       } catch (error) {
         console.error('Error sending confirmation email:', error);
         // Don't fail the request if email fails

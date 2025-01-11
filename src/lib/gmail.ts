@@ -172,6 +172,13 @@ async function sendConfirmationEmail(appointment: TimeSlot) {
     return;
   }
 
+  console.log('Starting sendConfirmationEmail with appointment:', {
+    clientName: appointment.clientName,
+    clientEmail: appointment.clientEmail,
+    startTime: appointment.startTime,
+    status: appointment.status
+  });
+
   const appointmentDate = new Date(appointment.startTime);
   const formatter = new Intl.DateTimeFormat('fr-FR', {
     timeZone: 'Africa/Casablanca',
@@ -275,7 +282,7 @@ async function sendConfirmationEmail(appointment: TimeSlot) {
 
           <div class="social-links">
             <a href="https://www.joyshypnose-therapies.com">Notre site web</a> |
-            <a href="https://www.instagram.com/joys.hypnose">Instagram</a>
+            <a href="https://www.instagram.com/joys_hypnose">Instagram</a>
           </div>
 
           <p>Nous vous remercions pour votre compréhension et avons hâte de vous retrouver bientôt !</p>
