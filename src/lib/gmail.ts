@@ -2,28 +2,47 @@ import { google } from 'googleapis';
 import { OAuth2Client } from 'google-auth-library';
 import type { TimeSlot } from '@/types/appointment';
 
-// Initialize the Gmail API client
-const createGmailClient = () => {
-  try {
-    const oauth2Client = new OAuth2Client(
-      process.env.GMAIL_CLIENT_ID,
-      process.env.GMAIL_CLIENT_SECRET,
-      'https://developers.google.com/oauthplayground'
-    );
+// Cache for the OAuth2 client
+let oauth2ClientCache: any = null;
+let lastTokenRefresh: number = 0;
+const TOKEN_REFRESH_INTERVAL = 30 * 60 * 1000; // 30 minutes
 
+async function getOAuth2Client() {
+  const now = Date.now();
+  
+  // If we have a cached client and the token was refreshed recently, return it
+  if (oauth2ClientCache && (now - lastTokenRefresh) < TOKEN_REFRESH_INTERVAL) {
+    return oauth2ClientCache;
+  }
+
+  // Create a new OAuth2 client
+  const oauth2Client = new google.auth.OAuth2(
+    process.env.GMAIL_CLIENT_ID,
+    process.env.GMAIL_CLIENT_SECRET,
+    process.env.GMAIL_REDIRECT_URI
+  );
+
+  try {
     oauth2Client.setCredentials({
       refresh_token: process.env.GMAIL_REFRESH_TOKEN
     });
 
-    return google.gmail({ version: 'v1', auth: oauth2Client });
+    // Force a token refresh
+    await oauth2Client.getAccessToken();
+    
+    // Update cache
+    oauth2ClientCache = oauth2Client;
+    lastTokenRefresh = now;
+    
+    return oauth2Client;
   } catch (error) {
-    console.error('Error creating Gmail client:', error);
-    throw error;
+    console.error('Error refreshing Gmail token:', error);
+    throw new Error('Failed to refresh Gmail token');
   }
-};
+}
 
 async function sendClientConfirmation(appointment: TimeSlot) {
-  const gmail = createGmailClient();
+  const gmail = google.gmail({ version: 'v1', auth: await getOAuth2Client() });
   if (!gmail) {
     console.warn('Gmail client not initialized - skipping client confirmation');
     return;
@@ -166,7 +185,7 @@ async function sendClientConfirmation(appointment: TimeSlot) {
 }
 
 async function sendConfirmationEmail(appointment: TimeSlot) {
-  const gmail = createGmailClient();
+  const gmail = google.gmail({ version: 'v1', auth: await getOAuth2Client() });
   if (!gmail) {
     console.warn('Gmail client not initialized - skipping confirmation email');
     return;
@@ -332,7 +351,7 @@ export async function sendAppointmentNotification(appointment: TimeSlot) {
     status: appointment.status
   });
 
-  const gmail = createGmailClient();
+  const gmail = google.gmail({ version: 'v1', auth: await getOAuth2Client() });
   if (!gmail) {
     console.warn('Gmail client not initialized - check environment variables:', {
       clientId: process.env.GMAIL_CLIENT_ID ? 'Set' : 'Not set',
@@ -557,7 +576,7 @@ export async function sendAppointmentNotification(appointment: TimeSlot) {
 // Test function to verify configuration
 export async function testEmailConfig() {
   try {
-    const gmail = createGmailClient();
+    const gmail = google.gmail({ version: 'v1', auth: await getOAuth2Client() });
     const response = await gmail.users.getProfile({ userId: 'me' });
     return {
       success: true,
