@@ -4,6 +4,7 @@ import { authOptions } from '@/app/utils/authOptions';
 import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 import { sendConfirmationEmail } from '@/lib/gmail';
+import type { TimeSlot } from '@/types/appointment';
 
 export async function PATCH(
   request: Request,
@@ -51,7 +52,25 @@ export async function PATCH(
           status: result.status
         });
         
-        await sendConfirmationEmail(result);
+        // Cast the MongoDB document to TimeSlot type
+        const appointment: TimeSlot = {
+          _id: result._id.toString(),
+          startTime: new Date(result.startTime),
+          endTime: new Date(result.endTime),
+          status: result.status,
+          clientName: result.clientName,
+          clientEmail: result.clientEmail,
+          clientPhone: result.clientPhone,
+          notes: result.notes,
+          isFictitious: result.isFictitious || false,
+          isFirstTime: result.isFirstTime || false,
+          isOnline: result.isOnline || false,
+          isRedFlagged: result.isRedFlagged || false,
+          createdAt: new Date(result.createdAt),
+          updatedAt: new Date(result.updatedAt)
+        };
+        
+        await sendConfirmationEmail(appointment);
         console.log('Confirmation email sent successfully for appointment:', params.id);
       } catch (error) {
         console.error('Error sending confirmation email:', error);
