@@ -4,6 +4,7 @@ import { authOptions } from '@/app/utils/authOptions';
 import clientPromise from '@/lib/mongodb';
 import type { NewsItem, NewsResponse } from '@/types/news';
 import { ObjectId } from 'mongodb';
+import { connectToDatabase } from '@/lib/mongodb';
 
 // Helper function to generate slug
 function generateSlug(title: string): string {
@@ -15,58 +16,38 @@ function generateSlug(title: string): string {
 
 export async function GET(request: Request) {
   try {
+    const { db } = await connectToDatabase();
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const pageSize = parseInt(searchParams.get('pageSize') || '10');
-    const type = searchParams.get('type');
-    const status = searchParams.get('status');
-    const search = searchParams.get('search');
-
-    const client = await clientPromise;
-    const db = client.db('joyshypnose');
-    const newsCollection = db.collection('news');
 
     // Build query
-    const query: any = {};
-    if (type) query.type = type;
-    if (status) query.status = status;
+    const query: any = { status: 'published' };
+    const type = searchParams.get('type');
+    const search = searchParams.get('search');
+
+    if (type && type !== 'all') {
+      query.type = type;
+    }
+
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: 'i' } },
-        { content: { $regex: search, $options: 'i' } }
+        { content: { $regex: search, $options: 'i' } },
+        { excerpt: { $regex: search, $options: 'i' } },
       ];
     }
 
-    // Get total count for pagination
-    const total = await newsCollection.countDocuments(query);
-
-    // Fetch news items with pagination
-    const news = await newsCollection
+    // Fetch news items
+    const news = await db
+      .collection('news')
       .find(query)
       .sort({ publishedAt: -1, createdAt: -1 })
-      .skip((page - 1) * pageSize)
-      .limit(pageSize)
       .toArray();
 
-    const response: NewsResponse = {
-      success: true,
-      data: news.map(item => ({
-        ...item,
-        _id: item._id.toString()
-      })),
-      pagination: {
-        total,
-        page,
-        pageSize,
-        totalPages: Math.ceil(total / pageSize)
-      }
-    };
-
-    return NextResponse.json(response);
+    return NextResponse.json({ data: news });
   } catch (error) {
     console.error('Error fetching news:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch news' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
