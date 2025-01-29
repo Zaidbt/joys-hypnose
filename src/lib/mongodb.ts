@@ -25,4 +25,10 @@ if (process.env.NODE_ENV === 'development') {
   clientPromise = client.connect();
 }
 
+export async function connectToDatabase() {
+  const client = await clientPromise;
+  const db = client.db('joyshypnose');
+  return { client, db };
+}
+
 export default clientPromise; 
