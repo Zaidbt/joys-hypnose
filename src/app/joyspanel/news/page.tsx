@@ -67,7 +67,7 @@ export default function NewsPage() {
         ...(selectedStatus !== 'all' && { status: selectedStatus }),
       });
 
-      const response = await fetch(\`/api/news?\${queryParams}\`);
+      const response = await fetch(`/api/news?${queryParams}`);
       if (!response.ok) throw new Error('Failed to fetch news');
       
       const data = await response.json();
@@ -86,7 +86,7 @@ export default function NewsPage() {
     }
 
     try {
-      const response = await fetch(\`/api/news/\${id}\`, {
+      const response = await fetch(`/api/news/${id}`, {
         method: 'DELETE',
       });
 
@@ -101,7 +101,7 @@ export default function NewsPage() {
   const handleStatusToggle = async (id: string, currentStatus: string) => {
     try {
       const newStatus = currentStatus === 'published' ? 'draft' : 'published';
-      const response = await fetch(\`/api/news/\${id}\`, {
+      const response = await fetch(`/api/news/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -291,7 +291,7 @@ export default function NewsPage() {
                               )}
                             </button>
                             <button
-                              onClick={() => router.push(\`/joyspanel/news/\${item._id}\`)}
+                              onClick={() => router.push(`/joyspanel/news/${item._id}`)}
                               className="text-primary-600 hover:text-primary-900"
                             >
                               <PencilIcon className="h-5 w-5" />

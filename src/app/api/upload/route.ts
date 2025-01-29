@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     const buffer = Buffer.from(bytes);
     const uniqueId = uuidv4();
     const extension = file.type.split('/')[1];
-    const filename = \`\${uniqueId}.\${extension}\`;
+    const filename = `${uniqueId}.${extension}`;
 
     // Save file to public directory
     const path = join(process.cwd(), 'public', 'uploads', filename);
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
     // Return the URL
     return NextResponse.json({
       success: true,
-      url: \`/uploads/\${filename}\`,
+      url: `/uploads/${filename}`,
     });
   } catch (error) {
     console.error('Error uploading file:', error);
