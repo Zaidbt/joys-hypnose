@@ -166,12 +166,19 @@ export async function POST(request: Request) {
       });
       
       if (isAdmin) {
-        // Send confirmation email for admin-created appointments
+        // Send confirmation email to client for admin-created appointments
         await sendConfirmationEmail({
           ...appointment,
           _id: result.insertedId.toString()
         });
         console.log('Confirmation email sent successfully for admin booking');
+
+        // Also send notification email to admin
+        await sendAppointmentNotification({
+          ...appointment,
+          _id: result.insertedId.toString()
+        });
+        console.log('Notification email sent successfully to admin for admin booking');
       } else {
         // Send notification email for client bookings
         await sendAppointmentNotification({
