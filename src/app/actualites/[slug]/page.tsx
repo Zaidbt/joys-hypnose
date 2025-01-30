@@ -10,6 +10,7 @@ import {
   ClockIcon,
   UserIcon,
   ArrowLeftIcon,
+  ShareIcon,
 } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
 import type { NewsItem, NewsType } from '@/types/news';
@@ -67,6 +68,18 @@ export default function NewsItemPage({ params }: { params: { slug: string } }) {
     }
   };
 
+  const handleShare = async () => {
+    try {
+      await navigator.share({
+        title: newsItem?.title,
+        text: newsItem?.excerpt,
+        url: window.location.href,
+      });
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-[calc(100vh-5rem)]">
@@ -100,88 +113,111 @@ export default function NewsItemPage({ params }: { params: { slug: string } }) {
   const Icon = newsTypeIcons[newsItem.type as NewsType];
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
-      {/* Hero Section */}
-      <div className="relative bg-gradient-to-br from-primary-700 to-primary-900">
-        {newsItem.image ? (
-          <div className="absolute inset-0">
-            <img
-              src={newsItem.image}
-              alt={newsItem.title}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-black opacity-50"></div>
-          </div>
-        ) : (
-          <div className="absolute inset-0 bg-[url('/images/pattern.svg')] opacity-10"></div>
-        )}
-
-        <div className="relative container mx-auto px-4 py-24">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="max-w-3xl"
+    <div className="min-h-screen bg-gray-50">
+      {/* Navigation Bar */}
+      <div className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-lg z-10 border-b border-gray-200">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+          <button
+            onClick={() => router.push('/actualites')}
+            className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors"
           >
-            <div className="flex items-center mb-6">
-              <button
-                onClick={() => router.push('/actualites')}
-                className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm transition-colors"
-              >
-                <ArrowLeftIcon className="h-4 w-4 mr-2" />
-                Retour aux actualités
-              </button>
-            </div>
-
-            <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-white/90 backdrop-blur-sm text-primary-700 shadow-lg mb-6">
-              <Icon className="h-4 w-4 mr-2" />
-              {newsTypeLabels[newsItem.type as NewsType]}
-            </span>
-
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
-              {newsItem.title}
-            </h1>
-
-            <div className="flex flex-wrap items-center gap-4 text-primary-100">
-              <span className="flex items-center">
-                <ClockIcon className="h-5 w-5 mr-2" />
-                {formatDate(new Date(newsItem.publishedAt || newsItem.createdAt))}
-              </span>
-              {newsItem.author && (
-                <span className="flex items-center">
-                  <UserIcon className="h-5 w-5 mr-2" />
-                  {newsItem.author}
-                </span>
-              )}
-              {newsItem.type === 'event' && newsItem.eventLocation && (
-                <span className="flex items-center">
-                  <MapPinIcon className="h-5 w-5 mr-2" />
-                  {newsItem.eventLocation}
-                </span>
-              )}
-            </div>
-          </motion.div>
+            <ArrowLeftIcon className="h-4 w-4 mr-2" />
+            Retour aux actualités
+          </button>
+          <button
+            onClick={handleShare}
+            className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors"
+          >
+            <ShareIcon className="h-4 w-4 mr-2" />
+            Partager
+          </button>
         </div>
       </div>
 
-      {/* Content Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="container mx-auto px-4 py-12"
-      >
-        <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-sm p-8">
-          {newsItem.excerpt && (
-            <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-              {newsItem.excerpt}
-            </p>
+      {/* Main Content */}
+      <div className="pt-16">
+        {/* Hero Section */}
+        <div className="relative bg-gray-900">
+          {newsItem.image ? (
+            <div className="aspect-[21/9] max-h-[70vh] relative">
+              <img
+                src={newsItem.image}
+                alt={newsItem.title}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-gray-900/20"></div>
+            </div>
+          ) : (
+            <div className="aspect-[21/9] max-h-[70vh] bg-gradient-to-br from-primary-700 to-primary-900 flex items-center justify-center">
+              <Icon className="h-32 w-32 text-white/20" />
+            </div>
           )}
-          <div 
-            className="prose prose-lg max-w-none prose-primary"
-            dangerouslySetInnerHTML={{ __html: newsItem.content }}
-          />
+
+          {/* Article Header */}
+          <div className="absolute bottom-0 left-0 right-0 p-8">
+            <div className="container mx-auto max-w-4xl">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-white"
+              >
+                <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-white/10 backdrop-blur-sm text-white mb-4">
+                  <Icon className="h-4 w-4 mr-2" />
+                  {newsTypeLabels[newsItem.type as NewsType]}
+                </span>
+
+                <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
+                  {newsItem.title}
+                </h1>
+
+                <div className="flex flex-wrap items-center gap-6 text-white/80 text-sm">
+                  <span className="flex items-center">
+                    <ClockIcon className="h-5 w-5 mr-2" />
+                    {formatDate(new Date(newsItem.publishedAt || newsItem.createdAt))}
+                  </span>
+                  {newsItem.author && (
+                    <span className="flex items-center">
+                      <UserIcon className="h-5 w-5 mr-2" />
+                      {newsItem.author}
+                    </span>
+                  )}
+                  {newsItem.type === 'event' && newsItem.eventLocation && (
+                    <span className="flex items-center">
+                      <MapPinIcon className="h-5 w-5 mr-2" />
+                      {newsItem.eventLocation}
+                    </span>
+                  )}
+                </div>
+              </motion.div>
+            </div>
+          </div>
         </div>
-      </motion.div>
+
+        {/* Article Content */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="container mx-auto max-w-4xl px-4 py-12"
+        >
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            {newsItem.excerpt && (
+              <div className="p-8 border-b border-gray-100 bg-gray-50">
+                <p className="text-xl text-gray-600 leading-relaxed">
+                  {newsItem.excerpt}
+                </p>
+              </div>
+            )}
+            
+            <div className="p-8 md:p-12">
+              <div 
+                className="prose prose-lg max-w-none prose-primary prose-headings:font-bold prose-p:leading-relaxed prose-img:rounded-xl"
+                dangerouslySetInnerHTML={{ __html: newsItem.content }}
+              />
+            </div>
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 } 

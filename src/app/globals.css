@@ -137,4 +137,118 @@ h1, h2, h3, h4, h5, h6,
 .prose-editor .ql-picker {
   height: 28px;
 }
+
+/* Article Content Styles */
+.prose {
+  --tw-prose-body: theme('colors.gray.600');
+  --tw-prose-headings: theme('colors.gray.900');
+  --tw-prose-lead: theme('colors.gray.600');
+  --tw-prose-links: theme('colors.primary.600');
+  --tw-prose-bold: theme('colors.gray.900');
+  --tw-prose-counters: theme('colors.gray.500');
+  --tw-prose-bullets: theme('colors.gray.300');
+  --tw-prose-hr: theme('colors.gray.200');
+  --tw-prose-quotes: theme('colors.gray.900');
+  --tw-prose-quote-borders: theme('colors.primary.200');
+  --tw-prose-captions: theme('colors.gray.500');
+  --tw-prose-code: theme('colors.gray.900');
+  --tw-prose-pre-code: theme('colors.gray.200');
+  --tw-prose-pre-bg: theme('colors.gray.800');
+  --tw-prose-th-borders: theme('colors.gray.300');
+  --tw-prose-td-borders: theme('colors.gray.200');
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4 {
+  font-weight: 700;
+  line-height: 1.3;
+  margin-top: 2em;
+  margin-bottom: 1em;
+  color: theme('colors.gray.900');
+}
+
+.prose h1:first-child,
+.prose h2:first-child,
+.prose h3:first-child,
+.prose h4:first-child {
+  margin-top: 0;
+}
+
+.prose p {
+  margin-bottom: 1.5em;
+  line-height: 1.75;
+}
+
+.prose img {
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  margin: 2em 0;
+}
+
+.prose blockquote {
+  font-style: italic;
+  border-left-width: 0.25rem;
+  border-left-color: theme('colors.primary.500');
+  margin: 2em 0;
+  padding-left: 1.5em;
+  font-size: 1.125em;
+  color: theme('colors.gray.700');
+}
+
+.prose ul, .prose ol {
+  margin: 1.5em 0;
+  padding-left: 1.5em;
+}
+
+.prose li {
+  margin: 0.5em 0;
+}
+
+.prose a {
+  text-decoration: none;
+  border-bottom: 1px solid theme('colors.primary.200');
+  transition: border-color 0.2s ease;
+}
+
+.prose a:hover {
+  border-bottom-color: theme('colors.primary.500');
+}
+
+.prose code {
+  background-color: theme('colors.gray.100');
+  padding: 0.2em 0.4em;
+  border-radius: 0.25em;
+  font-size: 0.875em;
+}
+
+.prose pre {
+  background-color: theme('colors.gray.800');
+  color: theme('colors.gray.200');
+  padding: 1.5em;
+  border-radius: 0.5em;
+  overflow-x: auto;
+  margin: 2em 0;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2em 0;
+}
+
+.prose th {
+  background-color: theme('colors.gray.50');
+  font-weight: 600;
+  text-align: left;
+  padding: 0.75em 1em;
+  border-bottom: 2px solid theme('colors.gray.200');
+}
+
+.prose td {
+  padding: 0.75em 1em;
+  border-bottom: 1px solid theme('colors.gray.200');
+}
+
+.prose tr:last-child td {
+  border-bottom: none;
+}
  
