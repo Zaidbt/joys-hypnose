@@ -111,11 +111,16 @@ export default function NewsPage() {
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to update status');
+      const data = await response.json();
+      
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to update status');
+      }
 
       await fetchNews();
     } catch (error) {
-      setError('Failed to update status');
+      console.error('Error updating status:', error);
+      setError(error instanceof Error ? error.message : 'Failed to update status');
     }
   };
 
