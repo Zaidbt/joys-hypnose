@@ -206,7 +206,7 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
                 Image URL
               </label>
               <input
-                type="url"
+                type="text"
                 id="image"
                 value={newsItem.image || ''}
                 onChange={(e) => setNewsItem({ ...newsItem, image: e.target.value })}
