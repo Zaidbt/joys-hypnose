@@ -68,13 +68,15 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
     try {
       setIsSaving(true);
       setError(null);
+      // Exclude _id from the request body
+      const { _id, ...newsItemWithoutId } = newsItem;
       const response = await fetch(`/api/news/${params.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          ...newsItem,
+          ...newsItemWithoutId,
           updatedAt: new Date().toISOString(),
         }),
       });
