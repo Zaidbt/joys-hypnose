@@ -109,17 +109,17 @@ export default function EventRegistrationsPage() {
             }
           </p>
         </div>
-        {eventId && (
-          <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+        <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+          {eventId ? (
             <button
-              onClick={() => router.push('/joyspanel/news')}
+              onClick={() => router.push('/joyspanel/event-registrations')}
               className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
             >
               <ArrowLeftIcon className="h-4 w-4 mr-2" />
-              Retour aux actualités
+              Toutes les inscriptions
             </button>
-          </div>
-        )}
+          ) : null}
+        </div>
       </div>
 
       {/* Filters */}
@@ -152,7 +152,7 @@ export default function EventRegistrationsPage() {
                 <thead className="bg-gray-50">
                   <tr>
                     <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
-                      Événement
+                      {!eventId && "Événement"}
                     </th>
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                       Participant
@@ -174,9 +174,11 @@ export default function EventRegistrationsPage() {
                 <tbody className="divide-y divide-gray-200 bg-white">
                   {registrations.map((registration) => (
                     <tr key={registration._id}>
-                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
-                        <div className="font-medium text-gray-900">{registration.eventTitle}</div>
-                      </td>
+                      {!eventId && (
+                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                          <div className="font-medium text-gray-900">{registration.eventTitle}</div>
+                        </td>
+                      )}
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         <div className="font-medium text-gray-900">
                           {registration.firstName} {registration.lastName}
@@ -195,22 +197,44 @@ export default function EventRegistrationsPage() {
                         </span>
                       </td>
                       <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                        {registration.status === 'pending' && (
-                          <div className="flex justify-end space-x-2">
-                            <button
-                              onClick={() => handleStatusChange(registration._id!, 'confirmed')}
-                              className="text-green-600 hover:text-green-900"
-                            >
-                              <CheckIcon className="h-5 w-5" />
-                            </button>
+                        <div className="flex justify-end space-x-2">
+                          {registration.status === 'pending' && (
+                            <>
+                              <button
+                                onClick={() => handleStatusChange(registration._id!, 'confirmed')}
+                                className="text-green-600 hover:text-green-900"
+                                title="Confirmer"
+                              >
+                                <CheckIcon className="h-5 w-5" />
+                              </button>
+                              <button
+                                onClick={() => handleStatusChange(registration._id!, 'cancelled')}
+                                className="text-red-600 hover:text-red-900"
+                                title="Annuler"
+                              >
+                                <XMarkIcon className="h-5 w-5" />
+                              </button>
+                            </>
+                          )}
+                          {registration.status === 'confirmed' && (
                             <button
                               onClick={() => handleStatusChange(registration._id!, 'cancelled')}
                               className="text-red-600 hover:text-red-900"
+                              title="Annuler"
                             >
                               <XMarkIcon className="h-5 w-5" />
                             </button>
-                          </div>
-                        )}
+                          )}
+                          {registration.status === 'cancelled' && (
+                            <button
+                              onClick={() => handleStatusChange(registration._id!, 'confirmed')}
+                              className="text-green-600 hover:text-green-900"
+                              title="Réactiver"
+                            >
+                              <CheckIcon className="h-5 w-5" />
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
