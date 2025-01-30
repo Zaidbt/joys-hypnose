@@ -46,10 +46,18 @@ export default function NewsItemPage({ params }: { params: { slug: string } }) {
   const fetchNewsItem = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`/api/news/by-slug/${params.slug}`);
-      if (!response.ok) throw new Error('Failed to fetch news item');
+      console.log('Fetching news item with slug:', params.slug);
+      const response = await fetch(`/api/news/by-slug/${encodeURIComponent(params.slug)}`);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error response:', errorData);
+        throw new Error(errorData.error || 'Failed to fetch news item');
+      }
       
       const data = await response.json();
+      console.log('Received news item data:', data);
+      
       if (!data.success) {
         throw new Error(data.error || 'Failed to load news item');
       }
@@ -61,8 +69,8 @@ export default function NewsItemPage({ params }: { params: { slug: string } }) {
       
       setNewsItem(data.data);
     } catch (error) {
+      console.error('Error details:', error);
       setError(error instanceof Error ? error.message : 'Failed to load news item');
-      console.error('Error fetching news item:', error);
     } finally {
       setIsLoading(false);
     }

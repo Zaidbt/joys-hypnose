@@ -17,12 +17,16 @@ export async function GET(
     const session = await getServerSession(authOptions);
     const isAdmin = !!session;
 
+    // Decode the slug
+    const decodedSlug = decodeURIComponent(params.slug);
+    console.log('Looking for news item with decoded slug:', decodedSlug);
+
     // First find the news item regardless of status
-    const newsItem = await newsCollection.findOne({ slug: params.slug });
+    const newsItem = await newsCollection.findOne({ slug: decodedSlug });
     console.log('Found news item:', newsItem);
 
     if (!newsItem) {
-      console.log('No news item found for slug:', params.slug);
+      console.log('No news item found for slug:', decodedSlug);
       return NextResponse.json(
         { success: false, error: 'News item not found' },
         { status: 404 }

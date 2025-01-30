@@ -202,7 +202,10 @@ export default function NewsPage() {
                 variants={itemVariants}
                 whileHover={{ y: -8 }}
                 className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer"
-                onClick={() => router.push(`/actualites/${item.slug}`)}
+                onClick={() => {
+                  console.log('Navigating to news item:', item);
+                  router.push(`/actualites/${encodeURIComponent(item.slug)}`);
+                }}
               >
                 <div className="relative h-56 bg-gray-200">
                   {item.image ? (
