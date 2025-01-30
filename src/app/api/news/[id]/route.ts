@@ -61,7 +61,31 @@ export async function PUT(
     const db = client.db('joyshypnose');
     const newsCollection = db.collection('news');
 
-    // Validate required fields
+    // If this is just a status update
+    if (Object.keys(body).length === 1 && body.status) {
+      const updateData = {
+        status: body.status,
+        updatedAt: new Date(),
+        ...(body.status === 'published' && { publishedAt: new Date() })
+      };
+
+      const result = await newsCollection.findOneAndUpdate(
+        { _id: new ObjectId(params.id) },
+        { $set: updateData },
+        { returnDocument: 'after' }
+      );
+
+      if (!result) {
+        return NextResponse.json(
+          { success: false, error: 'News item not found' },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json({ success: true, data: result });
+    }
+
+    // For full updates, validate required fields
     if (!body.title || !body.content || !body.type) {
       return NextResponse.json(
         { success: false, error: 'Missing required fields' },
