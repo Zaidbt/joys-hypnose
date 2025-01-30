@@ -75,6 +75,7 @@ export default function NewsPage() {
         throw new Error(data.error || 'Failed to load news');
       }
       
+      console.log('Fetched news items:', data.data);
       setNews(data.data || []);
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to load news');
@@ -87,6 +88,8 @@ export default function NewsPage() {
   const filteredNews = selectedType === 'all'
     ? news
     : news.filter(item => item.type === selectedType);
+
+  console.log('Filtered news items:', filteredNews);
 
   if (isLoading) {
     return (

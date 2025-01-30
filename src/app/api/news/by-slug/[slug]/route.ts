@@ -20,9 +20,12 @@ export async function GET(
     // Build query
     const query = isAdmin ? { slug: params.slug } : { slug: params.slug, status: 'published' };
 
+    console.log('Searching for news item with query:', query);
     const newsItem = await newsCollection.findOne(query);
+    console.log('Found news item:', newsItem);
 
     if (!newsItem) {
+      console.log('No news item found for slug:', params.slug);
       return NextResponse.json(
         { success: false, error: 'News item not found' },
         { status: 404 }
