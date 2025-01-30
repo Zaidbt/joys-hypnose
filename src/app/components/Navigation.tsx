@@ -15,8 +15,10 @@ export default function Navigation() {
 
   const navigation = [
     { name: 'Accueil', href: '/' },
+    { name: 'Mon Approche', href: '/mon-approche' },
     { name: 'Services', href: '/services' },
     { name: 'Actualités', href: '/actualites' },
+    { name: 'Blog', href: '/blog' },
     { name: 'Contact', href: '/contact' },
   ];
 
