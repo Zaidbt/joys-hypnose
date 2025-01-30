@@ -175,19 +175,89 @@ export default function NewsItemPage({ params }: { params: { slug: string } }) {
 
             {/* Featured Image */}
             {newsItem.image && (
-              <div className="px-8 mb-8">
-                <div className="aspect-[16/9] max-h-[400px] rounded-xl overflow-hidden flex items-center justify-center bg-gray-50">
-                  <img
-                    src={newsItem.image}
-                    alt={newsItem.title}
-                    className="w-full h-full object-contain"
-                  />
-                </div>
+              <div className="relative w-full h-[400px] mb-8">
+                <img
+                  src={newsItem.image}
+                  alt={newsItem.title}
+                  className="w-full h-full object-cover"
+                />
               </div>
             )}
 
             {/* Article Content */}
             <div className="px-8 pb-8">
+              {/* Event Details (if type is event) */}
+              {newsItem.type === 'event' && (
+                <div className="mb-8 p-6 bg-primary-50 rounded-xl">
+                  <h3 className="text-lg font-semibold text-primary-700 mb-4">Détails de l'événement</h3>
+                  <div className="space-y-3">
+                    {newsItem.eventDate && (
+                      <div className="flex items-center text-gray-700">
+                        <CalendarIcon className="h-5 w-5 mr-3 text-primary-600" />
+                        <div>
+                          <span className="font-medium">Date : </span>
+                          {formatDate(new Date(newsItem.eventDate))}
+                          {newsItem.eventEndDate && (
+                            <> - {formatDate(new Date(newsItem.eventEndDate))}</>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    {newsItem.eventLocation && (
+                      <div className="flex items-center text-gray-700">
+                        <MapPinIcon className="h-5 w-5 mr-3 text-primary-600" />
+                        <div>
+                          <span className="font-medium">Lieu : </span>
+                          {newsItem.eventLocation}
+                        </div>
+                      </div>
+                    )}
+                    {newsItem.eventPrice && (
+                      <div className="flex items-center text-gray-700">
+                        <span className="mr-3 text-primary-600">Prix :</span>
+                        {newsItem.eventPrice} DH
+                      </div>
+                    )}
+                    {newsItem.isOnline && (
+                      <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                        Événement en ligne
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Press Details (if type is press) */}
+              {newsItem.type === 'press' && (
+                <div className="mb-8 p-6 bg-primary-50 rounded-xl">
+                  <h3 className="text-lg font-semibold text-primary-700 mb-4">Détails de la publication</h3>
+                  <div className="space-y-3">
+                    {newsItem.publication && (
+                      <div className="flex items-center text-gray-700">
+                        <NewspaperIcon className="h-5 w-5 mr-3 text-primary-600" />
+                        <div>
+                          <span className="font-medium">Publication : </span>
+                          {newsItem.publication}
+                        </div>
+                      </div>
+                    )}
+                    {newsItem.originalArticleUrl && (
+                      <div className="mt-4">
+                        <a
+                          href={newsItem.originalArticleUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center px-4 py-2 border border-primary-600 rounded-md shadow-sm text-sm font-medium text-primary-600 bg-white hover:bg-primary-50"
+                        >
+                          Lire l'article original
+                          <ArrowLeftIcon className="ml-2 h-4 w-4" />
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {newsItem.excerpt && (
                 <div className="mb-8 p-6 bg-gray-50 rounded-xl">
                   <p className="text-lg text-gray-600 leading-relaxed italic">
@@ -200,6 +270,22 @@ export default function NewsItemPage({ params }: { params: { slug: string } }) {
                 className="prose prose-lg max-w-none prose-primary prose-headings:font-bold prose-p:leading-relaxed prose-img:rounded-xl"
                 dangerouslySetInnerHTML={{ __html: newsItem.content }}
               />
+
+              {/* Tags */}
+              {newsItem.tags && newsItem.tags.length > 0 && (
+                <div className="mt-8 pt-8 border-t border-gray-200">
+                  <div className="flex flex-wrap gap-2">
+                    {newsItem.tags.map((tag, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </motion.div>
         </div>
