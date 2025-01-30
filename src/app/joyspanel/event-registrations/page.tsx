@@ -9,6 +9,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ArrowLeftIcon,
+  TrashIcon,
 } from '@heroicons/react/24/outline';
 import type { EventRegistration } from '@/types/news';
 
@@ -83,6 +84,24 @@ export default function EventRegistrationsPage() {
       await fetchRegistrations();
     } catch (error) {
       console.error('Error updating status:', error);
+    }
+  };
+
+  const handleDelete = async (registrationId: string) => {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer cette inscription ? Cette action est irréversible.')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/event-registrations/${registrationId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) throw new Error('Failed to delete registration');
+      
+      await fetchRegistrations();
+    } catch (error) {
+      console.error('Error deleting registration:', error);
     }
   };
 
@@ -234,6 +253,13 @@ export default function EventRegistrationsPage() {
                               <CheckIcon className="h-5 w-5" />
                             </button>
                           )}
+                          <button
+                            onClick={() => handleDelete(registration._id!)}
+                            className="text-gray-600 hover:text-gray-900"
+                            title="Supprimer"
+                          >
+                            <TrashIcon className="h-5 w-5" />
+                          </button>
                         </div>
                       </td>
                     </tr>

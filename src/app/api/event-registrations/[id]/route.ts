@@ -66,4 +66,46 @@ export async function PUT(
       { status: 500 }
     );
   }
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    // Check authentication
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    const client = await clientPromise;
+    const db = client.db('joyshypnose');
+    const registrationsCollection = db.collection('event_registrations');
+
+    const result = await registrationsCollection.deleteOne({
+      _id: new ObjectId(params.id)
+    });
+
+    if (result.deletedCount === 0) {
+      return NextResponse.json(
+        { success: false, error: 'Registration not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Registration deleted successfully'
+    });
+  } catch (error) {
+    console.error('Error deleting registration:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to delete registration' },
+      { status: 500 }
+    );
+  }
 } 
