@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   CheckIcon,
   XMarkIcon,
   FunnelIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  ArrowLeftIcon,
 } from '@heroicons/react/24/outline';
 import type { EventRegistration } from '@/types/news';
 
@@ -25,16 +26,19 @@ const statusColors = {
 
 export default function EventRegistrationsPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const eventId = searchParams.get('eventId');
   const [registrations, setRegistrations] = useState<EventRegistration[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
+  const [eventTitle, setEventTitle] = useState<string>('');
 
   useEffect(() => {
     fetchRegistrations();
-  }, [currentPage, selectedStatus]);
+  }, [currentPage, selectedStatus, eventId]);
 
   const fetchRegistrations = async () => {
     try {
@@ -43,6 +47,7 @@ export default function EventRegistrationsPage() {
         page: currentPage.toString(),
         pageSize: '10',
         ...(selectedStatus !== 'all' && { status: selectedStatus }),
+        ...(eventId && { eventId }),
       });
 
       const response = await fetch(`/api/event-registrations?${queryParams}`);
@@ -51,6 +56,11 @@ export default function EventRegistrationsPage() {
       const data = await response.json();
       setRegistrations(data.data);
       setTotalPages(data.pagination?.totalPages || 1);
+      
+      // Set event title if we have registrations and this is for a specific event
+      if (data.data.length > 0 && eventId) {
+        setEventTitle(data.data[0].eventTitle);
+      }
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to load registrations');
     } finally {
@@ -89,11 +99,27 @@ export default function EventRegistrationsPage() {
       {/* Header */}
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
-          <h1 className="text-2xl font-semibold text-gray-900">Inscriptions aux événements</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">
+            {eventId ? `Inscriptions pour ${eventTitle}` : 'Toutes les inscriptions aux événements'}
+          </h1>
           <p className="mt-2 text-sm text-gray-700">
-            Liste des inscriptions aux différents événements
+            {eventId 
+              ? 'Liste des inscriptions pour cet événement'
+              : 'Liste des inscriptions aux différents événements'
+            }
           </p>
         </div>
+        {eventId && (
+          <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+            <button
+              onClick={() => router.push('/joyspanel/news')}
+              className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+            >
+              <ArrowLeftIcon className="h-4 w-4 mr-2" />
+              Retour aux actualités
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Filters */}
