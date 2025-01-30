@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/utils/authOptions';
 import clientPromise from '@/lib/mongodb';
+import { sendEventEmails } from '@/lib/eventEmails';
 import type { EventRegistration, EventRegistrationResponse, EventRegistrationsListResponse } from '@/types/news';
 
 export async function POST(request: Request) {
@@ -10,6 +11,7 @@ export async function POST(request: Request) {
     const client = await clientPromise;
     const db = client.db('joyshypnose');
     const registrationsCollection = db.collection('event_registrations');
+    const eventsCollection = db.collection('news');
 
     // Validate required fields
     if (!body.eventId || !body.firstName || !body.lastName || !body.email || !body.phone) {
@@ -19,20 +21,37 @@ export async function POST(request: Request) {
       );
     }
 
+    // Get the event details
+    const event = await eventsCollection.findOne({ _id: body.eventId });
+    if (!event) {
+      return NextResponse.json(
+        { success: false, error: 'Event not found' },
+        { status: 404 }
+      );
+    }
+
     const registration: EventRegistration = {
       ...body,
       createdAt: new Date(),
-      status: 'pending'
+      status: 'pending',
+      participantName: `${body.firstName} ${body.lastName}`,
+      participantEmail: body.email,
+      participantPhone: body.phone,
+      notes: body.message || ''
     };
 
     const result = await registrationsCollection.insertOne(registration);
+    const registrationWithId = {
+      ...registration,
+      _id: result.insertedId.toString()
+    };
+
+    // Send confirmation emails
+    await sendEventEmails(registrationWithId, event);
 
     const response: EventRegistrationResponse = {
       success: true,
-      data: {
-        ...registration,
-        _id: result.insertedId.toString()
-      }
+      data: registrationWithId
     };
 
     return NextResponse.json(response, { status: 201 });
