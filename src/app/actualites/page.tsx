@@ -9,6 +9,7 @@ import {
   MapPinIcon,
   ClockIcon,
   UserIcon,
+  ArrowLongRightIcon,
 } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
 import type { NewsItem, NewsType } from '@/types/news';
@@ -29,6 +30,21 @@ const newsTypeLabels = {
 
 const formatDate = (date: Date) => {
   return formatInTimeZone(date, 'Africa/Casablanca', 'd MMMM yyyy', { locale: fr });
+};
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0 }
 };
 
 export default function NewsPage() {
@@ -74,36 +90,59 @@ export default function NewsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
+      <div className="flex justify-center items-center min-h-[calc(100vh-5rem)]">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 min-h-screen pt-20">
       {/* Hero Section */}
-      <div className="bg-primary-700 py-16">
-        <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold text-white mb-4">Actualités</h1>
-          <p className="text-primary-100 text-lg max-w-2xl">
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="relative bg-gradient-to-br from-primary-700 to-primary-900 py-24 overflow-hidden"
+      >
+        <div className="absolute inset-0 bg-[url('/images/pattern.svg')] opacity-10"></div>
+        <div className="container mx-auto px-4 relative">
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-5xl font-bold text-white mb-6 leading-tight"
+          >
+            Actualités
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="text-primary-100 text-xl max-w-2xl leading-relaxed"
+          >
             Découvrez les dernières actualités, événements et articles de presse concernant l'hypnose et nos activités.
-          </p>
+          </motion.p>
         </div>
-      </div>
+      </motion.div>
 
-      {/* Filters */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-wrap gap-2 mb-8">
+      {/* Content Section */}
+      <div className="container mx-auto px-4 py-12">
+        {/* Filters */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-wrap gap-3 mb-12"
+        >
           <button
             onClick={() => setSelectedType('all')}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            className={`px-6 py-3 rounded-full text-sm font-medium transition-all duration-200 transform hover:scale-105 ${
               selectedType === 'all'
-                ? 'bg-primary-600 text-white'
-                : 'bg-white text-gray-600 hover:bg-gray-100'
+                ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/30'
+                : 'bg-white text-gray-600 hover:bg-gray-100 shadow-md hover:shadow-lg'
             }`}
           >
-            Tout
+            Tout voir
           </button>
           {Object.entries(newsTypeLabels).map(([type, label]) => {
             const Icon = newsTypeIcons[type as NewsType];
@@ -111,10 +150,10 @@ export default function NewsPage() {
               <button
                 key={type}
                 onClick={() => setSelectedType(type as NewsType)}
-                className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                className={`inline-flex items-center px-6 py-3 rounded-full text-sm font-medium transition-all duration-200 transform hover:scale-105 ${
                   selectedType === type
-                    ? 'bg-primary-600 text-white'
-                    : 'bg-white text-gray-600 hover:bg-gray-100'
+                    ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/30'
+                    : 'bg-white text-gray-600 hover:bg-gray-100 shadow-md hover:shadow-lg'
                 }`}
               >
                 <Icon className="h-4 w-4 mr-2" />
@@ -122,81 +161,93 @@ export default function NewsPage() {
               </button>
             );
           })}
-        </div>
+        </motion.div>
 
         {/* News Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredNews.map((item, index) => {
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
+          {filteredNews.map((item) => {
             const Icon = newsTypeIcons[item.type as NewsType];
             return (
               <motion.div
                 key={item._id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
-                className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+                variants={itemVariants}
+                whileHover={{ y: -8 }}
+                className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer"
                 onClick={() => router.push(`/actualites/${item.slug}`)}
               >
-                <div className="relative h-48 bg-gray-200">
+                <div className="relative h-56 bg-gray-200">
                   {item.image ? (
                     <img
                       src={item.image}
                       alt={item.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-primary-100">
-                      <Icon className="h-12 w-12 text-primary-600" />
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100">
+                      <Icon className="h-16 w-16 text-primary-600" />
                     </div>
                   )}
                   <div className="absolute top-4 left-4">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white text-primary-700 shadow-sm">
-                      <Icon className="h-4 w-4 mr-1" />
+                    <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-white/90 backdrop-blur-sm text-primary-700 shadow-lg">
+                      <Icon className="h-4 w-4 mr-2" />
                       {newsTypeLabels[item.type as NewsType]}
                     </span>
                   </div>
                 </div>
-                <div className="p-6">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-2">
+                <div className="p-8">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-primary-600 transition-colors">
                     {item.title}
                   </h2>
                   {item.excerpt && (
-                    <p className="text-gray-600 mb-4 line-clamp-2">{item.excerpt}</p>
+                    <p className="text-gray-600 mb-6 line-clamp-2">{item.excerpt}</p>
                   )}
-                  <div className="flex items-center text-sm text-gray-500 space-x-4">
+                  <div className="flex flex-wrap items-center text-sm text-gray-500 gap-4 mb-6">
                     <span className="flex items-center">
-                      <ClockIcon className="h-4 w-4 mr-1" />
+                      <ClockIcon className="h-4 w-4 mr-2" />
                       {formatDate(new Date(item.publishedAt || item.createdAt))}
                     </span>
                     {item.author && (
                       <span className="flex items-center">
-                        <UserIcon className="h-4 w-4 mr-1" />
+                        <UserIcon className="h-4 w-4 mr-2" />
                         {item.author}
                       </span>
                     )}
                     {item.type === 'event' && item.eventLocation && (
                       <span className="flex items-center">
-                        <MapPinIcon className="h-4 w-4 mr-1" />
+                        <MapPinIcon className="h-4 w-4 mr-2" />
                         {item.eventLocation}
                       </span>
                     )}
+                  </div>
+                  <div className="flex items-center text-primary-600 font-medium group-hover:text-primary-700 transition-colors">
+                    Lire la suite
+                    <ArrowLongRightIcon className="h-5 w-5 ml-2 transform group-hover:translate-x-2 transition-transform" />
                   </div>
                 </div>
               </motion.div>
             );
           })}
-        </div>
+        </motion.div>
 
         {filteredNews.length === 0 && (
-          <div className="text-center py-12">
-            <MegaphoneIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center py-16 bg-white rounded-2xl shadow-sm"
+          >
+            <MegaphoneIcon className="h-16 w-16 text-gray-400 mx-auto mb-6" />
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">
               Aucune actualité trouvée
             </h3>
-            <p className="text-gray-600">
-              Il n'y a pas encore d'actualités dans cette catégorie.
+            <p className="text-gray-600 max-w-md mx-auto">
+              Il n'y a pas encore d'actualités dans cette catégorie. Revenez bientôt pour découvrir nos nouveaux contenus.
             </p>
-          </div>
+          </motion.div>
         )}
       </div>
     </div>
