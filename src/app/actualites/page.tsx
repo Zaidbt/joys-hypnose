@@ -40,18 +40,29 @@ export default function NewsPage() {
 
   useEffect(() => {
     fetchNews();
-  }, []);
+  }, [selectedType]);
 
   const fetchNews = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/news');
+      const queryParams = new URLSearchParams();
+      
+      if (selectedType !== 'all') {
+        queryParams.set('type', selectedType);
+      }
+
+      const response = await fetch(`/api/news?${queryParams}`);
       if (!response.ok) throw new Error('Failed to fetch news');
       
       const data = await response.json();
-      setNews(data.data);
+      if (data.success === false) {
+        throw new Error(data.error || 'Failed to load news');
+      }
+      
+      setNews(data.data || []);
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to load news');
+      console.error('Error fetching news:', error);
     } finally {
       setIsLoading(false);
     }

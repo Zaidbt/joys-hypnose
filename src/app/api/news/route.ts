@@ -19,13 +19,24 @@ export async function GET(request: Request) {
     const { db } = await connectToDatabase();
     const { searchParams } = new URL(request.url);
 
+    // Check if request is from admin panel
+    const session = await getServerSession(authOptions);
+    const isAdmin = !!session;
+
     // Build query
-    const query: any = { status: 'published' };
+    const query: any = isAdmin ? {} : { status: 'published' };
     const type = searchParams.get('type');
+    const status = searchParams.get('status');
     const search = searchParams.get('search');
+    const page = parseInt(searchParams.get('page') || '1');
+    const pageSize = parseInt(searchParams.get('pageSize') || '10');
 
     if (type && type !== 'all') {
       query.type = type;
+    }
+
+    if (status && status !== 'all' && isAdmin) {
+      query.status = status;
     }
 
     if (search) {
@@ -36,14 +47,33 @@ export async function GET(request: Request) {
       ];
     }
 
+    // Get total count for pagination
+    const total = await db.collection('news').countDocuments(query);
+
     // Fetch news items
     const news = await db
       .collection('news')
       .find(query)
       .sort({ publishedAt: -1, createdAt: -1 })
+      .skip(isAdmin ? (page - 1) * pageSize : 0)
+      .limit(isAdmin ? pageSize : 0)
       .toArray();
 
-    return NextResponse.json({ data: news });
+    // Prepare response
+    const response: NewsResponse = {
+      success: true,
+      data: news,
+      ...(isAdmin && {
+        pagination: {
+          total,
+          page,
+          pageSize,
+          totalPages: Math.ceil(total / pageSize)
+        }
+      })
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
     console.error('Error fetching news:', error);
     return NextResponse.json(
