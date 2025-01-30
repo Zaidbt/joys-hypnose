@@ -112,11 +112,11 @@ export default function EventRegistrationsPage() {
         <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
           {eventId ? (
             <button
-              onClick={() => router.push('/joyspanel/event-registrations')}
+              onClick={() => router.push('/joyspanel/news')}
               className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
             >
               <ArrowLeftIcon className="h-4 w-4 mr-2" />
-              Toutes les inscriptions
+              Retour aux actualités
             </button>
           ) : null}
         </div>

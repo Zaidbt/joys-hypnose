@@ -13,13 +13,15 @@ import {
   ArrowLeftOnRectangleIcon,
   Bars3Icon,
   XMarkIcon,
-  ClipboardDocumentCheckIcon
+  ClipboardDocumentCheckIcon,
+  NewspaperIcon
 } from '@heroicons/react/24/outline';
 import { useState } from 'react';
 
 const navigation = [
   { name: 'Dashboard', href: '/joyspanel', icon: ChartBarIcon },
   { name: 'Blog Posts', href: '/joyspanel/posts', icon: DocumentTextIcon },
+  { name: 'Actualités', href: '/joyspanel/news', icon: NewspaperIcon },
   { name: 'Rendez-vous', href: '/joyspanel/appointments', icon: CalendarIcon },
   { name: 'Clients', href: '/joyspanel/clients', icon: UserGroupIcon },
   { name: 'Newsletter', href: '/joyspanel/newsletter', icon: EnvelopeIcon },
