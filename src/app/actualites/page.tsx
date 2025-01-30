@@ -66,6 +66,8 @@ export default function NewsPage() {
       if (selectedType !== 'all') {
         queryParams.set('type', selectedType);
       }
+      // Always filter for published articles on the public page
+      queryParams.set('status', 'published');
 
       console.log('Fetching news with params:', queryParams.toString());
       const response = await fetch(`/api/news?${queryParams}`);

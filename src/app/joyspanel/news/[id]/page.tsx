@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Editor } from '@/components/Editor';
+import dynamic from 'next/dynamic';
 import {
   ArrowLeftIcon,
   CalendarIcon,
@@ -10,6 +10,12 @@ import {
   MegaphoneIcon,
 } from '@heroicons/react/24/outline';
 import type { NewsItem } from '@/types/news';
+
+// Dynamic import of the Editor to avoid SSR issues
+const Editor = dynamic(() => import('@/components/Editor'), {
+  ssr: false,
+  loading: () => <p>Loading editor...</p>,
+});
 
 const newsTypes = [
   { id: 'press', label: 'Presse', icon: NewspaperIcon },
