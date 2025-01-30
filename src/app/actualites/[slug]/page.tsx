@@ -16,6 +16,7 @@ import { motion } from 'framer-motion';
 import type { NewsItem, NewsType } from '@/types/news';
 import { formatInTimeZone } from 'date-fns-tz';
 import { fr } from 'date-fns/locale';
+import dynamic from 'next/dynamic';
 
 const newsTypeIcons = {
   press: NewspaperIcon,
@@ -32,6 +33,10 @@ const newsTypeLabels = {
 const formatDate = (date: Date) => {
   return formatInTimeZone(date, 'Africa/Casablanca', 'd MMMM yyyy', { locale: fr });
 };
+
+const EventRegistrationForm = dynamic(() => import('@/components/EventRegistrationForm'), {
+  ssr: false,
+});
 
 export default function NewsItemPage({ params }: { params: { slug: string } }) {
   const router = useRouter();
@@ -196,43 +201,51 @@ export default function NewsItemPage({ params }: { params: { slug: string } }) {
             <div className="px-8 pb-8">
               {/* Event Details (if type is event) */}
               {newsItem.type === 'event' && (
-                <div className="mb-8 p-6 bg-primary-50 rounded-xl">
-                  <h3 className="text-lg font-semibold text-primary-700 mb-4">Détails de l'événement</h3>
-                  <div className="space-y-3">
-                    {newsItem.eventDate && (
-                      <div className="flex items-center text-gray-700">
-                        <CalendarIcon className="h-5 w-5 mr-3 text-primary-600" />
-                        <div>
-                          <span className="font-medium">Date : </span>
-                          {formatDate(new Date(newsItem.eventDate))}
-                          {newsItem.eventEndDate && (
-                            <> - {formatDate(new Date(newsItem.eventEndDate))}</>
-                          )}
+                <>
+                  <div className="mb-8 p-6 bg-primary-50 rounded-xl">
+                    <h3 className="text-lg font-semibold text-primary-700 mb-4">Détails de l'événement</h3>
+                    <div className="space-y-3">
+                      {newsItem.eventDate && (
+                        <div className="flex items-center text-gray-700">
+                          <CalendarIcon className="h-5 w-5 mr-3 text-primary-600" />
+                          <div>
+                            <span className="font-medium">Date : </span>
+                            {formatDate(new Date(newsItem.eventDate))}
+                            {newsItem.eventEndDate && (
+                              <> - {formatDate(new Date(newsItem.eventEndDate))}</>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    )}
-                    {newsItem.eventLocation && (
-                      <div className="flex items-center text-gray-700">
-                        <MapPinIcon className="h-5 w-5 mr-3 text-primary-600" />
-                        <div>
-                          <span className="font-medium">Lieu : </span>
-                          {newsItem.eventLocation}
+                      )}
+                      {newsItem.eventLocation && (
+                        <div className="flex items-center text-gray-700">
+                          <MapPinIcon className="h-5 w-5 mr-3 text-primary-600" />
+                          <div>
+                            <span className="font-medium">Lieu : </span>
+                            {newsItem.eventLocation}
+                          </div>
                         </div>
-                      </div>
-                    )}
-                    {newsItem.eventPrice && (
-                      <div className="flex items-center text-gray-700">
-                        <span className="mr-3 text-primary-600">Prix :</span>
-                        {newsItem.eventPrice} DH
-                      </div>
-                    )}
-                    {newsItem.isOnline && (
-                      <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                        Événement en ligne
-                      </div>
-                    )}
+                      )}
+                      {newsItem.eventPrice && (
+                        <div className="flex items-center text-gray-700">
+                          <span className="mr-3 text-primary-600">Prix :</span>
+                          {newsItem.eventPrice} DH
+                        </div>
+                      )}
+                      {newsItem.isOnline && (
+                        <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                          Événement en ligne
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
+
+                  {/* Registration Form */}
+                  <div className="mt-12">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-6">Inscription à l'événement</h3>
+                    <EventRegistrationForm event={newsItem} />
+                  </div>
+                </>
               )}
 
               {/* Press Details (if type is press) */}

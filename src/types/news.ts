@@ -41,15 +41,15 @@ export interface NewsItem {
 export interface EventRegistration {
   _id?: string;
   eventId: string;
-  name: string;
+  eventTitle: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  phone?: string;
-  registeredAt: Date;
-  status: RegistrationStatus;
-  notes?: string;
-  paymentStatus?: 'pending' | 'completed' | 'failed';
-  paymentAmount?: number;
-  attendanceConfirmed?: boolean;
+  phone: string;
+  numberOfPeople: number;
+  message?: string;
+  createdAt: Date;
+  status: 'pending' | 'confirmed' | 'cancelled';
 }
 
 export interface NewsResponse {
@@ -67,6 +67,24 @@ export interface NewsResponse {
 export interface RegistrationResponse {
   success: boolean;
   data: EventRegistration | EventRegistration[];
+  error?: string;
+  pagination?: {
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+  };
+}
+
+export interface EventRegistrationResponse {
+  success: boolean;
+  data?: EventRegistration;
+  error?: string;
+}
+
+export interface EventRegistrationsListResponse {
+  success: boolean;
+  data?: EventRegistration[];
   error?: string;
   pagination?: {
     total: number;
