@@ -45,6 +45,7 @@ export default function Footer() {
               <Link href="/" className="block text-gray-600 hover:text-rose-500 transition-colors">Accueil</Link>
               <Link href="/mon-approche" className="block text-gray-600 hover:text-rose-500 transition-colors">Mon Approche</Link>
               <Link href="/services" className="block text-gray-600 hover:text-rose-500 transition-colors">Services</Link>
+              <Link href="/actualites" className="block text-gray-600 hover:text-rose-500 transition-colors">Actualités</Link>
               <Link href="/blog" className="block text-gray-600 hover:text-rose-500 transition-colors">Blog</Link>
               <Link href="/contact" className="block text-gray-600 hover:text-rose-500 transition-colors">Contact</Link>
             </nav>
