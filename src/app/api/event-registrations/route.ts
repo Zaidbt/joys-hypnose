@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/utils/authOptions';
 import clientPromise from '@/lib/mongodb';
+import { ObjectId } from 'mongodb';
 import { sendEventEmails } from '@/lib/eventEmails';
 import type { EventRegistration, EventRegistrationResponse, EventRegistrationsListResponse } from '@/types/news';
 
@@ -22,7 +23,7 @@ export async function POST(request: Request) {
     }
 
     // Get the event details
-    const event = await eventsCollection.findOne({ _id: body.eventId });
+    const event = await eventsCollection.findOne({ _id: new ObjectId(body.eventId) });
     if (!event) {
       return NextResponse.json(
         { success: false, error: 'Event not found' },
