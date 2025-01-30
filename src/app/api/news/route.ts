@@ -56,7 +56,7 @@ export async function GET(request: Request) {
       .find(query)
       .sort({ publishedAt: -1, createdAt: -1 })
       .skip(isAdmin ? (page - 1) * pageSize : 0)
-      .limit(isAdmin ? pageSize : 0)
+      .limit(isAdmin ? pageSize : 100) // Allow up to 100 items for public page
       .toArray();
 
     // Prepare response
