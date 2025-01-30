@@ -176,11 +176,11 @@ export default function NewsItemPage({ params }: { params: { slug: string } }) {
             {/* Featured Image */}
             {newsItem.image && (
               <div className="px-8 mb-8">
-                <div className="aspect-[16/9] max-h-[400px] rounded-xl overflow-hidden">
+                <div className="aspect-[16/9] max-h-[400px] rounded-xl overflow-hidden flex items-center justify-center bg-gray-50">
                   <img
                     src={newsItem.image}
                     alt={newsItem.title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                   />
                 </div>
               </div>

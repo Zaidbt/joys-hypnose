@@ -206,7 +206,7 @@ export default function CreateNewsPage() {
                   <label className="block text-sm font-medium text-gray-700">Contenu</label>
                   <div className="mt-1">
                     <Editor
-                      initialValue={formData.content}
+                      value={formData.content}
                       onChange={handleEditorChange}
                       className="min-h-[400px]"
                     />
