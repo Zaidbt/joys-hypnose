@@ -10,8 +10,13 @@ import { connectToDatabase } from '@/lib/mongodb';
 function generateSlug(title: string): string {
   return title
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '');
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+    .replace(/[^a-z0-9-\s]/g, '') // Keep only alphanumeric, hyphens and spaces
+    .trim()
+    .replace(/\s+/g, '-') // Replace spaces with single hyphens
+    .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+    .replace(/(^-|-$)/g, ''); // Remove leading/trailing hyphens
 }
 
 export async function GET(request: Request) {
