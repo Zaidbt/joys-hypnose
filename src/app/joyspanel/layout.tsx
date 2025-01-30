@@ -12,7 +12,8 @@ import {
   EnvelopeIcon,
   ArrowLeftOnRectangleIcon,
   Bars3Icon,
-  XMarkIcon
+  XMarkIcon,
+  ClipboardDocumentCheckIcon
 } from '@heroicons/react/24/outline';
 import { useState } from 'react';
 
@@ -22,6 +23,7 @@ const navigation = [
   { name: 'Rendez-vous', href: '/joyspanel/appointments', icon: CalendarIcon },
   { name: 'Clients', href: '/joyspanel/clients', icon: UserGroupIcon },
   { name: 'Newsletter', href: '/joyspanel/newsletter', icon: EnvelopeIcon },
+  { name: 'Inscriptions événements', href: '/joyspanel/event-registrations', icon: ClipboardDocumentCheckIcon },
   { name: 'Paramètres', href: '/joyspanel/appointments/settings', icon: Cog6ToothIcon },
 ];
 
