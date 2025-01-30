@@ -67,22 +67,43 @@ export default function NewsPage() {
         queryParams.set('type', selectedType);
       }
 
+      console.log('Fetching news with params:', queryParams.toString());
       const response = await fetch(`/api/news?${queryParams}`);
       if (!response.ok) throw new Error('Failed to fetch news');
       
       const data = await response.json();
+      console.log('API Response:', data);
+      
       if (data.success === false) {
         throw new Error(data.error || 'Failed to load news');
       }
       
-      console.log('Fetched news items:', data.data);
-      setNews(data.data || []);
+      // Ensure all news items have slugs
+      const newsWithSlugs = data.data.map((item: NewsItem) => ({
+        ...item,
+        slug: item.slug || generateSlug(item.title)
+      }));
+      
+      console.log('Processed news items:', newsWithSlugs);
+      setNews(newsWithSlugs || []);
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to load news');
       console.error('Error fetching news:', error);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const generateSlug = (title: string): string => {
+    return title
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+      .replace(/[^a-z0-9-\s]/g, '') // Keep only alphanumeric, hyphens and spaces
+      .trim()
+      .replace(/\s+/g, '-') // Replace spaces with single hyphens
+      .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+      .replace(/(^-|-$)/g, ''); // Remove leading/trailing hyphens
   };
 
   const filteredNews = selectedType === 'all'

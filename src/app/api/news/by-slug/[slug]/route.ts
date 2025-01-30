@@ -17,11 +17,8 @@ export async function GET(
     const session = await getServerSession(authOptions);
     const isAdmin = !!session;
 
-    // Build query
-    const query = isAdmin ? { slug: params.slug } : { slug: params.slug, status: 'published' };
-
-    console.log('Searching for news item with query:', query);
-    const newsItem = await newsCollection.findOne(query);
+    // First find the news item regardless of status
+    const newsItem = await newsCollection.findOne({ slug: params.slug });
     console.log('Found news item:', newsItem);
 
     if (!newsItem) {
@@ -29,6 +26,15 @@ export async function GET(
       return NextResponse.json(
         { success: false, error: 'News item not found' },
         { status: 404 }
+      );
+    }
+
+    // Then check status if not admin
+    if (!isAdmin && newsItem.status !== 'published') {
+      console.log('News item exists but is not published:', newsItem.status);
+      return NextResponse.json(
+        { success: false, error: 'Article non disponible' },
+        { status: 403 }
       );
     }
 
