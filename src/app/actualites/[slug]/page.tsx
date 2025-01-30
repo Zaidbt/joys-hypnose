@@ -136,87 +136,73 @@ export default function NewsItemPage({ params }: { params: { slug: string } }) {
 
       {/* Main Content */}
       <div className="pt-16">
-        {/* Hero Section */}
-        <div className="relative bg-gray-900">
-          {newsItem.image ? (
-            <div className="aspect-[21/9] max-h-[70vh] relative">
-              <img
-                src={newsItem.image}
-                alt={newsItem.title}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-gray-900/20"></div>
-            </div>
-          ) : (
-            <div className="aspect-[21/9] max-h-[70vh] bg-gradient-to-br from-primary-700 to-primary-900 flex items-center justify-center">
-              <Icon className="h-32 w-32 text-white/20" />
-            </div>
-          )}
+        <div className="container mx-auto max-w-4xl px-4 py-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-2xl shadow-sm overflow-hidden"
+          >
+            {/* Article Header */}
+            <div className="p-8 pb-0">
+              <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-primary-50 text-primary-700 mb-6">
+                <Icon className="h-4 w-4 mr-2" />
+                {newsTypeLabels[newsItem.type as NewsType]}
+              </span>
 
-          {/* Article Header */}
-          <div className="absolute bottom-0 left-0 right-0 p-8">
-            <div className="container mx-auto max-w-4xl">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-white"
-              >
-                <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-white/10 backdrop-blur-sm text-white mb-4">
-                  <Icon className="h-4 w-4 mr-2" />
-                  {newsTypeLabels[newsItem.type as NewsType]}
+              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight">
+                {newsItem.title}
+              </h1>
+
+              <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500 mb-8">
+                <span className="flex items-center">
+                  <ClockIcon className="h-5 w-5 mr-2" />
+                  {formatDate(new Date(newsItem.publishedAt || newsItem.createdAt))}
                 </span>
-
-                <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-                  {newsItem.title}
-                </h1>
-
-                <div className="flex flex-wrap items-center gap-6 text-white/80 text-sm">
+                {newsItem.author && (
                   <span className="flex items-center">
-                    <ClockIcon className="h-5 w-5 mr-2" />
-                    {formatDate(new Date(newsItem.publishedAt || newsItem.createdAt))}
+                    <UserIcon className="h-5 w-5 mr-2" />
+                    {newsItem.author}
                   </span>
-                  {newsItem.author && (
-                    <span className="flex items-center">
-                      <UserIcon className="h-5 w-5 mr-2" />
-                      {newsItem.author}
-                    </span>
-                  )}
-                  {newsItem.type === 'event' && newsItem.eventLocation && (
-                    <span className="flex items-center">
-                      <MapPinIcon className="h-5 w-5 mr-2" />
-                      {newsItem.eventLocation}
-                    </span>
-                  )}
-                </div>
-              </motion.div>
+                )}
+                {newsItem.type === 'event' && newsItem.eventLocation && (
+                  <span className="flex items-center">
+                    <MapPinIcon className="h-5 w-5 mr-2" />
+                    {newsItem.eventLocation}
+                  </span>
+                )}
+              </div>
             </div>
-          </div>
-        </div>
 
-        {/* Article Content */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="container mx-auto max-w-4xl px-4 py-12"
-        >
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-            {newsItem.excerpt && (
-              <div className="p-8 border-b border-gray-100 bg-gray-50">
-                <p className="text-xl text-gray-600 leading-relaxed">
-                  {newsItem.excerpt}
-                </p>
+            {/* Featured Image */}
+            {newsItem.image && (
+              <div className="px-8 mb-8">
+                <div className="aspect-[16/9] max-h-[400px] rounded-xl overflow-hidden">
+                  <img
+                    src={newsItem.image}
+                    alt={newsItem.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               </div>
             )}
-            
-            <div className="p-8 md:p-12">
+
+            {/* Article Content */}
+            <div className="px-8 pb-8">
+              {newsItem.excerpt && (
+                <div className="mb-8 p-6 bg-gray-50 rounded-xl">
+                  <p className="text-lg text-gray-600 leading-relaxed italic">
+                    {newsItem.excerpt}
+                  </p>
+                </div>
+              )}
+              
               <div 
                 className="prose prose-lg max-w-none prose-primary prose-headings:font-bold prose-p:leading-relaxed prose-img:rounded-xl"
                 dangerouslySetInnerHTML={{ __html: newsItem.content }}
               />
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </div>
     </div>
   );
