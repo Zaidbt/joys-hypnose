@@ -10,6 +10,15 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Check authentication for admin panel
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     const client = await clientPromise;
     const db = client.db('joyshypnose');
     const newsCollection = db.collection('news');
@@ -48,6 +57,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Check authentication
     const session = await getServerSession(authOptions);
     if (!session) {
       return NextResponse.json(
@@ -82,7 +92,13 @@ export async function PUT(
         );
       }
 
-      return NextResponse.json({ success: true, data: result });
+      return NextResponse.json({
+        success: true,
+        data: {
+          ...result,
+          _id: result._id.toString()
+        }
+      });
     }
 
     // For full updates, validate required fields

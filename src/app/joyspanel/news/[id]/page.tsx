@@ -31,8 +31,13 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
   const fetchNewsItem = async () => {
     try {
       setIsLoading(true);
+      setError(null);
       const response = await fetch(`/api/news/${params.id}`);
-      if (!response.ok) throw new Error('Failed to fetch news item');
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to fetch news item');
+      }
       
       const data = await response.json();
       if (!data.success) {
@@ -54,22 +59,32 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
 
     try {
       setIsSaving(true);
+      setError(null);
       const response = await fetch(`/api/news/${params.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(newsItem),
+        body: JSON.stringify({
+          ...newsItem,
+          updatedAt: new Date().toISOString(),
+        }),
       });
 
       if (!response.ok) {
-        const data = await response.json();
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update news item');
+      }
+
+      const data = await response.json();
+      if (!data.success) {
         throw new Error(data.error || 'Failed to update news item');
       }
 
       router.push('/joyspanel/news');
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to update news item');
+      console.error('Error updating news item:', error);
     } finally {
       setIsSaving(false);
     }
@@ -77,8 +92,12 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
+      <div className="min-h-screen bg-gray-50 px-4 py-8">
+        <div className="max-w-3xl mx-auto">
+          <div className="flex justify-center items-center min-h-[calc(100vh-4rem)]">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
+          </div>
+        </div>
       </div>
     );
   }
