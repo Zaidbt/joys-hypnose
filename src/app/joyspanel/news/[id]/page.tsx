@@ -275,25 +275,6 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
             </div>
           </div>
         </form>
-
-        {/* Actions */}
-        <div className="mt-6 flex flex-col sm:flex-row sm:justify-end gap-3">
-          {newsItem.type === 'event' && (
-            <Link
-              href={`/joyspanel/event-registrations?eventId=${newsItem._id}`}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-            >
-              <ClipboardDocumentCheckIcon className="h-5 w-5 mr-2" />
-              Voir les inscriptions
-            </Link>
-          )}
-          <button
-            type="submit"
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-          >
-            Enregistrer les modifications
-          </button>
-        </div>
       </div>
     </div>
   );

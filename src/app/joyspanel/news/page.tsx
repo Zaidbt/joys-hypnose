@@ -15,10 +15,12 @@ import {
   ClockIcon,
   EyeIcon,
   EyeSlashIcon,
+  ClipboardDocumentCheckIcon,
 } from '@heroicons/react/24/outline';
 import type { NewsItem, NewsType } from '@/types/news';
 import { formatInTimeZone } from 'date-fns-tz';
 import { fr } from 'date-fns/locale';
+import Link from 'next/link';
 
 const newsTypeIcons = {
   press: NewspaperIcon,
@@ -295,6 +297,15 @@ export default function NewsPage() {
                                 <EyeIcon className="h-5 w-5" />
                               )}
                             </button>
+                            {item.type === 'event' && (
+                              <Link
+                                href={`/joyspanel/event-registrations?eventId=${item._id}`}
+                                className="text-primary-600 hover:text-primary-900"
+                                title="Voir les inscriptions"
+                              >
+                                <ClipboardDocumentCheckIcon className="h-5 w-5" />
+                              </Link>
+                            )}
                             <button
                               onClick={() => router.push(`/joyspanel/news/${item._id}`)}
                               className="text-primary-600 hover:text-primary-900"
