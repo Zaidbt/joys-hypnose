@@ -123,21 +123,15 @@ export default function NewsPage() {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen pt-20">
+    <div className="bg-white min-h-screen pt-20">
       {/* Hero Section */}
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="relative bg-gradient-to-br from-primary-700 to-primary-900 py-24 overflow-hidden"
-      >
-        <div className="absolute inset-0 bg-[url('/images/pattern.svg')] opacity-10"></div>
-        <div className="container mx-auto px-4 relative">
+      <div className="container mx-auto px-4 py-16 sm:py-24">
+        <div className="max-w-3xl mx-auto text-center">
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-5xl font-bold text-white mb-6 leading-tight"
+            className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6"
           >
             Actualités
           </motion.h1>
@@ -145,12 +139,12 @@ export default function NewsPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="text-primary-100 text-xl max-w-2xl leading-relaxed"
+            className="text-xl text-gray-600 leading-relaxed"
           >
             Découvrez les dernières actualités, événements et articles de presse concernant l'hypnose et nos activités.
           </motion.p>
         </div>
-      </motion.div>
+      </div>
 
       {/* Content Section */}
       <div className="container mx-auto px-4 py-12">
