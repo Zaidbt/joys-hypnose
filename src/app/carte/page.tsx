@@ -45,8 +45,8 @@ export default function BusinessCardPage() {
               className="object-cover"
             />
           </div>
-          <h1 className="text-2xl font-semibold text-gray-900 mb-2">Kenza Joyce</h1>
-          <p className="text-rose-600 font-medium mb-4">Hypnothérapeute</p>
+          <h1 className="text-2xl font-semibold text-gray-900 mb-2">Joy's Hypnose</h1>
+          <p className="text-rose-600 font-medium mb-4">Hypnothérapeute certifiée 🇲🇦🇨🇦<br/>Hypnose Transformatrice, régressive quantique spirituelle<br/>Chamane, sound healer, numérologie</p>
           
           <button
             onClick={handleShare}
@@ -90,7 +90,7 @@ export default function BusinessCardPage() {
             </div>
             <div className="flex items-center text-gray-600">
               <CalendarIcon className="h-5 w-5 text-rose-400 mr-3" />
-              <span>Lundi - Vendredi, 9:00 - 17:00</span>
+              <span>Lundi - Vendredi, 10:00 - 17:00</span>
             </div>
           </div>
         </motion.div>
