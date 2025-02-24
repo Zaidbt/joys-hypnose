@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/joyspanel/', '/api/'],
     },
-    sitemap: 'https://joyshypnose-therapies.com/sitemap.xml',
+    sitemap: 'https://www.joyshypnose-therapies.com/api/sitemap',
   };
 } 
