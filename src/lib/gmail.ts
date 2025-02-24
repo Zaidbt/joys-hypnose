@@ -573,22 +573,78 @@ export async function sendAppointmentNotification(appointment: TimeSlot) {
   }
 }
 
-// Test function to verify configuration
 export async function testEmailConfig() {
   try {
-    const gmail = google.gmail({ version: 'v1', auth: await getOAuth2Client() });
-    const response = await gmail.users.getProfile({ userId: 'me' });
+    const oauth2Client = await getOAuth2Client();
+    if (!oauth2Client) {
+      return {
+        success: false,
+        error: 'Failed to initialize OAuth2 client',
+        emailAddress: null
+      };
+    }
+
+    const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
+    const profile = await gmail.users.getProfile({ userId: 'me' });
+
     return {
       success: true,
-      emailAddress: response.data.emailAddress,
-      messagesTotal: response.data.messagesTotal
+      error: null,
+      emailAddress: profile.data.emailAddress
     };
   } catch (error) {
-    console.error('Error testing email configuration:', error);
+    console.error('Error testing Gmail configuration:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
+      emailAddress: null
     };
+  }
+}
+
+// Log current Gmail configuration
+console.log('Gmail Configuration:', {
+  clientId: process.env.GMAIL_CLIENT_ID || 'Not set',
+  clientSecret: process.env.GMAIL_CLIENT_SECRET ? 'Set' : 'Not set',
+  redirectUri: process.env.GMAIL_REDIRECT_URI,
+  refreshToken: process.env.GMAIL_REFRESH_TOKEN ? 'Set' : 'Not set',
+  adminEmail: process.env.ADMIN_EMAIL
+});
+
+export async function sendEmail(to: string, subject: string, htmlContent: string) {
+  const gmail = google.gmail({ version: 'v1', auth: await getOAuth2Client() });
+  if (!gmail) {
+    console.warn('Gmail client not initialized - skipping email');
+    return;
+  }
+
+  const message = [
+    'Content-Type: text/html; charset=utf-8',
+    'MIME-Version: 1.0',
+    `To: ${to}`,
+    'From: Joy\'s Hypnose <noreply@joyshypnose-therapies.com>',
+    `Subject: ${subject}`,
+    '',
+    htmlContent
+  ].join('\n');
+
+  const encodedMessage = Buffer.from(message)
+    .toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+
+  try {
+    await gmail.users.messages.send({
+      userId: 'me',
+      requestBody: {
+        raw: encodedMessage,
+      },
+    });
+    console.log('Email sent successfully');
+  } catch (error) {
+    console.error('Error sending email:', error);
+    throw error;
   }
 }
 

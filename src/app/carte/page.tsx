@@ -81,7 +81,8 @@ export default function BusinessCardPage() {
               src="/images/joys.webp"
               alt="Joy's Hypnose"
               fill
-              className="object-contain"
+              className="object-cover"
+              style={{ objectPosition: 'center 30%' }}
               sizes="(max-width: 128px) 100vw, 128px"
             />
           </div>
@@ -135,13 +136,39 @@ export default function BusinessCardPage() {
               knzjoyce@gmail.com
             </a>
             <div className="flex items-start text-gray-600">
-              <MapPinIcon className="h-5 w-5 text-rose-400 mr-3 mt-1" />
-              <span>
-                17 Rue Bab El Mandab,<br />
-                Residence El Prado 2,<br />
-                1er étage appart #2 Bourgogne,<br />
-                Casablanca
-              </span>
+              <MapPinIcon className="h-5 w-5 text-rose-400 mr-3 mt-1 flex-shrink-0" />
+              <div>
+                <span className="block mb-2">
+                  17 Rue Bab El Mandab,<br />
+                  Residence El Prado 2,<br />
+                  1er étage appart #2 Bourgogne,<br />
+                  Casablanca
+                </span>
+                <div className="flex space-x-3 text-sm">
+                  <a
+                    href="https://www.google.com/maps/search/?api=1&query=17+Rue+Bab+El+Mandab+Residence+El+Prado+2+Bourgogne+Casablanca"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-rose-500 hover:text-rose-600"
+                  >
+                    Google Maps
+                  </a>
+                  <a
+                    href="https://waze.com/ul?q=17+Rue+Bab+El+Mandab+Residence+El+Prado+2+Bourgogne+Casablanca"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-rose-500 hover:text-rose-600"
+                  >
+                    Waze
+                  </a>
+                  <a
+                    href="maps://?address=17+Rue+Bab+El+Mandab+Residence+El+Prado+2+Bourgogne+Casablanca"
+                    className="text-rose-500 hover:text-rose-600"
+                  >
+                    Plans
+                  </a>
+                </div>
+              </div>
             </div>
             <div className="flex items-center text-gray-600">
               <CalendarIcon className="h-5 w-5 text-rose-400 mr-3" />
