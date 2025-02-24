@@ -592,4 +592,41 @@ export async function testEmailConfig() {
   }
 }
 
+export async function sendEmail(to: string, subject: string, htmlContent: string) {
+  const gmail = google.gmail({ version: 'v1', auth: await getOAuth2Client() });
+  if (!gmail) {
+    console.warn('Gmail client not initialized - skipping email');
+    return;
+  }
+
+  const message = [
+    'Content-Type: text/html; charset=utf-8',
+    'MIME-Version: 1.0',
+    `To: ${to}`,
+    'From: Joy\'s Hypnose <noreply@joyshypnose-therapies.com>',
+    `Subject: ${subject}`,
+    '',
+    htmlContent
+  ].join('\n');
+
+  const encodedMessage = Buffer.from(message)
+    .toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+
+  try {
+    await gmail.users.messages.send({
+      userId: 'me',
+      requestBody: {
+        raw: encodedMessage,
+      },
+    });
+    console.log('Email sent successfully');
+  } catch (error) {
+    console.error('Error sending email:', error);
+    throw error;
+  }
+}
+
 export { sendConfirmationEmail };
