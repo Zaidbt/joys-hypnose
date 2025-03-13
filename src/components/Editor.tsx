@@ -19,6 +19,7 @@ export default function Editor({ value = '', onChange, className = '' }: EditorP
         init={{
           height: 500,
           menubar: false,
+          disabled: false,
           plugins: [
             'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
             'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
