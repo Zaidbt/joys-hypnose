@@ -32,6 +32,7 @@ export default function Editor({ value = '', onChange, className = '' }: EditorP
           directionality: 'ltr',
           branding: false,
           promotion: false,
+          referrerpolicy: "origin"
         }}
       />
     </div>
