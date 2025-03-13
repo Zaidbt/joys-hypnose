@@ -10,10 +10,12 @@ interface EditorProps {
 }
 
 export default function Editor({ value = '', onChange, className = '' }: EditorProps) {
+  const apiKey = process.env.NEXT_PUBLIC_TINY_MCE_API_KEY || '';
+  
   return (
     <div className={className}>
       <TinyMCEEditor
-        apiKey={process.env.NEXT_PUBLIC_TINY_MCE_API_KEY}
+        apiKey={apiKey}
         value={value}
         onEditorChange={onChange}
         init={{
