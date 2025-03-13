@@ -18,10 +18,10 @@ import {
 } from '@heroicons/react/24/outline';
 import type { NewsItem, NewsType } from '@/types/news';
 
-// Dynamic import of the rich text editor to avoid SSR issues
-const Editor = dynamic(() => import('@/components/Editor'), {
+// Import RichTextEditor dynamically to avoid SSR issues
+const RichTextEditor = dynamic(() => import('@/app/components/RichTextEditor'), {
   ssr: false,
-  loading: () => <p>Loading editor...</p>,
+  loading: () => <div className="h-64 bg-gray-100 animate-pulse rounded-lg" />
 });
 
 const newsTypeIcons = {
@@ -205,10 +205,10 @@ export default function CreateNewsPage() {
                 <div className="sm:col-span-6">
                   <label className="block text-sm font-medium text-gray-700">Contenu</label>
                   <div className="mt-1">
-                    <Editor
-                      value={formData.content}
+                    <RichTextEditor
+                      value={formData.content || ''}
                       onChange={handleEditorChange}
-                      className="min-h-[400px]"
+                      placeholder="Écrivez votre contenu ici..."
                     />
                   </div>
                 </div>
