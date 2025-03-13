@@ -14,9 +14,9 @@ import type { NewsItem } from '@/types/news';
 import Link from 'next/link';
 
 // Dynamic import of the Editor to avoid SSR issues
-const Editor = dynamic(() => import('@/components/Editor'), {
+const RichTextEditor = dynamic(() => import('@/app/components/RichTextEditor'), {
   ssr: false,
-  loading: () => <p>Loading editor...</p>,
+  loading: () => <div className="h-64 bg-gray-100 animate-pulse rounded-lg" />
 });
 
 const newsTypes = [
@@ -217,13 +217,14 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
             </div>
 
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Contenu
-              </label>
-              <Editor
-                value={newsItem.content}
-                onChange={(content) => setNewsItem({ ...newsItem, content })}
-              />
+              <label className="block text-sm font-medium text-gray-700">Contenu</label>
+              <div className="mt-1">
+                <RichTextEditor
+                  value={newsItem.content}
+                  onChange={(content) => setNewsItem({ ...newsItem, content })}
+                  placeholder="Écrivez votre contenu ici..."
+                />
+              </div>
             </div>
 
             {newsItem.type === 'event' && (
