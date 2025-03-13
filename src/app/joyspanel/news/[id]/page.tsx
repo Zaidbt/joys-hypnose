@@ -10,7 +10,7 @@ import {
   MegaphoneIcon,
   ClipboardDocumentCheckIcon,
 } from '@heroicons/react/24/outline';
-import type { NewsItem } from '@/types/news';
+import type { NewsItem, NewsType } from '@/types/news';
 import Link from 'next/link';
 
 // Dynamic import of the Editor to avoid SSR issues
@@ -191,7 +191,7 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
               <select
                 id="type"
                 value={newsItem.type}
-                onChange={(e) => setNewsItem({ ...newsItem, type: e.target.value })}
+                onChange={(e) => setNewsItem({ ...newsItem, type: e.target.value as NewsType })}
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                 required
               >
@@ -252,7 +252,7 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
                 onChange={(e) => setNewsItem({ 
                   ...newsItem, 
                   status: e.target.checked ? 'published' : 'draft',
-                  publishedAt: e.target.checked ? new Date().toISOString() : newsItem.publishedAt
+                  publishedAt: e.target.checked ? new Date() : newsItem.publishedAt
                 })}
                 className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
               />
