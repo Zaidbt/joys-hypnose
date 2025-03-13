@@ -83,17 +83,19 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
   const quillRef = useRef<ReactQuill>(null);
 
   useEffect(() => {
-    // Load Google Fonts dynamically
-    const link = document.createElement('link');
-    link.href = 'https://fonts.googleapis.com/css2?family=' + fonts.map(font => 
-      font.replace(/\s+/g, '+')
-    ).join('&family=') + '&display=swap';
-    link.rel = 'stylesheet';
-    document.head.appendChild(link);
+    if (typeof window !== 'undefined') {
+      // Load Google Fonts dynamically only on client side
+      const link = document.createElement('link');
+      link.href = 'https://fonts.googleapis.com/css2?family=' + fonts.map(font => 
+        font.replace(/\s+/g, '+')
+      ).join('&family=') + '&display=swap';
+      link.rel = 'stylesheet';
+      document.head.appendChild(link);
 
-    return () => {
-      document.head.removeChild(link);
-    };
+      return () => {
+        document.head.removeChild(link);
+      };
+    }
   }, []);
 
   const modules = {
