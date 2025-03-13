@@ -207,7 +207,7 @@ export default function CreateNewsPage() {
                   <div className="mt-1">
                     <RichTextEditor
                       value={formData.content || ''}
-                      onChange={handleEditorChange}
+                      onChange={(content: string) => handleEditorChange(content)}
                       placeholder="Écrivez votre contenu ici..."
                     />
                   </div>
