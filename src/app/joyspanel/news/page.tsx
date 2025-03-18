@@ -248,11 +248,26 @@ export default function NewsPage() {
                           <div className="flex items-center">
                             <div className="h-10 w-10 flex-shrink-0">
                               {item.image ? (
-                                <img
-                                  className="h-10 w-10 rounded-full object-cover"
-                                  src={item.image}
-                                  alt=""
-                                />
+                                <div className="relative group">
+                                  <img
+                                    className="h-10 w-10 rounded-full object-cover"
+                                    src={item.image}
+                                    alt=""
+                                  />
+                                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black bg-opacity-50 rounded-full">
+                                    <a
+                                      href={item.image}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-white hover:text-primary-200"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                      }}
+                                    >
+                                      <EyeIcon className="h-5 w-5" />
+                                    </a>
+                                  </div>
+                                </div>
                               ) : (
                                 <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
                                   <Icon className="h-6 w-6 text-primary-600" />

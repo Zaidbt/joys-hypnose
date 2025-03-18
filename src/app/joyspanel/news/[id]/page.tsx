@@ -10,7 +10,7 @@ import {
   MegaphoneIcon,
   ClipboardDocumentCheckIcon,
 } from '@heroicons/react/24/outline';
-import type { NewsItem } from '@/types/news';
+import type { NewsItem, NewsType } from '@/types/news';
 import Link from 'next/link';
 
 // Dynamic import of the Editor to avoid SSR issues
@@ -191,7 +191,7 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
               <select
                 id="type"
                 value={newsItem.type}
-                onChange={(e) => setNewsItem({ ...newsItem, type: e.target.value })}
+                onChange={(e) => setNewsItem({ ...newsItem, type: e.target.value as NewsType })}
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                 required
               >
@@ -227,18 +227,56 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
             </div>
 
             {newsItem.type === 'event' && (
-              <div className="mb-6">
-                <label htmlFor="eventLocation" className="block text-sm font-medium text-gray-700 mb-1">
-                  Lieu de l'événement
-                </label>
-                <input
-                  type="text"
-                  id="eventLocation"
-                  value={newsItem.eventLocation || ''}
-                  onChange={(e) => setNewsItem({ ...newsItem, eventLocation: e.target.value })}
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                />
-              </div>
+              <>
+                <div className="mb-6">
+                  <label htmlFor="eventDate" className="block text-sm font-medium text-gray-700 mb-1">
+                    Date de l'événement
+                  </label>
+                  <input
+                    type="datetime-local"
+                    id="eventDate"
+                    value={newsItem.eventDate ? new Date(newsItem.eventDate).toISOString().slice(0, 16) : ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setNewsItem({
+                        ...newsItem,
+                        eventDate: value ? new Date(value) : undefined
+                      });
+                    }}
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                  />
+                </div>
+                <div className="mb-6">
+                  <label htmlFor="eventEndDate" className="block text-sm font-medium text-gray-700 mb-1">
+                    Date de fin
+                  </label>
+                  <input
+                    type="datetime-local"
+                    id="eventEndDate"
+                    value={newsItem.eventEndDate ? new Date(newsItem.eventEndDate).toISOString().slice(0, 16) : ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setNewsItem({
+                        ...newsItem,
+                        eventEndDate: value ? new Date(value) : undefined
+                      });
+                    }}
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                  />
+                </div>
+                <div className="mb-6">
+                  <label htmlFor="eventLocation" className="block text-sm font-medium text-gray-700 mb-1">
+                    Lieu de l'événement
+                  </label>
+                  <input
+                    type="text"
+                    id="eventLocation"
+                    value={newsItem.eventLocation || ''}
+                    onChange={(e) => setNewsItem({ ...newsItem, eventLocation: e.target.value })}
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                  />
+                </div>
+              </>
             )}
           </div>
 
@@ -251,7 +289,7 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
                 onChange={(e) => setNewsItem({ 
                   ...newsItem, 
                   status: e.target.checked ? 'published' : 'draft',
-                  publishedAt: e.target.checked ? new Date().toISOString() : newsItem.publishedAt
+                  publishedAt: e.target.checked ? new Date() : newsItem.publishedAt
                 })}
                 className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
               />
