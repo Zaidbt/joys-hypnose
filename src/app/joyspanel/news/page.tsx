@@ -139,7 +139,7 @@ export default function NewsPage() {
       {/* Header */}
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
-          <h1 className="text-2xl font-semibold text-gray-900">Actualités</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">Actualités - TEST PHRASE</h1>
           <p className="mt-2 text-sm text-gray-700">
             Gérez vos actualités, événements et articles de presse
           </p>
