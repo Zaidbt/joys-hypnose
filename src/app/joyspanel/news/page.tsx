@@ -217,19 +217,19 @@ export default function NewsPage() {
               <table className="min-w-full divide-y divide-gray-300">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                    <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 w-[40%]">
                       Titre
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-[20%]">
                       Type
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-[20%]">
                       Date
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-[10%]">
                       Statut
                     </th>
-                    <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                    <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6 w-[10%]">
                       <span className="sr-only">Actions</span>
                     </th>
                   </tr>
@@ -244,7 +244,7 @@ export default function NewsPage() {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                       >
-                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                        <td className="py-4 pl-4 pr-3 text-sm sm:pl-6">
                           <div className="flex items-center">
                             <div className="h-10 w-10 flex-shrink-0">
                               {item.image ? (
@@ -274,10 +274,10 @@ export default function NewsPage() {
                                 </div>
                               )}
                             </div>
-                            <div className="ml-4">
-                              <div className="font-medium text-gray-900">{item.title}</div>
+                            <div className="ml-4 max-w-xs">
+                              <div className="font-medium text-gray-900 truncate">{item.title}</div>
                               {item.excerpt && (
-                                <div className="text-gray-500">{item.excerpt}</div>
+                                <div className="text-gray-500 truncate">{item.excerpt}</div>
                               )}
                             </div>
                           </div>
