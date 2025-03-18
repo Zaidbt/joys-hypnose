@@ -9,6 +9,8 @@ import {
   NewspaperIcon,
   MegaphoneIcon,
   ClipboardDocumentCheckIcon,
+  PhotoIcon,
+  EyeIcon,
 } from '@heroicons/react/24/outline';
 import type { NewsItem, NewsType } from '@/types/news';
 import Link from 'next/link';
@@ -204,16 +206,75 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
             </div>
 
             <div className="mb-6">
-              <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-1">
-                Image URL
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Image
               </label>
-              <input
-                type="text"
-                id="image"
-                value={newsItem.image || ''}
-                onChange={(e) => setNewsItem({ ...newsItem, image: e.target.value })}
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-              />
+              <div className="mt-1">
+                {newsItem.image ? (
+                  <div className="relative">
+                    <img
+                      src={newsItem.image}
+                      alt={newsItem.title}
+                      className="h-48 w-full object-cover rounded-lg"
+                    />
+                    <div className="absolute top-2 right-2 flex space-x-2">
+                      <a
+                        href={newsItem.image}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-2 bg-white rounded-full shadow-lg hover:bg-gray-100"
+                        title="View full image"
+                      >
+                        <EyeIcon className="h-5 w-5 text-gray-600" />
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => setNewsItem({ ...newsItem, image: undefined })}
+                        className="p-2 bg-white rounded-full shadow-lg hover:bg-gray-100"
+                        title="Remove image"
+                      >
+                        <span className="text-red-600">&times;</span>
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
+                    <div className="space-y-1 text-center">
+                      <PhotoIcon className="mx-auto h-12 w-12 text-gray-400" />
+                      <div className="flex text-sm text-gray-600">
+                        <label htmlFor="image-upload" className="relative cursor-pointer rounded-md bg-white font-medium text-primary-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-primary-500 focus-within:ring-offset-2 hover:text-primary-500">
+                          <span>Upload an image</span>
+                          <input
+                            id="image-upload"
+                            name="image-upload"
+                            type="file"
+                            accept="image/*"
+                            className="sr-only"
+                            onChange={async (e) => {
+                              if (!e.target.files?.[0]) return;
+                              const file = e.target.files[0];
+                              const formData = new FormData();
+                              formData.append('file', file);
+                              try {
+                                const response = await fetch('/api/upload', {
+                                  method: 'POST',
+                                  body: formData,
+                                });
+                                if (!response.ok) throw new Error('Failed to upload image');
+                                const data = await response.json();
+                                setNewsItem({ ...newsItem, image: data.url });
+                              } catch (error) {
+                                setError('Failed to upload image');
+                              }
+                            }}
+                          />
+                        </label>
+                      </div>
+                      <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="mb-6">
